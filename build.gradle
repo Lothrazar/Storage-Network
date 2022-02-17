@@ -20,7 +20,7 @@ import groovy.json.JsonOutput
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' 
 
 minecraft {
-    mappings channel: 'stable', version: '39'
+    mappings channel: 'stable', version: '39-1.12'
 	
    // version = "${mc_version}-${forge_version}"
 
