@@ -26,7 +26,7 @@ public class ContainerFastRequest extends ContainerFastNetworkCrafter {
     this.inventorySlots.clear();
     this.inventoryItemStacks.clear();
     for (int i = 0; i < 9; i++) {
-      if (i != 8) this.craftMatrix.stackList.set(i, tile.matrix.getOrDefault(i, ItemStack.EMPTY));
+      if (i != 8) this.craftMatrix.setInventorySlotContents(i, tile.matrix.getOrDefault(i, ItemStack.EMPTY));
       else this.craftMatrix.setInventorySlotContents(i, tile.matrix.getOrDefault(i, ItemStack.EMPTY));
     }
     SlotCraftingNetwork slotCraftOutput = new SlotCraftingNetwork(player, craftMatrix, craftResult, 0, 101, 128);

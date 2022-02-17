@@ -27,8 +27,8 @@ public class ContainerFastRemote extends ContainerFastNetworkCrafter {
     this.inventorySlots.clear();
     this.inventoryItemStacks.clear();
     for (int i = 0; i < 9; i++) {
-      if (i != 8) this.craftMatrix.stackList.set(i, NBTHelper.getItemStack(remoteItemStack, "c" + i));
-      else this.craftMatrix.setInventorySlotContents(i, NBTHelper.getItemStack(remoteItemStack, "c" + i));
+      if (i != 8) craftMatrix.setInventorySlotContents(i, NBTHelper.getItemStack(remoteItemStack, "c" + i));
+      else craftMatrix.setInventorySlotContents(i, NBTHelper.getItemStack(remoteItemStack, "c" + i));
     }
     SlotCraftingNetwork slotCraftOutput = new SlotCraftingNetwork(player, craftMatrix, craftResult, 0, 101, 128);
     slotCraftOutput.setTileMaster(this.getTileMaster());

@@ -138,7 +138,7 @@ public abstract class ContainerFastNetworkCrafter extends ContainerFastBench imp
       if (!world.isRemote) {
         ItemStack[] lastItems = new ItemStack[9];
         for (int i = 0; i < 9; i++) {
-          lastItems[i] = this.craftMatrix.getStackInSlot(i).copy();
+          lastItems[i] = craftMatrix.getStackInSlot(i).copy();
         }
         IRecipe rec = lastRecipe;
         ItemStack take = super.onTake(player, stack);
@@ -191,7 +191,7 @@ public abstract class ContainerFastNetworkCrafter extends ContainerFastBench imp
       for (int i = 0; i < 9; i++) {
         if (matrix.getStackInSlot(i).isEmpty()) {
           ItemStack cached = requests[i];
-          if (!cached.isEmpty()) matrix.stackList.set(i, slot.getTileMaster().request(new ItemStackMatcher(cached, true, false, cached.hasTagCompound()), two ? 1 : cached.getMaxStackSize(), false));
+          if (!cached.isEmpty()) matrix.setInventorySlotContents(i, slot.getTileMaster().request(new ItemStackMatcher(cached, true, false, cached.hasTagCompound()), two ? 1 : cached.getMaxStackSize(), false));
         }
       }
       return;
@@ -251,7 +251,7 @@ public abstract class ContainerFastNetworkCrafter extends ContainerFastBench imp
         taken.put(oldStackPack, taken.get(oldStackPack) + desired);
         ItemStack stack = oldStack.copy();
         stack.setCount(desired);
-        matrix.stackList.set(i, stack);
+        matrix.setInventorySlotContents(i, stack);
       }
     }
     //Deal with the remainder
