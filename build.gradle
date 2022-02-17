@@ -1,79 +1,101 @@
 buildscript {
     repositories {
-        jcenter()
         maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3+'
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
 
 version = "${mc_version}-${mod_version}"
-group= "mrriegel.storagenetwork"
+group = "mrriegel.storagenetwork"
 archivesBaseName = "SimpleStorageNetwork"
 
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
+import net.minecraftforge.gradle.common.task.SignJar
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' 
 
 minecraft {
-    version = "${mc_version}-${forge_version}"
-    runDir = "run"
-    mappings = "stable_39"
-    makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    useDepAts = true
-    replace '@FINGERPRINT@', project.findProperty('signSHA1')
-	replaceIn "StorageNetwork.java"
-    replace "@VERSION@", "${mod_version}"
-}
-task signJar(type: SignJar, dependsOn: reobfJar) {
+    mappings channel: 'stable', version: '39'
+	
+   // version = "${mc_version}-${forge_version}"
 
-     // Skips if the keyStore property is missing.
-    onlyIf {
-        project.hasProperty('keyStore')
-    }
 
-     // findProperty allows us to reference the property without it existing.
-    // Using project.propName would cause the script to fail validation if
-    // the property did not exist.
-    keyStore = project.findProperty('keyStore')
-    alias = project.findProperty('keyStoreAlias')
-    storePass = project.findProperty('keyStorePass')
-    keyPass = project.findProperty('keyStoreKeyPass')
-    inputFile = jar.archivePath
-    outputFile = jar.archivePath
-}
-// Runs this task automatically when build is ran.
-build.dependsOn signJar
+    runs {
+        client {
+            workingDirectory project.file('run')
 
-repositories {
-    maven { // JEI
-        url "http://dvs1.progwml6.com/files/maven"
-    }
-    maven { //Guide API
-        url "http://tehnut.info/maven/"
-    }
-    maven {
-        url = "http://minecraft.curseforge.com/api/maven/"
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+        }
+
+        server {
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+        }
     }
 }
+
+
 dependencies {
-   deobfCompile "mezz.jei:jei_${mc_version}:${jei_version}"
-   deobfCompile "fastworkbench:FastWorkbench:${mc_version}:${fb_version}"
+ // {mc_version}-${forge_version}
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
+
+
+   implementation "mezz.jei:jei_${mc_version}:${jei_version}"
+   implementation "fastworkbench:FastWorkbench:${mc_version}:${fb_version}"
 //  optional:
 //   deobfCompile "compact-machines:compactmachines3-${mc_version}:${cm_version}:${cm_build}" 
 }
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+
+//task signJar(type: SignJar, dependsOn: reobfJar) {
+//
+//     // Skips if the keyStore property is missing.
+//    onlyIf {
+//        project.hasProperty('keyStore')
+//    }
+//
+//     // findProperty allows us to reference the property without it existing.
+//    // Using project.propName would cause the script to fail validation if
+//    // the property did not exist.
+//    keyStore = project.findProperty('keyStore')
+//    alias = project.findProperty('keyStoreAlias')
+//    storePass = project.findProperty('keyStorePass')
+//    keyPass = project.findProperty('keyStoreKeyPass')
+//    inputFile = jar.archivePath
+//    outputFile = jar.archivePath
+//}
+//// Runs this task automatically when build is ran.
+//build.dependsOn signJar
+
+repositories {
+    maven { // JEI
+        url "https://dvs1.progwml6.com/files/maven"
     }
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+ //   maven { //Guide API
+  //      url "http://tehnut.info/maven/"
+   // }
+    maven {
+        url = "https://minecraft.curseforge.com/api/maven/"
     }
 }
+// Example configuration to allow publishing using the maven-publish task
+// This is the preferred method to reobfuscate your jar file
+jar.finalizedBy('reobfJar') 
+// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
+//publish.dependsOn('reobfJar')
+
+
+
