@@ -34,7 +34,7 @@ public class GuiControl extends GuiContainer {
 
   private static final int HEIGHT = 256;
   private static final int WIDTH = 176;
-  private static final ResourceLocation texture = new ResourceLocation(StorageNetwork.MODID, "textures/gui/request_full.png");
+  private static final ResourceLocation texture = new ResourceLocation(StorageNetwork.MODID, "textures/gui/control.png");
   //private TileControl tile;
   protected GuiTextField searchBar;
   //list includes search bar
@@ -311,6 +311,7 @@ public class GuiControl extends GuiContainer {
   @Override
   public void drawScreen(int mouseX, int mouseY, float partialTicks) {
     super.drawScreen(mouseX, mouseY, partialTicks);
+    super.renderHoveredToolTip(mouseX, mouseY);
     if (this.searchBar != null) {
       this.searchBar.drawTextBox();
     }
@@ -438,10 +439,11 @@ public class GuiControl extends GuiContainer {
 
   @Override
   protected void keyTyped(char typedChar, int keyCode) throws IOException {
-    super.keyTyped(typedChar, keyCode);
     if (this.searchBar != null && this.searchBar.isFocused()) {
-      this.searchBar.textboxKeyTyped(typedChar, keyCode);
+      if (this.searchBar.textboxKeyTyped(typedChar, keyCode))
+        return;
     }
+    super.keyTyped(typedChar, keyCode);
   }
 
   /**
