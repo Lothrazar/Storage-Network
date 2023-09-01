@@ -20,6 +20,7 @@ public class JeiPlugin implements IModPlugin {
     registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandler<>(ContainerRequest.class), VanillaRecipeCategoryUid.CRAFTING);
     registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandlerRemote<>(ContainerRemote.class), VanillaRecipeCategoryUid.CRAFTING);
     registry.addRecipeCatalyst(new ItemStack(ModBlocks.request), VanillaRecipeCategoryUid.CRAFTING);
+    registry.getRecipeTransferRegistry().addUniversalRecipeTransferHandler(new ProcessRecipeTransferHandler());
     if (GuiHandler.FB_LOADED) {
       registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandler<>(ContainerFastRequest.class), VanillaRecipeCategoryUid.CRAFTING);
       registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandlerRemote<>(ContainerFastRemote.class), VanillaRecipeCategoryUid.CRAFTING);
