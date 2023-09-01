@@ -1,6 +1,7 @@
 package mrriegel.storagenetwork.block.master;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -224,6 +225,7 @@ public class TileMaster extends TileEntity implements ITickable, INetworkMaster 
     }
     // 3. Otherwise try to find a new inventory that can take the remainder of the itemstack
     List<IConnectableLink> storages = getSortedConnectableStorage();
+    Collections.reverse(storages);
     for (IConnectableLink storage : storages) {
       // Ignore storages that can not import
       if (!storage.getSupportedTransferDirection().match(EnumStorageDirection.IN)) {
