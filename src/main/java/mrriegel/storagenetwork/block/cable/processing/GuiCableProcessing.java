@@ -10,7 +10,6 @@ import mrriegel.storagenetwork.gui.IPublicGuiContainer;
 import mrriegel.storagenetwork.gui.ItemSlotNetwork;
 import mrriegel.storagenetwork.network.CableDataMessage;
 import mrriegel.storagenetwork.network.CableDataMessage.CableMessageType;
-import mrriegel.storagenetwork.network.CableFilterMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
 import mrriegel.storagenetwork.util.inventory.FilterItemStackHandler;
 import net.minecraft.client.gui.GuiButton;

@@ -17,14 +17,14 @@ public class JeiPlugin implements IModPlugin {
 
   @Override
   public void register(IModRegistry registry) {
-    registry.getRecipeTransferRegistry().addUniversalRecipeTransferHandler(new RequestRecipeTransferHandler<>(ContainerRequest.class));
-    registry.getRecipeTransferRegistry().addUniversalRecipeTransferHandler(new RequestRecipeTransferHandlerRemote<>(ContainerRemote.class));
+    registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandler<>(ContainerRequest.class), VanillaRecipeCategoryUid.CRAFTING);
+    registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandlerRemote<>(ContainerRemote.class), VanillaRecipeCategoryUid.CRAFTING);
     registry.addRecipeCatalyst(new ItemStack(ModBlocks.request), VanillaRecipeCategoryUid.CRAFTING);
     if (GuiHandler.FB_LOADED) {
-      registry.getRecipeTransferRegistry().addUniversalRecipeTransferHandler(new RequestRecipeTransferHandler<>(ContainerFastRequest.class));
-      registry.getRecipeTransferRegistry().addUniversalRecipeTransferHandler(new RequestRecipeTransferHandlerRemote<>(ContainerFastRemote.class));
-      registry.getRecipeTransferRegistry().addUniversalRecipeTransferHandler(new RequestRecipeTransferHandler<>(ContainerFastRequest.Client.class));
-      registry.getRecipeTransferRegistry().addUniversalRecipeTransferHandler(new RequestRecipeTransferHandlerRemote<>(ContainerFastRemote.Client.class));
+      registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandler<>(ContainerFastRequest.class), VanillaRecipeCategoryUid.CRAFTING);
+      registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandlerRemote<>(ContainerFastRemote.class), VanillaRecipeCategoryUid.CRAFTING);
+      registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandler<>(ContainerFastRequest.Client.class), VanillaRecipeCategoryUid.CRAFTING);
+      registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RequestRecipeTransferHandlerRemote<>(ContainerFastRemote.Client.class), VanillaRecipeCategoryUid.CRAFTING);
     }
   }
 }
