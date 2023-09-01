@@ -136,12 +136,9 @@ public abstract class GuiCableBase extends GuiContainer {
       FilterItemStackHandler stackHandler = getFilterHandler();
       PacketRegistry.INSTANCE.sendToServer(new CableFilterMessage(i, itemSlot.getStack(), stackHandler.ores, stackHandler.meta, stackHandler.nbt));
       //for anyone to override
-      mouseWheelOverSlot(i, wheelUp);
       return;
     }
   }
-
-  protected void mouseWheelOverSlot(int slot, boolean wheelUp) {}
 
   @Override
   public void drawScreen(int mouseX, int mouseY, float partialTicks) {

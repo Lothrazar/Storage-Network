@@ -43,6 +43,9 @@ public class CableFilterMessage implements IMessage, IMessageHandler<CableFilter
         TileCable tileCable = ((ContainerCable) player.openContainer).tile;
         if (tileCable instanceof TileCableProcess) {
           TileCableProcess processCable = (TileCableProcess) tileCable;
+          if (message.stack != null && message.index >= 0) {
+            processCable.filters.setStackInSlot(message.index, message.stack);
+          }
           processCable.filters.ores = message.ore;
           processCable.filters.meta = message.meta;
           processCable.filters.nbt = message.nbt;
