@@ -3,6 +3,8 @@ package mrriegel.storagenetwork.block.cable.processing;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+
+import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.block.cable.TileCableWithFacing;
 import mrriegel.storagenetwork.block.master.TileMaster;
 import mrriegel.storagenetwork.data.ItemStackMatcher;
@@ -50,7 +52,7 @@ public class TileCableProcess extends TileCableWithFacing {
       return;
     }
     if (processRequest.isAlwaysActive() == false && processRequest.getCount() <= 0) {
-      return; //no more left to do
+      return; // no more left to do
     }
     if (getMaster() == null || getMaster().getTileEntity(TileMaster.class) == null) {
       return;
@@ -58,106 +60,90 @@ public class TileCableProcess extends TileCableWithFacing {
     if (!hasDirection()) {
       return;
     }
-    TileMaster master = getMaster().getTileEntity(TileMaster.class);
-    //now check item filter for input/output
+    // now check item filter for input/output
     List<ItemStack> ingredients = getProcessIngredients();
-    //well should this only be a single output?
+    // well should this only be a single output?
     List<ItemStack> outputs = getProcessOutputs();
-    //EXAMPLE REQUEST:
-    //automate a furnace:
+    if (ingredients.size() == 0 || outputs.size() == 0) {
+      return;
+    }
+    TileMaster master = getMaster().getTileEntity(TileMaster.class);
+    // EXAMPLE REQUEST:
+    // automate a furnace:
     // ingredient is one cobblestone (network provides-exports this)
     // output is one smoothstone (network gets-imports this)
-    //
-    IItemHandler inventoryLinked = UtilInventory.getItemHandler(world.getTileEntity(this.getFacingPosition()), getDirection().getOpposite());
-    //      StorageNetwork.log("ST " + request.getStatus() + "  ingredients " + ingredients.size());
-    //we need to input ingredients FROM network into target
-    //PROBLEM: two ingredients: dirt + gravel
-    // network has tons dirt, no gravel.
-    //it will insert dirt, skip gravel, stay on exporting
-    //and keep sending dirt forever
-    // StorageNetwork.log("exporting SIZE = " + ingredients.size() + "/" + tileCable.getPos());
-    if (processRequest.getStatus() == ProcessRequestModel.ProcessStatus.EXPORTING && ingredients.size() > 0) { //EXPORTING:from network to inventory . also default state
-      //also TOP ROW
-      //NEW : this mode more stubborn. ex auto crafter.
-      //if the target already has items, who cares, i was told to be in export mode so export a set if possible right away always.
-      //then (assuming that works or even if not)
-      //check if it has required
-      //does the target have everything it needs, yes or no
-      //look for full set,
-      //if we get all
-      boolean simulate = true;
-      int numSatisfiedIngredients = 0;
-      for (ItemStack ingred : ingredients) {
-        //  how many are needed. request them
-        //true is using nbt
-        inventoryLinked = UtilInventory.getItemHandler(world.getTileEntity(this.getFacingPosition()), this.getFacingTopRow());
-        ItemStack requestedFromNetwork = master.request(
-            new ItemStackMatcher(ingred.copy(), this.filters.meta, this.filters.ores, this.filters.nbt),
-            ingred.getCount(), simulate);//false means 4real, no simulate
+    if (processRequest.getStatus() == ProcessRequestModel.ProcessStatus.EXPORTING) {
+      // insert ingredients one by one instead of all at once to be more effecient
+      // with item requests
+      // keep track of inserted ingredients with stackIndex and make sure to start at
+      // the right one
+      boolean exportedAll = true;
+      for (ItemStack ingred : ingredients.subList(processRequest.getStackIndex(), ingredients.size())) {
+        ItemStackMatcher matcher = new ItemStackMatcher(ingred.copy(), this.filters.meta, this.filters.ores,
+            this.filters.nbt);
+        ItemStack requestedFromNetwork = master.request(matcher, ingred.getCount(), true);
         int found = requestedFromNetwork.getCount();
-        //   StorageNetwork.log("ingr size " + ingred.getSize() + " found +" + found + " of " + ingred.getStack().getDisplayName());
-        ItemStack remain = ItemHandlerHelper.insertItemStacked(inventoryLinked, requestedFromNetwork, simulate);
+        // StorageNetwork.log("ingr size " + ingred.getSize() + " found +" + found + "
+        // of " + ingred.getStack().getDisplayName());
+        IItemHandler inventoryLinked = UtilInventory.getItemHandler(world.getTileEntity(this.getFacingPosition()),
+            this.getFacingTopRow());
+        ItemStack remain = ItemHandlerHelper.insertItemStacked(inventoryLinked, requestedFromNetwork, true);
         if (remain.isEmpty() && found >= ingred.getCount()) {
-          numSatisfiedIngredients++;
-          //then do it for real
-          //            simulate = false;
-          //            requestedFromNetwork = this.request(new ItemStackMatcher(ingred.getStack()), ingred.getSize(), simulate);//false means 4real, no simulate
-          //            remain = ItemHandlerHelper.insertItemStacked(inventoryLinked, requestedFromNetwork, simulate);
-          //done
-          //now count whats needed, SHOULD be zero
-        }
-        //          int manyMoreNeeded = UtilInventory.containsAtLeastHowManyNeeded(inventoryLinked, ingred.getStack(), ingred.getSize());
-        //          if (manyMoreNeeded == 0) {
-        //            //ok it has ingredients here
-        //          }
-      } //end loop on ingredients
-      //NOW do real inserts
-      //   StorageNetwork.log("satisfied # + " + numSatisfiedIngredients + " / " + ingredients.size());
-      if (numSatisfiedIngredients == ingredients.size()) {
-        //and if we can insert all
-        //then complete transaction (get and put items)
-        simulate = false;
-        for (ItemStack ingred : ingredients) {
-          ItemStack requestedFromNetwork = master.request(new ItemStackMatcher(ingred), ingred.getCount(), simulate);//false means 4real, no simulate
-          ItemHandlerHelper.insertItemStacked(inventoryLinked, requestedFromNetwork, simulate);
-        }
-        //flip that waitingResult flag on request (and save)
-        processRequest.setStatus(ProcessRequestModel.ProcessStatus.IMPORTING);
-        this.setRequest(processRequest);
-      }
-    }
-    else if (processRequest.getStatus() == ProcessRequestModel.ProcessStatus.IMPORTING && outputs.size() > 0) { //from inventory to network
-      //try to find/get from the blocks outputs into network
-      // look for "output" items that can be   from target
-      for (ItemStack out : outputs) {
-        //pull this many from targe
-        inventoryLinked = UtilInventory.getItemHandler(world.getTileEntity(this.getFacingPosition()), this.getFacingBottomRow());
-        boolean simulate = true;
-        int targetStillNeeds = UtilInventory.containsAtLeastHowManyNeeded(inventoryLinked, out, out.getCount());//.extractItem(inventoryLinked, new ItemStackMatcher(out.getStack().copy()), out.getSize(), simulate);
-        ItemStack stackToMove = out.copy();
-        //  StorageNetwork.log("IMPORTING: " + stackToMove.toString());
-        stackToMove.setCount(out.getCount());
-        int countNotInserted = master.insertStack(stackToMove, simulate);
-        if (countNotInserted == 0 && targetStillNeeds == 0) { //extracted.getCount() == out.getSize() && countNotInserted == extracted.getCount()) {
-          //success
-          simulate = false;
-          //new extract item using capabilityies
-          UtilInventory.extractItem(inventoryLinked, new ItemStackMatcher(out), out.getCount(), simulate);
-          countNotInserted = master.insertStack(stackToMove, simulate);
-          // IF all found
-          //then complete extraction (and insert into network)
-          //then toggle that waitingResult flag on request (and save)
-          processRequest.setStatus(ProcessRequestModel.ProcessStatus.EXPORTING);
-          //  StorageNetwork.log("IMPORTING: TO STATUS EXPORTING  ");
-          this.setRequest(processRequest);
-          //we got what we needed
-          if (processRequest.isAlwaysActive() == false) {
-            processRequest.reduceCount();
+          // then do it for real
+          requestedFromNetwork = master.request(matcher, ingred.getCount(), false);
+          remain = ItemHandlerHelper.insertItemStacked(inventoryLinked, requestedFromNetwork, false);
+          if (!remain.isEmpty()) {
+            StorageNetwork.log("ingr" + ingred.getDisplayName() + " had "
+                + remain.getCount() + " left after insertion");
           }
+          // done inserting item, increment it in the request
+          processRequest.increaseStackIndex();
+        } else {
+          // couldn't insert item, wait to insert more or change mode until we succeed
+          exportedAll = false;
+          break;
+        }
+      } // end loop on ingredients
+      if (exportedAll) {
+        processRequest.setStatus(ProcessRequestModel.ProcessStatus.IMPORTING);
+      }
+    } else if (processRequest.getStatus() == ProcessRequestModel.ProcessStatus.IMPORTING) {
+      // try to find/get from the blocks outputs into network
+      // look for "output" items that can be from target
+      // do one by one here as well because we can
+      boolean importedAll = true;
+      for (ItemStack out : outputs.subList(processRequest.getStackIndex(), outputs.size())) {
+        // pull this many from target
+        IItemHandler inventoryLinked = UtilInventory.getItemHandler(world.getTileEntity(this.getFacingPosition()),
+            this.getFacingBottomRow());
+        // make sure the target has all the items we want to import
+        int targetStillNeeds = UtilInventory.containsAtLeastHowManyNeeded(inventoryLinked, out, out.getCount());
+        if (targetStillNeeds > 0) {
+          importedAll = false;
+          break;
+        }
+        // make sure we are able to import all the items
+        int countNotInserted = master.insertStack(out, true);
+        if (countNotInserted > 0) {
+          importedAll = false;
+          break;
+        }
+        // StorageNetwork.log("IMPORTING: " + out.toString());
+        // new extract item using capabilities
+        ItemStack extracted = UtilInventory.extractItem(inventoryLinked, new ItemStackMatcher(out), out.getCount(), false);
+        master.insertStack(extracted, false);
+        // done importing item, increment it in the request
+        processRequest.increaseStackIndex();
+      }
+      if (importedAll) {
+        // change mode back to exporting
+        // StorageNetwork.log("IMPORTING: TO STATUS EXPORTING ");
+        processRequest.setStatus(ProcessRequestModel.ProcessStatus.EXPORTING);
+        if (processRequest.isAlwaysActive() == false) {
+          processRequest.reduceCount();
         }
       }
     }
-    this.setRequest(processRequest);
     this.markDirty();
   }
 
@@ -193,8 +179,9 @@ public class TileCableProcess extends TileCableWithFacing {
     this.processModel = processModel;
   }
 
-  //TODO: also list of requests ordered . and nbt saved
-  // where a process terminal lists some nodes and I "turn node on for 6 cycles" and it keeps track, maybe stuck after 2.
+  // TODO: also list of requests ordered . and nbt saved
+  // where a process terminal lists some nodes and I "turn node on for 6 cycles"
+  // and it keeps track, maybe stuck after 2.
   public ProcessRequestModel getRequest() {
     return getProcessModel();
   }
