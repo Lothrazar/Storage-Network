@@ -1,7 +1,7 @@
 package mrriegel.storagenetwork.util.inventory;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import mrriegel.storagenetwork.api.data.IItemStackMatcher;
 import mrriegel.storagenetwork.data.ItemStackMatcher;
@@ -42,7 +42,13 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
   }
 
   public List<IItemStackMatcher> getStackMatchers() {
-    return getStacks().stream().map(stack -> new ItemStackMatcher(stack, meta, ores, nbt)).collect(Collectors.toList());
+    List<ItemStack> storedStacks = getStacks();
+    List<IItemStackMatcher> ret = new ArrayList<>(storedStacks.size());
+    for (ItemStack stack : storedStacks) {
+      if (!stack.isEmpty())
+        ret.add(new ItemStackMatcher(stack, meta, ores, nbt));
+    }
+    return ret;
   }
 
   public void clear() {

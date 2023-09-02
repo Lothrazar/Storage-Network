@@ -151,30 +151,26 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
     ItemStack firstMatchedStack = ItemStack.EMPTY;
     int remaining = size;
     for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
-      //force simulate: allow them to not let me see the stack, also dont extract since it might steal/dupe
-      ItemStack stack = itemHandler.extractItem(slot, remaining, true);//itemHandler.getStackInSlot(slot);
-      if (stack == null || stack.isEmpty()) {
+      // first check if we should bother trying to extract the item
+      ItemStack check = itemHandler.getStackInSlot(slot);
+      if (check == null || check.isEmpty() || filters.isStackFiltered(check) || !matcher.match(check)) {
         continue;
       }
-      // Ignore stacks that are filtered
-      if (this.filters.isStackFiltered(stack)) {
+      // now try for real (or for simulate)
+      ItemStack extracted = itemHandler.extractItem(slot, remaining, simulate);
+      if (extracted == null || extracted.isEmpty() || filters.isStackFiltered(extracted) || !matcher.match(extracted)) {
         continue;
       }
       // If its not even the item type we're looking for -> continue
       if (firstMatchedStack.isEmpty()) {
-        if (!matcher.match(stack)) {
-          continue;
-        }
-        firstMatchedStack = stack.copy();
+        firstMatchedStack = extracted;
       }
       else {
-        if (!ItemHandlerHelper.canItemStacksStack(firstMatchedStack, stack)) {
+        if (!ItemHandlerHelper.canItemStacksStack(firstMatchedStack, extracted)) {
           continue;
         }
       }
-      int toExtract = Math.min(stack.getCount(), remaining);
-      ItemStack extractedStack = itemHandler.extractItem(slot, toExtract, simulate);
-      remaining -= extractedStack.getCount();
+      remaining -= extracted.getCount();
       if (remaining <= 0) {
         break;
       }

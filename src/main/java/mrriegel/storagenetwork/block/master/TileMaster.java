@@ -200,6 +200,7 @@ public class TileMaster extends TileEntity implements ITickable, INetworkMaster 
     }
     // 1. Try to insert into a recent slot for the same item.
     //    We do this to avoid having to search for the appropriate inventory repeatedly.
+    // (nothing appears to ever be added to the cache as far as I can tell, as it might break priority)
     String key = getStackKey(stack);
     if (hasCachedSlot(stack)) {
       DimPos cachedStoragePos = getCachedSlot(stack);
@@ -237,6 +238,9 @@ public class TileMaster extends TileEntity implements ITickable, INetworkMaster 
       }
       // If it can we need to know, i.e. store the remainder
       stack = storage.insertStack(stack, simulate);
+      if (stack.isEmpty()) {
+        break;
+      }
     }
     return stack.getCount();
   }
