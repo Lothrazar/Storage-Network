@@ -73,8 +73,8 @@ gui.storagenetwork.gui.whitelist=Allow-list
 gui.storagenetwork.gui.blacklist=Ignore-list
 
 gui.storagenetwork.sort=Sort Direction
-gui.storagenetwork.priority.up=Demote Priority (smaller goes first)
-gui.storagenetwork.priority.down=Promote Priority (smaller goes first)
+gui.storagenetwork.priority.up=Promote Priority
+gui.storagenetwork.priority.down=Demote Priority
 
 gui.storagenetwork.req.tooltip_NAME=Sort by name
 gui.storagenetwork.req.tooltip_MOD=Sort by mod
