@@ -75,7 +75,7 @@ public class GuiCableLink extends GuiCable {
       for (int col = 0; col < cols; col++) {
         ItemStack stack = containerCableLink.link.filters.getStackInSlot(index);
         int x = 8 + col * SLOT_SIZE;
-        itemSlotsGhost.add(new ItemSlotNetwork(this, stack, guiLeft + x, guiTop + y, stack.getCount(), guiLeft, guiTop, true));
+        itemSlotsGhost.add(new ItemSlotNetwork(this, stack, guiLeft + x, guiTop + y, stack.getCount(), guiLeft, guiTop, false));
         index++;
       }
       //move down to second row 
