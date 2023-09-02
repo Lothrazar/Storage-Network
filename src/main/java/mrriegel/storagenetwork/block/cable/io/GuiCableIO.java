@@ -13,6 +13,7 @@ import mrriegel.storagenetwork.network.CableLimitMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
 import mrriegel.storagenetwork.util.inventory.FilterItemStackHandler;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -37,18 +38,8 @@ public class GuiCableIO extends GuiCable {
   @Override
   public void importSlotsButtonPressed() {
     super.importSlotsButtonPressed();
-    int targetSlot = 0;
-    for (ItemStack filterSuggestion : containerCableIO.cap.getStacksForFilter()) {
-      // Ignore stacks that are already filtered
-      if (containerCableIO.cap.filters.isStackFiltered(filterSuggestion)) {
-        continue;
-      }
-      containerCableIO.cap.filters.setStackInSlot(targetSlot, filterSuggestion.copy());
-      targetSlot++;
-      if (targetSlot >= containerCableIO.cap.filters.getSlots()) {
-        break;
-      }
-    }
+    // import here for faster responsiveness I guess
+    containerCableIO.cap.importFilterStacks();
   }
 
   @Override
@@ -168,13 +159,17 @@ public class GuiCableIO extends GuiCable {
     if (containerCableIO == null || containerCableIO.cap == null) {
       return;
     }
+    int change = GuiScreen.isShiftKeyDown() ? 10 : 1;
+    if (GuiScreen.isAltKeyDown()) {
+      change *= 5;
+    }
     if (button.id == btnMinus.id) {
-      containerCableIO.cap.priority--;
-      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id));
+      containerCableIO.cap.priority -= change;
+      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, containerCableIO.cap.priority));
     }
     else if (button.id == btnPlus.id) {
-      containerCableIO.cap.priority++;
-      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id));
+      containerCableIO.cap.priority += change;
+      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, containerCableIO.cap.priority));
     }
     else if (button.id == btnOperationToggle.id) {
       containerCableIO.cap.operationMustBeSmaller = !containerCableIO.cap.operationMustBeSmaller;

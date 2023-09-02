@@ -76,6 +76,36 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
     return result;
   }
 
+  public void importFilterStacks() {
+    if (inventoryFace == null) {
+      return;
+    }
+    DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
+    // Test whether the connected block has the IItemHandler capability
+    IItemHandler itemHandler = inventoryPos.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, inventoryFace.getOpposite());
+    if (itemHandler == null) {
+      return;
+    }
+    // clear the filter
+    filters.clear();
+    // If it does, iterate its stacks and add them to the result list
+    int targetSlot = 0;
+    for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
+      ItemStack stack = itemHandler.getStackInSlot(slot);
+      if (stack == null || stack.isEmpty()) {
+        continue;
+      }
+      if (filters.exactStackAlreadyInList(stack)) {
+        continue;
+      }
+      filters.setStackInSlot(targetSlot, stack.copy());
+      targetSlot++;
+      if (targetSlot >= FilterItemStackHandler.FILTER_SIZE) {
+        return;
+      }
+    }
+  }
+
   @Override
   public ItemStack insertStack(ItemStack stack, boolean simulate) {
     // If this storage is configured to only import into the network, do not

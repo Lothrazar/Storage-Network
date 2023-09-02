@@ -1,11 +1,8 @@
 package mrriegel.storagenetwork.capabilities;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import javax.annotation.Nullable;
-import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.api.capability.IConnectable;
 import mrriegel.storagenetwork.api.capability.IConnectableItemAutoIO;
 import mrriegel.storagenetwork.api.data.DimPos;
@@ -132,38 +129,36 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<NBTTagCompo
     return ItemHandlerHelper.insertItemStacked(itemHandler, stack, simulate);
   }
 
-  public List<ItemStack> getStacksForFilter() {
+  public void importFilterStacks() {
     if (inventoryFace == null) {
-      return Collections.emptyList();
+      return;
     }
     DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
     // Test whether the connected block has the IItemHandler capability
     IItemHandler itemHandler = inventoryPos.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, inventoryFace.getOpposite());
     if (itemHandler == null) {
-      StorageNetwork.error("getStacksForFilter    null itemhandler connection ");
-      return Collections.emptyList();
+      return;
     }
-    // If it does, iterate its stacks, filter them and add them to the result list
-    List<ItemStack> result = new ArrayList<>();
+    // clear the filter
+    filters.clear();
+    // If it does, iterate its stacks and add them to the result list
+    int targetSlot = 0;
     for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
       ItemStack stack = itemHandler.getStackInSlot(slot);
       if (stack == null || stack.isEmpty()) {
         continue;
       }
-      StorageNetwork.log(slot + "getStacksForFilter    " + stack
-          + filters.exactStackAlreadyInList(stack));
-      if (this.filters.exactStackAlreadyInList(stack)) {
+      if (filters.exactStackAlreadyInList(stack)) {
         continue;
       }
-      result.add(stack.copy());
-      StorageNetwork.log("getStacksForFilter   size up   " + result.size());
-      // We can abort after we've found FILTER_SIZE stacks; we don't have more filter slots anyway
-      if (result.size() >= FilterItemStackHandler.FILTER_SIZE) {
-        return result;
+      filters.setStackInSlot(targetSlot, stack.copy());
+      targetSlot++;
+      if (targetSlot >= FilterItemStackHandler.FILTER_SIZE) {
+        return;
       }
     }
-    return result;
   }
+
   @Override public FilterItemStackHandler getFilters() {
     return filters;
   }

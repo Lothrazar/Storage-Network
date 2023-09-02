@@ -13,6 +13,7 @@ import mrriegel.storagenetwork.util.UtilTileEntity;
 import mrriegel.storagenetwork.util.inventory.FilterItemStackHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -50,8 +51,6 @@ public abstract class GuiCableBase extends GuiContainer {
       return;
     }
     if (btnImport != null && button.id == btnImport.id) {
-      // First clear out all filters
-      stackHandler.clear();
       importSlotsButtonPressed();
       PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id));
     }
@@ -117,6 +116,10 @@ public abstract class GuiCableBase extends GuiContainer {
     if (wheel == 0) {
       return;
     }
+    int change = GuiScreen.isShiftKeyDown() ? 8 : 1;
+    if (GuiScreen.isAltKeyDown()) {
+      change *= 2;
+    }
     boolean wheelUp = wheel > 0;
     int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
     int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
@@ -126,16 +129,15 @@ public abstract class GuiCableBase extends GuiContainer {
         continue;
       }
       if (wheelUp)
-        itemSlot.getStack().grow(1);
+        itemSlot.getStack().grow(change);
       else
-        itemSlot.getStack().shrink(1);
+        itemSlot.getStack().shrink(change);
       if (itemSlot.getStack().getCount() >= 64) {
         itemSlot.getStack().setCount(64);
       }
       //and save changes OFC
       FilterItemStackHandler stackHandler = getFilterHandler();
       PacketRegistry.INSTANCE.sendToServer(new CableFilterMessage(i, itemSlot.getStack(), stackHandler.ores, stackHandler.meta, stackHandler.nbt));
-      //for anyone to override
       return;
     }
   }
