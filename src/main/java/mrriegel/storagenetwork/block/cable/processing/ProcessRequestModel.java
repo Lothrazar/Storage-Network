@@ -16,7 +16,7 @@ public class ProcessRequestModel {
   private static final String PREFIX = "sn_process_";
   //you can request more than 64
   private int count;
-  private boolean alwaysActive = true;
+  private boolean alwaysActive = false;
   private ProcessStatus status = ProcessStatus.EXPORTING;
   // current stack (in order of filters) being exported or imported
   private int stackIndex;
