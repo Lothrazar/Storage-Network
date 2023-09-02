@@ -8,6 +8,7 @@ import mrriegel.storagenetwork.network.CableLimitMessage;
 import mrriegel.storagenetwork.network.CableRefreshClientMessage;
 import mrriegel.storagenetwork.network.ClearRecipeMessage;
 import mrriegel.storagenetwork.network.InsertMessage;
+import mrriegel.storagenetwork.network.OpenRemoteMessage;
 import mrriegel.storagenetwork.network.ProcessRecipeMessage;
 import mrriegel.storagenetwork.network.RecipeMessage;
 import mrriegel.storagenetwork.network.RefreshFilterClientMessage;
@@ -40,5 +41,6 @@ public class PacketRegistry {
     INSTANCE.registerMessage(RequestCableMessage.class, RequestCableMessage.class, id++, Side.SERVER);
     INSTANCE.registerMessage(CableControlMessage.class, CableControlMessage.class, id++, Side.SERVER);
     INSTANCE.registerMessage(RefreshFilterClientMessage.class, RefreshFilterClientMessage.class, id++, Side.CLIENT);
+    INSTANCE.registerMessage(OpenRemoteMessage.class, OpenRemoteMessage.class, id++, Side.SERVER);
   }
 }

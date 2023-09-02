@@ -28,7 +28,6 @@ import mrriegel.storagenetwork.item.remote.GuiRemote;
 import mrriegel.storagenetwork.item.remote.RemoteType;
 import mrriegel.storagenetwork.util.UtilTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
@@ -78,12 +77,11 @@ public class GuiHandler implements IGuiHandler {
       }
     }
     if (ID == GuiIDs.REMOTE.ordinal()) {
-      EnumHand hand = EnumHand.values()[x];
-      if (FB_LOADED && ConfigHandler.allowFastWorkBenchIntegration && player.getHeldItem(hand).getMetadata() != RemoteType.SIMPLE.ordinal()) {
-        return new ContainerFastRemote(player, world, hand);
+      if (FB_LOADED && ConfigHandler.allowFastWorkBenchIntegration && player.inventory.getStackInSlot(x).getMetadata() != RemoteType.SIMPLE.ordinal()) {
+        return new ContainerFastRemote(player, world, x);
       }
       else {
-        return new ContainerRemote(player.inventory, hand);
+        return new ContainerRemote(player.inventory, x);
       }
     }
     return null;
@@ -126,12 +124,11 @@ public class GuiHandler implements IGuiHandler {
       }
     }
     if (ID == GuiIDs.REMOTE.ordinal()) {
-      EnumHand hand = EnumHand.values()[x];
-      if (FB_LOADED && ConfigHandler.allowFastWorkBenchIntegration && player.getHeldItem(hand).getMetadata() != RemoteType.SIMPLE.ordinal()) {
-        return new GuiFastRemote(player, world, hand);
+      if (FB_LOADED && ConfigHandler.allowFastWorkBenchIntegration && player.inventory.getStackInSlot(x).getMetadata() != RemoteType.SIMPLE.ordinal()) {
+        return new GuiFastRemote(player, world, x);
       }
       else {
-        return new GuiRemote(new ContainerRemote(player.inventory, hand));
+        return new GuiRemote(new ContainerRemote(player.inventory, x));
       }
     }
     return null;

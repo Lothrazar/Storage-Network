@@ -72,17 +72,40 @@ public class ItemRemote extends Item {
       //unbound or invalid data
       return super.onItemRightClick(world, player, hand);
     }
+    int slot = hand == EnumHand.OFF_HAND ? player.inventory.getSizeInventory() - 1 : player.inventory.currentItem;
+    if (tryOpenGui(world, player, itemStackIn, slot))
+      return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+    return super.onItemRightClick(world, player, hand);
+  }
+
+  @Override
+  public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    ItemStack stack = playerIn.getHeldItem(hand);
+    if (worldIn.getTileEntity(pos) instanceof TileMaster) {
+      NBTHelper.setInteger(stack, "x", pos.getX());
+      NBTHelper.setInteger(stack, "y", pos.getY());
+      NBTHelper.setInteger(stack, "z", pos.getZ());
+      NBTHelper.setBoolean(stack, "bound", true);
+      NBTHelper.setInteger(stack, "dim", worldIn.provider.getDimension());
+      NBTHelper.setString(stack, "sort", EnumSortType.NAME.toString());
+      return EnumActionResult.SUCCESS;
+    }
+    return super.onItemUse(playerIn, worldIn, pos, hand, side, hitX, hitY, hitZ);
+  }
+
+  public static boolean tryOpenGui(World world, EntityPlayer player, ItemStack remote, int inventorySlot) {
+    int itemDamage = remote.getItemDamage();
     World serverTargetWorld;
     int x, y, z, itemStackDim;
     BlockPos targetPos;
     try {
-      x = NBTHelper.getInteger(itemStackIn, "x");
-      y = NBTHelper.getInteger(itemStackIn, "y");
-      z = NBTHelper.getInteger(itemStackIn, "z");
-      itemStackDim = NBTHelper.getInteger(itemStackIn, "dim");
+      x = NBTHelper.getInteger(remote, "x");
+      y = NBTHelper.getInteger(remote, "y");
+      z = NBTHelper.getInteger(remote, "z");
+      itemStackDim = NBTHelper.getInteger(remote, "dim");
       // validate possible missing data
-      if (NBTHelper.getString(itemStackIn, "sort") == null) {
-        NBTHelper.setString(itemStackIn, "sort", EnumSortType.NAME.toString());
+      if (NBTHelper.getString(remote, "sort") == null) {
+        NBTHelper.setString(remote, "sort", EnumSortType.NAME.toString());
       }
       targetPos = new BlockPos(x, y, z);
       serverTargetWorld = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(itemStackDim);
@@ -90,12 +113,12 @@ public class ItemRemote extends Item {
     catch (Throwable e) {
       //cant tell if this is NBT error or statistics usage recording issue
       //https://github.com/PrinceOfAmber/Storage-Network/issues/93
-      StorageNetwork.instance.logger.error("Invalid remote data " + itemStackIn.getTagCompound(), e);
-      return super.onItemRightClick(world, player, hand);
+      StorageNetwork.instance.logger.error("Invalid remote data " + remote.getTagCompound(), e);
+      return false;
     }
     if (!serverTargetWorld.getChunk(targetPos).isLoaded()) {
       StorageNetwork.chatMessage(player, "item.remote.notloaded");
-      return super.onItemRightClick(world, player, hand);
+      return false;
     }
     RemoteType remoteType = RemoteType.values()[itemDamage];
     // first make sure area is loaded, BEFORE getting TE
@@ -120,33 +143,17 @@ public class ItemRemote extends Item {
       }
       // ok we found a target
       if (canOpenGUI) {
-        player.openGui(StorageNetwork.instance, getGui(), world, hand.ordinal(), y, z);
-        return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+        player.openGui(StorageNetwork.instance, getGui(), world, inventorySlot, y, z);
+        return true;
       }
-      else {// if (itemStackIn.getItemDamage() == 0 && (NBTHelper.getInteger(itemStackIn, "dim") == worldIn.provider.getDimension() || player.getDistance(x, y, z) > 32))
-        //        StorageNetwork.log("out of range");
+      else {
         StorageNetwork.statusMessage(player, "item.remote.outofrange");
       }
     }
-    return super.onItemRightClick(world, player, hand);
+    return false;
   }
 
-  @Override
-  public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    ItemStack stack = playerIn.getHeldItem(hand);
-    if (worldIn.getTileEntity(pos) instanceof TileMaster) {
-      NBTHelper.setInteger(stack, "x", pos.getX());
-      NBTHelper.setInteger(stack, "y", pos.getY());
-      NBTHelper.setInteger(stack, "z", pos.getZ());
-      NBTHelper.setBoolean(stack, "bound", true);
-      NBTHelper.setInteger(stack, "dim", worldIn.provider.getDimension());
-      NBTHelper.setString(stack, "sort", EnumSortType.NAME.toString());
-      return EnumActionResult.SUCCESS;
-    }
-    return super.onItemUse(playerIn, worldIn, pos, hand, side, hitX, hitY, hitZ);
-  }
-
-  protected int getGui() {
+  protected static int getGui() {
     return GuiHandler.GuiIDs.REMOTE.ordinal();
   }
 

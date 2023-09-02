@@ -119,4 +119,6 @@ processing.empty.ingredients=Empty Ingredients
 gui.storagenetwork.processing.recipe=Ingredients for each cycle will be sent as if coming from this block-side
 gui.storagenetwork.processing.extract=When pulling processing results it will be taken as if from this block-side
 
+key.remote.desc=Open Remote
+key.storagenetwork.category=Simple Storage Network
 

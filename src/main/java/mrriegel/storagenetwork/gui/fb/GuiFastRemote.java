@@ -7,15 +7,14 @@ import mrriegel.storagenetwork.item.remote.ItemRemote;
 import mrriegel.storagenetwork.util.NBTHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class GuiFastRemote extends GuiFastNetworkCrafter {
 
-  public GuiFastRemote(EntityPlayer player, World world, EnumHand hand) {
+  public GuiFastRemote(EntityPlayer player, World world, int remoteSlot) {
     super(player, world, BlockPos.ORIGIN);
-    this.inventorySlots = new ContainerFastRemote.Client(player, world, hand);
+    this.inventorySlots = new ContainerFastRemote.Client(player, world, remoteSlot);
   }
 
   @Override
