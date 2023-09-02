@@ -223,10 +223,6 @@ public class BlockCable extends AbstractBlockConnectable {
 
   @Override
   public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileEntity tileHere = world.getTileEntity(pos);
-    if (tileHere == null || !(tileHere instanceof TileCable)) {
-      return FULL_BLOCK_AABB;
-    }
     UnlistedPropertyBlockNeighbors.BlockNeighbors neighbors = getBlockNeighbors(world, pos);
     float x1 = 0.37F;
     float x2 = 0.63F;
