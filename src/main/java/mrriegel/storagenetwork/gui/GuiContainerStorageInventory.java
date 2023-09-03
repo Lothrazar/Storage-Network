@@ -238,7 +238,6 @@ public abstract class GuiContainerStorageInventory extends GuiContainer implemen
       slot.drawSlot(mouseX, mouseY);
       if (slot.isMouseOverSlot(mouseX, mouseY)) {
         stackUnderMouse = slot.getStack();
-        //        break;
       }
     }
     if (slots.isEmpty()) {

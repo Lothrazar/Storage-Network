@@ -239,7 +239,6 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
       slot.drawSlot(mouseX, mouseY);
       if (slot.isMouseOverSlot(mouseX, mouseY)) {
         stackUnderMouse = slot.getStack();
-        //        break;
       }
     }
     if (slots.isEmpty()) {
@@ -312,8 +311,6 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
 
   @Override
   public void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-    if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT))
-      this.fontRenderer.drawString("f", 0, 0, 4210752);
     this.fontRenderer.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 4, 4210752);
     if (this.isScreenValid() == false) {
       return;
