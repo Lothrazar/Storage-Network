@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -36,6 +39,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.oredict.OreDictionary;
 import shadows.fastbench.gui.GuiFastBench;
 
@@ -55,6 +59,8 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
   protected GuiTextField searchBar;
   protected GuiStorageButton directionBtn, sortBtn, keepBtn, jeiBtn, clearTextBtn;
   protected List<ItemSlotNetwork> slots;
+  protected List<ItemStack> displayedStacks;
+  protected Set<Integer> zeroStacks = new TreeSet<>();
   protected long lastClick;
   private boolean forceFocus;
 
@@ -71,6 +77,26 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
   @Override
   public void setStacks(List<ItemStack> stacks) {
     this.stacks = stacks;
+    zeroStacks.clear();
+    if (isShiftKeyDown()) {
+      for (int i = 0; i < displayedStacks.size(); i++) {
+        ItemStack stack = displayedStacks.get(i);
+        boolean match = false;
+        for (ItemStack newStack : stacks) {
+          if (ItemHandlerHelper.canItemStacksStack(newStack, stack)) {
+            match = true;
+            stack.setCount(newStack.getCount());
+            break;
+          }
+        }
+        // since lots of things don't do anything with empty stacks,
+        // just have the custom item slot show zero with the size actually being 1
+        if (!match) {
+          zeroStacks.add(i);
+          stack.setCount(1);
+        }
+      }
+    }
   }
 
   @Override
@@ -203,10 +229,12 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
       return;
     }
     renderTextures();
-    List<ItemStack> stacksToDisplay = applySearchTextToSlots();
-    sortItemStacks(stacksToDisplay);
-    applyScrollPaging(stacksToDisplay);
-    rebuildItemSlots(stacksToDisplay);
+    if (!isShiftKeyDown()) {
+      displayedStacks = applySearchTextToSlots();
+      sortItemStacks(displayedStacks);
+    }
+    applyScrollPaging(displayedStacks);
+    rebuildItemSlots(displayedStacks);
     renderItemSlots(mouseX, mouseY);
     searchBar.drawTextBox();
   }
@@ -254,8 +282,11 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
         if (index >= stacksToDisplay.size()) {
           break;
         }
-        int in = index;
-        slots.add(new ItemSlotNetwork(this, stacksToDisplay.get(in), guiLeft + 8 + col * 18, guiTop + 10 + row * 18, stacksToDisplay.get(in).getCount(), guiLeft, guiTop, true));
+        ItemStack stack = stacksToDisplay.get(index);
+        int count = stack.getCount();
+        if (zeroStacks.contains(index))
+          count = 0;
+        slots.add(new ItemSlotNetwork(this, stack, guiLeft + 8 + col * 18, guiTop + 10 + row * 18, count, guiLeft, guiTop, true));
         index++;
       }
     }
