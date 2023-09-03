@@ -55,7 +55,7 @@ public class GuiCableIO extends GuiCable {
     });
     Keyboard.enableRepeatEvents(true);
     fieldOperationLimit = new GuiTextField(99, fontRenderer, guiLeft + 54, guiTop + 69, TEXTBOX_WIDTH, fontRenderer.FONT_HEIGHT);
-    fieldOperationLimit.setMaxStringLength(3);
+    fieldOperationLimit.setMaxStringLength(6);
     fieldOperationLimit.setEnableBackgroundDrawing(false);
     fieldOperationLimit.setVisible(true);
     fieldOperationLimit.setTextColor(16777215);
