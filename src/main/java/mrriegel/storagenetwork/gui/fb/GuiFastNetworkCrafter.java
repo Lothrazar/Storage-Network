@@ -16,7 +16,7 @@ import mrriegel.storagenetwork.gui.IPublicGuiContainer;
 import mrriegel.storagenetwork.gui.IStorageInventory;
 import mrriegel.storagenetwork.gui.ItemSlotNetwork;
 import mrriegel.storagenetwork.jei.JeiHooks;
-import mrriegel.storagenetwork.jei.JeiSettings;
+import mrriegel.storagenetwork.jei.SearchSettings;
 import mrriegel.storagenetwork.network.ClearRecipeMessage;
 import mrriegel.storagenetwork.network.InsertMessage;
 import mrriegel.storagenetwork.network.RequestMessage;
@@ -53,7 +53,7 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
   public List<ItemStack> stacks, craftableStacks;
   protected ItemStack stackUnderMouse = ItemStack.EMPTY;
   protected GuiTextField searchBar;
-  protected GuiStorageButton directionBtn, sortBtn, jeiBtn, clearTextBtn;
+  protected GuiStorageButton directionBtn, sortBtn, keepBtn, jeiBtn, clearTextBtn;
   protected List<ItemSlotNetwork> slots;
   protected long lastClick;
   private boolean forceFocus;
@@ -112,15 +112,15 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
     searchBar.setVisible(true);
     searchBar.setTextColor(16777215);
     searchBar.setFocused(true);
-    if (JeiSettings.isJeiLoaded() && JeiSettings.isJeiSearchSynced()) {
-      searchBar.setText(JeiHooks.getFilterText());
-    }
+    searchBar.setText(SearchSettings.getSearch());
     directionBtn = new GuiStorageButton(0, guiLeft + 7, guiTop + 93, "");
     this.addButton(directionBtn);
     sortBtn = new GuiStorageButton(1, guiLeft + 21, guiTop + 93, "");
     this.addButton(sortBtn);
-    jeiBtn = new GuiStorageButton(4, guiLeft + 35, guiTop + 93, "");
-    if (JeiSettings.isJeiLoaded()) {
+    keepBtn = new GuiStorageButton(6, guiLeft + 35, guiTop + 93, "");
+    this.addButton(keepBtn);
+    jeiBtn = new GuiStorageButton(4, guiLeft + 49, guiTop + 93, "");
+    if (JeiHooks.isJeiLoaded()) {
       this.addButton(jeiBtn);
     }
     clearTextBtn = new GuiStorageButton(5, guiLeft + 64, guiTop + 93, "X");
@@ -351,11 +351,15 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
     if (sortBtn.isMouseOver()) {
       drawHoveringText(Lists.newArrayList(I18n.format("gui.storagenetwork.req.tooltip_" + getSort().toString())), mouseX, mouseY);
     }
+    if (keepBtn != null && keepBtn.isMouseOver()) {
+      String s = I18n.format(SearchSettings.isSearchKept() ? "gui.storagenetwork.fil.tooltip_keep_on" : "gui.storagenetwork.fil.tooltip_keep_off");
+      drawHoveringText(Lists.newArrayList(s), mouseX, mouseY);
+    }
     if (directionBtn.isMouseOver()) {
       drawHoveringText(Lists.newArrayList(I18n.format("gui.storagenetwork.sort")), mouseX, mouseY);
     }
     if (jeiBtn != null && jeiBtn.isMouseOver()) {
-      String s = I18n.format(JeiSettings.isJeiSearchSynced() ? "gui.storagenetwork.fil.tooltip_jei_on" : "gui.storagenetwork.fil.tooltip_jei_off");
+      String s = I18n.format(SearchSettings.isJeiSearchSynced() ? "gui.storagenetwork.fil.tooltip_jei_on" : "gui.storagenetwork.fil.tooltip_jei_off");
       drawHoveringText(Lists.newArrayList(s), mouseX, mouseY);
     }
   }
@@ -376,9 +380,15 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
     else if (button.id == sortBtn.id) {
       setSort(getSort().next());
     }
+    else if (button.id == keepBtn.id) {
+      doSort = false;
+      SearchSettings.setKeepSearch(!SearchSettings.isSearchKept());
+      SearchSettings.setSearch(searchBar.getText());
+    }
     else if (button.id == jeiBtn.id) {
       doSort = false;
-      JeiSettings.setJeiSearchSync(!JeiSettings.isJeiSearchSynced());
+      SearchSettings.setJeiSearchSync(!SearchSettings.isJeiSearchSynced());
+      SearchSettings.setSearch(searchBar.getText());
     }
     else if (button.id == this.clearTextBtn.id) {
       doSort = false;
@@ -393,9 +403,7 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
 
   private void clearSearch() {
     searchBar.setText("");
-    if (JeiSettings.isJeiSearchSynced()) {
-      JeiHooks.setFilterText("");
-    }
+    SearchSettings.setSearch("");
   }
 
   @Override
@@ -416,7 +424,7 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
       ItemStack stackCarriedByMouse = mc.player.inventory.getItemStack();
       boolean middleClick = mouseButton == UtilTileEntity.MOUSE_BTN_MIDDLE_CLICK;
       if (middleClick && !stackCarriedByMouse.isEmpty()) {
-        //weird delete bug 
+        //weird delete bug
         return;
       }
       if (!stackUnderMouse.isEmpty() &&
@@ -441,9 +449,7 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
       Keyboard.enableRepeatEvents(true);
       if (searchBar.isFocused() && this.searchBar.textboxKeyTyped(typedChar, keyCode)) {
         PacketRegistry.INSTANCE.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
-        if (JeiSettings.isJeiLoaded() && JeiSettings.isJeiSearchSynced()) {
-          JeiHooks.setFilterText(searchBar.getText());
-        }
+        SearchSettings.setSearch(searchBar.getText());
         return;
       }
       else if (this.stackUnderMouse.isEmpty() == false) {
@@ -451,7 +457,7 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
           JeiHooks.testJeiKeybind(keyCode, this.stackUnderMouse);
         }
         catch (Throwable e) {
-          //its ok JEI not installed for maybe an addon mod is ok 
+          //its ok JEI not installed for maybe an addon mod is ok
         }
       }
     }
@@ -510,8 +516,11 @@ public abstract class GuiFastNetworkCrafter extends GuiFastBench implements IPub
         if (id == sortBtn.id) {
           this.drawTexturedModalRect(this.x + 4, this.y + 3, 188 + (getSort() == EnumSortType.AMOUNT ? 6 : getSort() == EnumSortType.MOD ? 12 : 0), 14, 6, 8);
         }
+        if (id == keepBtn.id) {
+          this.drawTexturedModalRect(this.x + 4, this.y + 3, WIDTH + (SearchSettings.isSearchKept() ? 12 : 18), 22, 6, 8);
+        }
         if (id == jeiBtn.id) {
-          this.drawTexturedModalRect(this.x + 4, this.y + 3, WIDTH + (JeiSettings.isJeiSearchSynced() ? 0 : 6), 22, 6, 8);
+          this.drawTexturedModalRect(this.x + 4, this.y + 3, WIDTH + (SearchSettings.isJeiSearchSynced() ? 0 : 6), 22, 6, 8);
         }
         this.mouseDragged(mc, x, y);
         int l = 14737632;

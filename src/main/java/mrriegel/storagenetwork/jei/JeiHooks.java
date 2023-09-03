@@ -9,9 +9,19 @@ import net.minecraftforge.fml.common.Optional;
 
 public class JeiHooks {
 
+  private static boolean jeiLoaded;
+
+  public static boolean isJeiLoaded() {
+    return jeiLoaded;
+  }
+
+  public static void setJeiLoaded(boolean jeiLoaded) {
+    JeiHooks.jeiLoaded = jeiLoaded;
+  }
+
   public static String getFilterText() {
     try {
-      if (JeiSettings.isJeiLoaded()) {
+      if (jeiLoaded) {
         return getJeiTextInternal();
       }
     }
@@ -23,12 +33,12 @@ public class JeiHooks {
 
   /**
    * so if JEI is not loaded, this will be called but then its an empty FN
-   * 
+   *
    * @param s
    */
   public static void setFilterText(String s) {
     try {
-      if (JeiSettings.isJeiLoaded()) {
+      if (jeiLoaded) {
         setJeiTextInternal(s);
       }
     }

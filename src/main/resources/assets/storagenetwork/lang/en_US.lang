@@ -94,6 +94,8 @@ gui.storagenetwork.fil.tooltip_3=Clear text with right-click or X button
 gui.storagenetwork.tooltip_clear=Clear Search
 gui.storagenetwork.fil.tooltip_jei_on=JEI search enabled
 gui.storagenetwork.fil.tooltip_jei_off=JEI search disabled
+gui.storagenetwork.fil.tooltip_keep_on=Keep search enabled
+gui.storagenetwork.fil.tooltip_keep_off=Keep search disabled
 
 tile.storagenetwork:controller.name=Controller
 tooltip.storagenetwork.controller=Manage all Processing Cables in the network
