@@ -54,7 +54,7 @@ public abstract class GuiContainerStorageInventory extends GuiContainer implemen
   protected GuiTextField searchBar;
   protected GuiStorageButton directionBtn, sortBtn, keepBtn, jeiBtn, clearTextBtn;
   protected List<ItemSlotNetwork> slots;
-  protected List<ItemStack> displayedStacks;
+  protected List<ItemStack> displayedStacks = null;
   protected Set<Integer> zeroStacks = new TreeSet<>();
   protected long lastClick;
   private boolean forceFocus;
@@ -78,7 +78,7 @@ public abstract class GuiContainerStorageInventory extends GuiContainer implemen
   public void setStacks(List<ItemStack> stacks) {
     this.stacks = stacks;
     zeroStacks.clear();
-    if (isShiftKeyDown()) {
+    if (isShiftKeyDown() && displayedStacks != null) {
       for (int i = 0; i < displayedStacks.size(); i++) {
         ItemStack stack = displayedStacks.get(i);
         boolean match = false;
@@ -161,7 +161,7 @@ public abstract class GuiContainerStorageInventory extends GuiContainer implemen
   }
 
   protected boolean inSearchbar(int mouseX, int mouseY) {
-    return isPointInRegion(searchBar.x - guiLeft + 14, searchBar.y - guiTop, searchBar.width, fontRenderer.FONT_HEIGHT + 6, mouseX, mouseY);
+    return isPointInRegion(searchBar.x - guiLeft, searchBar.y - guiTop, searchBar.width, fontRenderer.FONT_HEIGHT, mouseX, mouseY);
   }
 
   @Override
@@ -229,7 +229,7 @@ public abstract class GuiContainerStorageInventory extends GuiContainer implemen
     }
     this.drawDefaultBackground();//dim the background as normal
     renderTextures();
-    if (!isShiftKeyDown()) {
+    if (!isShiftKeyDown() || displayedStacks == null) {
       displayedStacks = applySearchTextToSlots();
       sortStackWrappers(displayedStacks);
     }
