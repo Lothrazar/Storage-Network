@@ -47,6 +47,13 @@ public class BlockCable extends AbstractBlockConnectable {
     this.setCreativeTab(CreativeTab.tab);
   }
 
+  protected TileEntity getTileEntityNoUpdate(IBlockAccess world, BlockPos pos) {
+    if (!(world instanceof World))
+      return world.getTileEntity(pos);
+    TileEntity tile = ((World) world).getChunk(pos).getTileEntity(pos, EnumCreateEntityType.CHECK);
+    return tile;
+  }
+
   @SuppressWarnings("rawtypes")
   @Override
   protected BlockStateContainer createBlockState() {
@@ -77,7 +84,7 @@ public class BlockCable extends AbstractBlockConnectable {
   @SuppressWarnings("unchecked")
   @Nullable
   public <V> V getClientSideTileEntity(IBlockAccess world, BlockPos pos, Class<V> tileEntityClassOrInterface) {
-    TileEntity tileEntity = world.getTileEntity(pos);
+    TileEntity tileEntity = getTileEntityNoUpdate(world, pos);
     if (tileEntity == null) {
       return null;
     }
@@ -89,7 +96,7 @@ public class BlockCable extends AbstractBlockConnectable {
 
   @Nullable
   private <V> V getClientSideCapability(IBlockAccess world, BlockPos pos, Capability<V> capability, EnumFacing side) {
-    TileEntity tileEntity = world.getTileEntity(pos);
+    TileEntity tileEntity = getTileEntityNoUpdate(world, pos);
     if (tileEntity == null) {
       return null;
     }
