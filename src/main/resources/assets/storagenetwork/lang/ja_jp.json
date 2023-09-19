@@ -1,0 +1,186 @@
+{
+    "itemGroup.storagenetwork": "Simple Storage Network",
+    
+    "item.storagenetwork.network_book":"ネットワーク手引書",
+    "storagenetwork.network_book.landing_text":"シンプル収納ネットワークはあなたの全ての収納物を管理します。$(l:gs_setup)はじめに$(/l)を参照するか、アイテムを見つけてください。",
+    "block.storagenetwork.kabel": "ネットワークケーブル",
+    "block.storagenetwork.kabel.guide": "基本のネットワークケーブルで、ネットワーク系ブロックにのみ接続します。",
+    "block.storagenetwork.storage_kabel": "リンクケーブル",
+    "block.storagenetwork.storage_kabel.guide": "コンテナ1つをネットワークに接続します。これはコンテナがネットワークに接続する主要なポイントで、優先度付け、自動化のための何の制御も行われません。$(l:filter_kabel)フィルタリング版$(/l)に強化できます。",
+    "block.storagenetwork.export_kabel": "出力ケーブル",
+    "block.storagenetwork.export_kabel.guide": "コンテナに接続している間、ネットワークからそのコンテナにアイテムを出力します。出力ケーブル同士で優先度を設定でき、オプションでレッドストーン信号の出力も可能です。各種強化ができます。",
+    "block.storagenetwork.import_kabel": "入力ケーブル",
+    "block.storagenetwork.import_kabel.guide": "接続されたコンテナからネットワークにアイテムを入力し続けます。自動化のため、$(l:import_filter_kabel)フィルタリング版$(/l)に強化できます。",
+    "block.storagenetwork.import_filter_kabel": "フィルタリングされた入力ケーブル",
+    "block.storagenetwork.import_filter_kabel.guide": "接続されたコンテナからネットワークにアイテムを入力し続けます。GUI制御画面から、強化、アイテムフィルタ、レッドストーン制御などのカスタマイズが可能です。アイテムフィルタの「許可」モードはフィルタリングに合う適合するアイテムが通過することを意味し、「無視」モードはリスト内にあるアイテム以外が通過することを意味します。フィルターワイプをインポートすると、そのインベントリ内容と置き換えられます。",
+    "block.storagenetwork.filter_kabel": "フィルタリングされたリンクケーブル",
+    "block.storagenetwork.filter_kabel.guide": "コンテナ1つをネットワークに接続します。出力ケーブルとの間で優先度を設定できます。各種強化ができます。",
+    
+    "page.storagenetwork.gs_chunks":"チャンク",
+    "page.storagenetwork.gs_setup":"ネットワーク設定",
+    "page.storagenetwork.gs_priority":"優先度",
+    "storagenetwork.guide.getstarted":"はじめに",
+    "storagenetwork.guide.upgrades":"強化ユニット",
+    "storagenetwork.guide.upgrades.desc":"強化ユニットは$(l:export_kabel)出力ケーブル$(/l)や$(l:import_filter_kabel)フィルタリングされた入力ケーブル$(/l)のスロットにセットして使用します。",
+    "storagenetwork.guide.remotes":"遠隔操作",
+    "storagenetwork.guide.remotes.desc":"リモコンをネットワークに接続するため、リモコンを$(l:master)マネージャ$(/l)に対して使用してください。各リモコンはマネージャと座標・ディメンジョンによって関連付けられており、マネージャが壊されなければチャンクに読み込まれている間アクセス可能です。距離による制限はありません。",
+    "storagenetwork.guide.blocks":"ブロック",
+    "storagenetwork.guide.blocks.desc":"全てのネットワーク系ブロックは、どんなネットワーク系ブロックやケーブルに接続可能であり、異なるアクセス方法やネットワークの機能を提供します。",
+    "storagenetwork.guide.cables":"ケーブル",
+    "storagenetwork.guide.cables.desc":"ケーブルで接続することで、ブロックやノードをネットワークに参加させます。有効なネットワークには、$(l:master)マネージャt$(/l)を1つだけ設置し、最低でもひとつのコンテナを$(l:storage_kabel)リンク$(/l)ケーブルで接続する必要があります。",
+    "storagenetwork.guide.getstarted.desc":"その他の解説ページ",
+    "page.storagenetwork.gs_setup.left":"Simple Storage Networkを使い始めるための短い手引書。まず素材と$(l:kabel)リンクケーブル$(/l)、$(l:master)ネットワークマネージャ$(/l)を準備してください。ワールドにそれらを設置すればネットワークは機能します。$(l:storage_kabel)リンクケーブル$(/l)はチェストや他のコンテナをネットワークに接続します。アクセスするためには、$(l:inventory_remote)リモコン$(/l)や$(l:request)ブロック$(/l)が必要です。",
+ 		"page.storagenetwork.gs_setup.right":"ブックマーク機能を使用する",
+ 		"page.storagenetwork.gs_priority.left":"ケーブルは優先度順にソートされます。$(l:storge_kabel)リンクケーブル$(/l)のように何のGUIも提供されない場合、優先度はゼロとなります。ユーザーがネットワークに対し出し入れを行っている間、処理が完了するまで最も優先度の低いノードを使用しようと試みます。入出力を自動すると、全てのケーブルは毎回優先度順に、1tick、1ケーブルごとに1スタックのアクションが処理されます。",
+ 		"page.storagenetwork.gs_priority.right":"$(li)ケーブル優先度は昇順で処理され、$(li)同一優先度は一括で処理されます。$(li)例：[-2, -2, 0, 0, 1, 2, 4]$(li)この順序で順番に処理されます。",
+
+	  "page.storagenetwork.gs_chunks.left":"どんなネットワークも、$(l:master)ネットワークマネージャ$(/l)がワールドで読み込まれているチャンクにある場合のみ稼働します。$(l:storage_kabel)リンクケーブル$(/l)のようなケーブルの終点は、ネットワークマネージャと異なるチャンクに配置する場合、それぞれの設置されたチャンクによって切断される可能性があります。チャンク、ワールド、ディメンジョンに応じて複数のネットワークを作ることも可能です。",
+ 		"page.storagenetwork.gs_chunks.right":"$(li)応用例: したがって、20本のリンクケーブルがあるネットワークであっても、5本はチャンクの読み込み範囲外にある可能性があります。接触・遠隔問わず、ネットワークマネージャが読み込まれていれば画面を開けますが、読み込まれていないケーブルの接続先にあるコンテナ内のアイテムは見えません。$(li)遠隔操作の例:$(t:スポーンチャンクは常に読み込まれます)スポーンチャンク$(/t)から遠く離れた、海上拠点上にネットワークを構築したとします。ネザーに行くとマネージャのあるチャンクが読み込まれなくなるため、$(l:inventory_remote)遠隔操作$(/l)で接続できなくなります。",
+ 	
+    "block.storagenetwork.master": "ネットワークマネージャ",
+    "block.storagenetwork.master.tooltip": "ネットワークごとに1つだけ必要",
+    "block.storagenetwork.master.guide": "ネットワークの中心部です。ネットワーク1つに1つだけ必要で、2つ以上設置すると接続に問題が起きます。マネージャを別の場所に移すとネットワークが無効になり、入出力や遠隔での操作ができなくなります。相互に独立している限り、1つのワールドに複数のネットワークを作ることは可能です。",
+    
+    "block.storagenetwork.request": "ネットワークテーブル",
+    "block.storagenetwork.request.guide": "ネットワーク内のコンテナからアイテムを出し入れし、それらを素材にクラフトすることができます。$(l:crafting_remote)遠隔操作版$(/l)もあります。",
+    "block.storagenetwork.request.tooltip": "ネットワーク内のアイテム出し入れやクラフトに使用します。",
+    
+    "block.storagenetwork.inventory": "ネットワークインベントリ",
+    "block.storagenetwork.inventory.guide":  "ネットワーク内のコンテナからアイテムを出し入れできます。クラフトはできませんが、画面を広く使えます。$(l:inventory_remote)遠隔操作版$(/l)もあります。",
+    "block.storagenetwork.inventory.tooltip": "ネットワーク内のアイテムを出し入れできます。クラフトはできません。",
+    
+    "block.storagenetwork.exchange": "交換インターフェイス",
+    "block.storagenetwork.exchange.guide": "このブロックを経由して、ネットワークを他の自動化システムや倉庫システムに公開することができ、その場合このブロックはそれらに対するコントローラとして振舞います。例えば、バニラのホッパーをネットワーク上の交換インターフェイスに向けて設置すると、$(l:import_kabel)入力ケーブル$(/l)と同じようにアイテムを追加できます。下に設置したホッパーは任意のアイテムを出力します。他の倉庫Modと組み合わせてみてください！",
+    "block.storagenetwork.exchange.tooltip": "ネットワーク上のコンテナに接続するためのエンドポイントです。",
+
+    "block.storagenetwork.collector": "収集インターフェイス",
+    "block.storagenetwork.collector.guide":  "このブロックを経由して、ネットワークを他の自動化システムや倉庫システムに公開することができ、それらからアイテムを送り込むことができます。例えば、バニラのホッパーをネットワーク上の交換インターフェイスに向けて設置すると、$(l:import_kabel)入力ケーブル$(/l)と同じようにアイテムを追加できます。アイテムを取り出すことはできません。他の倉庫Modと組み合わせてみてください！",
+    "block.storagenetwork.collector.tooltip": "アイテムをネットワークに追加できます。",
+    
+    "item.storagenetwork.speed_upgrade": "速度強化",
+    "item.storagenetwork.speed_upgrade.guide": "ケーブル上に配置し、アイテムの搬入速度を上げます。通常搬入処理は毎tick行われるわけではありませんが、処理間のtick遅延を減少させる効果があります。速度低下と同時に配置されている場合、速度低下が無効化されます。",
+    "item.storagenetwork.speed_upgrade.tooltip": "入出力の速度を上げます。",
+    
+    "item.storagenetwork.operation_upgrade": "演算強化",
+    "item.storagenetwork.operation_upgrade.tooltip": "フィルタに設置した数単位でアイテムを転送します。他の強化の効果を上書きします。",
+    "item.storagenetwork.operation_upgrade.guide": "フィルタリングされたケーブルの許可モードをONにして配置すると、スタック数・フィルタ数の強化にかかわらず、配置した数だけのアイテムを転送しようとします。例えば、石を7個と砂3つをフィルターに配置した場合、デフォルトの4個ではなく、石7個、砂3個単位で転送します。",
+    
+    "item.storagenetwork.stack_upgrade": "転送量強化",
+    "item.storagenetwork.stack_upgrade.tooltip": "1回あたりの転送アイテム数を増やします。",
+    "item.storagenetwork.stack_upgrade.guide": "入力ケーブル・出力ケーブルに設置可能です。ケーブルが機能した時に転送するアイテムの数を、デフォルトの4ではなくフルスタックの64にします。",
+        
+    "item.storagenetwork.single_upgrade": "転送量低下",
+    "item.storagenetwork.single_upgrade.tooltip": "1回あたりの転送アイテム数を1にします。",
+    "item.storagenetwork.single_upgrade.guide": "入力ケーブル・出力ケーブルに設置可能です。ケーブルが機能した時に転送するアイテムの数を、デフォルトの4ではなく1にします。転送量強化と同時に配置すると、こちらが優先されます。",
+     
+    "item.storagenetwork.slow_upgrade": "速度低下",
+    "item.storagenetwork.slow_upgrade.tooltip": "入出力の速度を下げます。",
+    "item.storagenetwork.slow_upgrade.guide": "入力ケーブル・出力ケーブルに設置可能です。ケーブルの処理間tick遅延を増加させます。",
+     
+    "item.storagenetwork.stock_upgrade": "在庫維持",
+    "item.storagenetwork.stock_upgrade.tooltip": "接続されたコンテナに常に一定量を残すように転送します。",
+    "item.storagenetwork.stock_upgrade.guide": "出力ケーブルに配置すると、出力先のコンテナ内の各アイテムがフィルター内の各アイテムと同じ数になるように出力されます。反対に入力ケーブルに配置すると、フィルタ内に配置されている数を接続されたコンテナ内に残すように出力されます。",
+
+    "item.storagenetwork.builder_remote": "自動建設",
+    "item.storagenetwork.builder_remote.tooltip": "ネットワークの資材から自動で建築を行います。",
+    "item.storagenetwork.builder_remote.guide": "このブロックはマネージャにバインドできますが、専用の画面を持っていません。代わりに、クリックで登録したブロックと同種のブロックを使用時にネットワークから取り出し、その場に設置しようと試みます。",
+    "item.storagenetwork.builder_remote.blockstate": "ブロックが登録されていません。破壊ボタンで登録します。",
+   
+    "item.storagenetwork.inventory_remote": "リモートインベントリ",
+    "item.storagenetwork.inventory_remote.tooltip": "登録したネットワークに遠隔でアクセスできます。",
+    "item.storagenetwork.inventory_remote.guide": "マネージャに使用することでネットワークを登録します。距離とディメンジョンに関係なく、遠隔で$(l:inventory)ネットワークインベントリ$(/l)と同様のネットワークへの完全なアクセスを提供します。ホットキーから開くことも可能です。",
+    
+    "item.storagenetwork.crafting_remote": "リモートテーブル",
+    "item.storagenetwork.crafting_remote.tooltip": "登録したネットワークに遠隔でアクセスできます。クラフトも可能です。",
+    "item.storagenetwork.crafting_remote.guide": "マネージャに使用することでネットワークを登録します。距離とディメンジョンに関係なく、遠隔で$(l:request)ネットワークテーブル$(/l)と同様のアクセスとクラフトを提供します。",
+    
+    "item.storagenetwork.picker_remote": "ブロック抽出機",
+    "item.storagenetwork.picker_remote.tooltip": "ブロックに対して使用すると、ネットワークから同種のブロックを取得します。",
+    "item.storagenetwork.picker_remote.guide": "このブロックはマネージャにバインドできますが、専用の画面を持っていません。代わりに、ブロックに対して使用するとネットワークから同種のブロックを取得します。通常1スタック、しゃがみ状態で1つです。",
+    "item.storagenetwork.collector_remote": "自動転送機",
+    "item.storagenetwork.collector_remote.tooltip": "回収したアイテムをネットワークに自動転送します。",
+    "item.storagenetwork.collector_remote.guide": "マネージャに使用することでネットワークを登録します。どんなアイテムを回収した時でも、ネットワークにそのアイテムを収納しようと試みます。これは(curiosを含みますがエンダーチェストを除き)どこでも機能し、手やホットバーに保持する必要もありません。",
+
+    "block.storagenetwork.recipe.invalid": "トランザクション無効:",
+    "block.storagenetwork.recipe.invalidleft": "入力は左にセットしてください。",
+    "block.storagenetwork.recipe.invalidright": "出力は右にセットしてください。",
+    "block.storagenetwork.recipe.valid": "トランザクション有効",
+
+    "item.remote.found": "アイテムが見つかりました。抽出中････",
+    "item.remote.notfound.item": "ネットワーク内にアイテムが見つかりませんでした。",
+    "item.remote.notfound": "ネットワークが見つかりません。チャンクが読み込まれているか確認してください。",
+    "item.remote.notconnected": "ネットワークマネージャが登録されていません。まずネットワークマネージャに登録してください。",
+    "item.remote.connected": "ネットワークに接続しました。",
+    "item.remote.outofrange": "範囲外です。",
+    "item.remote.notloaded": "チャンクが読み込まれていません。",
+
+
+
+    "gui.storagenetwork.refresh": "処理トランザクションを更新しました。完了していない処理がある場合は、素材を回収するためにレシピモードに戻ってください。",
+
+    "gui.storagenetwork.checkbox.meta": "メタ情報",
+    "gui.storagenetwork.checkbox.ore": "鉱石辞書",
+    "gui.storagenetwork.checkbox.nbt": "NBTデータ",
+
+    "gui.storagenetwork.import": "フィルタとして設定",
+    "gui.storagenetwork.allowlist": "許可リスト",
+    "gui.storagenetwork.ignorelist": "無視リスト",
+    
+    "gui.storagenetwork.redstone.false":"常に有効",
+    "gui.storagenetwork.redstone.true":"レッドストーン信号入力時のみ稼働",
+
+    "gui.storagenetwork.sort": "ソート順序",
+    "gui.storagenetwork.priority.up": "優先度を上げる(値が小さい方が優先です)",
+    "gui.storagenetwork.priority.down": "優先度を下げる(値が小さい方が優先です)",
+
+    "gui.storagenetwork.req.tooltip_name": "名前順でソート",
+    "gui.storagenetwork.req.tooltip_mod": "Mod名でソート",
+    "gui.storagenetwork.req.tooltip_amount": "数量でソート",
+
+    "gui.storagenetwork.shift": "Shiftを押すと追加情報が表示されます。",
+    "gui.storagenetwork.fil.tooltip_in": "入力のみ",
+    "gui.storagenetwork.fil.tooltip_out": "出力のみ",
+    "gui.storagenetwork.fil.tooltip_both": "入出力",  
+    "gui.storagenetwork.fil.tooltip_mod": "接頭辞 @: Mod名で検索",
+    "gui.storagenetwork.fil.tooltip_tooltip": "接頭辞 #: ツールチップで検索",
+    "gui.storagenetwork.fil.tooltip_tags": "接頭辞 $: タグ名で検索",
+    "gui.storagenetwork.fil.tooltip_clear": "右クリックで入力テキストを消去",
+ 	"gui.storagenetwork.autofocus.tooltip.true":"検索バーを自動で選択",
+ 	"gui.storagenetwork.autofocus.tooltip.false":"検索バーを自動で選択しない",
+    "gui.storagenetwork.tooltip_clear": "検索結果をクリア",
+    "gui.storagenetwork.fil.tooltip_jei_on": "JEIでの検索を有効にする",
+    "gui.storagenetwork.fil.tooltip_jei_off": "JEIでの検索を無効にする",
+
+    "block.storagenetwork.kabel.tooltip": "基本となるネットワークケーブル ",
+    "block.storagenetwork.storage_kabel.tooltip": "コンテナをネットワークに接続します。",
+    "block.storagenetwork.export_kabel.tooltip": "接続されたコンテナにネットワークからアイテムを送り込みます。",
+    "block.storagenetwork.import_kabel.tooltip": "コンテナ内の全てのアイテムをネットワークに送り込みます。",
+    "block.storagenetwork.filter_kabel.tooltip": "コンテナ1つをネットワークに接続します。アイテムのフィルタリングも可能です。",
+    "block.storagenetwork.import_filter_kabel.tooltip": "コンテナ内のアイテムをフィルタリングしてネットワークに送り込みます。",
+    
+    
+    "tooltip.storagenetwork.kabel_P": "単純な処理トランザクションを自動化します。",
+         
+    "block.storagenetwork.controller": "コントローラー",
+    "block.storagenetwork.controller.tooltip": "ネットワーク内の全てのケーブルを管理します。",
+
+    "chat.main.emptyslots": "空きスロット数: ",
+    "chat.main.connectables": "接続ケーブル数: ",
+    
+    "key.storagenetwork.remote":"遠隔Curio",
+ 
+ 
+ 
+	"gui.storagenetwork.operate.tooltip":"論理チェックに失敗すると演算が無効化されます。",
+	"gui.storagenetwork.operate.tooltip.more":"アイテム数は値より大きい必要があります。",
+	"gui.storagenetwork.operate.tooltip.less":"アイテム数は値より少ない必要があります。",
+
+    "processing.buttons.toggle.true": "常に有効",
+    "processing.buttons.toggle.false": "要求された数だけ処理",
+    "processing.buttons.minus": "要求数を減らす",
+    "processing.buttons.plus": "要求数を増やす",
+    "processing.empty.ingredients": "素材不足",
+
+    "gui.storagenetwork.processing.recipe": "素材は各サイクルでこのブロックから送られます。",
+    "gui.storagenetwork.processing.extract": "アイテムの取り出し結果は、このブロックから取得できます。"
+}
