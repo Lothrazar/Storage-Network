@@ -83,7 +83,7 @@
 
     "item.storagenetwork.builder_remote": "自動建設",
     "item.storagenetwork.builder_remote.tooltip": "ネットワークの資材から自動で建築を行います。",
-    "item.storagenetwork.builder_remote.guide": "このブロックはマネージャにバインドできますが、専用の画面を持っていません。代わりに、クリックで登録したブロックと同種のブロックを使用時にネットワークから取り出し、その場に設置しようと試みます。",
+    "item.storagenetwork.builder_remote.guide": "このブロックはマネージャにバインドできますが、専用の画面を持っていません。代わりに、アイテム使用で登録したブロックと同種のブロックを使用時にネットワークから取り出し、その場に設置しようと試みます。",
     "item.storagenetwork.builder_remote.blockstate": "ブロックが登録されていません。破壊ボタンで登録します。",
    
     "item.storagenetwork.inventory_remote": "リモートインベントリ",
