@@ -43,7 +43,7 @@
     
     "block.storagenetwork.request": "Storage Request Table",
     "block.storagenetwork.request.guide": "Views the network inventory with full access to scroll, withdraw, and deposit items.  Custom crafting grid that pulls ingredients from the network.   See the $(l:crafting_remote)Remote version here$(/l)  ",
-    "block.storagenetwork.request.tooltip": "Used to overview and request items from the network",
+    "block.storagenetwork.request.tooltip": "Used to overview and request items from the network with a crafting grid",
     
     "block.storagenetwork.inventory": "Storage Inventory",
     "block.storagenetwork.inventory.guide":  "Views the network inventory with full access to scroll, withdraw, and deposit items.  See the $(l:inventory_remote)Remote version here$(/l)  ",

@@ -56,6 +56,11 @@ public class ScreenNetworkInventory extends AbstractContainerScreen<ContainerNet
   }
 
   @Override
+  public NetworkWidget getNetworkWidget() {
+    return network;
+  }
+
+  @Override
   public void setStacks(List<ItemStack> stacks) {
     network.stacks = stacks;
   }

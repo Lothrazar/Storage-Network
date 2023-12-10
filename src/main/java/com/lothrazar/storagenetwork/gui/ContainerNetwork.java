@@ -38,6 +38,8 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
   protected final ResultContainer resultInventory;
   protected Inventory playerInv;
   protected ResultSlot result;
+
+  protected List<Slot> playerSlots = new ArrayList<Slot>();
   protected boolean recipeLocked = false;
   protected Player player;
   protected CraftingRecipe recipeCurrent;
@@ -54,12 +56,20 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
 
   public abstract boolean isCrafting();
 
+  public Slot getResultSlot() {
+    return result;
+  }
+  public List<Slot> getPlayerSlots() {
+    return playerSlots;
+  }
+
   protected void bindPlayerInvo(Inventory playerInv) {
     this.player = playerInv.player;
     //player inventory
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 9; ++j) {
-        addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 174 + i * 18));
+        Slot slot = addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 174 + i * 18));
+        playerSlots.add(slot);
       }
     }
   }
@@ -75,7 +85,8 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
   public void bindHotbar() {
     //player hotbar
     for (int i = 0; i < 9; ++i) {
-      addSlot(new Slot(playerInv, i, 8 + i * 18, 232));
+      Slot slot = addSlot(new Slot(playerInv, i, 8 + i * 18, 232));
+      playerSlots.add(slot);
     }
   }
 
@@ -84,7 +95,8 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
     //3x3 crafting grid
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
-        addSlot(new Slot(matrix, index++, 8 + j * 18, 110 + i * 18));
+        Slot slot = addSlot(new Slot(matrix, index++, 8 + j * 18, 110 + i * 18));
+        playerSlots.add(slot);
       }
     }
   }

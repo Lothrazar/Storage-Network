@@ -3,6 +3,7 @@ package com.lothrazar.storagenetwork.jei;
 import java.util.Optional;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.request.ContainerNetworkCraftingTable;
+import com.lothrazar.storagenetwork.gui.NetworkWidget;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkCraftingRemote;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import mezz.jei.api.IModPlugin;
@@ -57,5 +58,35 @@ public class JeiPlugin implements IModPlugin {
         return Optional.of(SsnRegistry.Menus.CRAFTING_REMOTE.get());
       }
     }, RecipeTypes.CRAFTING);
+  }
+
+
+  static {
+    NetworkWidget.searchHandlers.add(new NetworkWidget.ISearchHandler() {
+
+      @Override
+      public void setSearch(String text) {
+        if (runtime != null) {
+          if (runtime.getIngredientFilter() != null) {
+            runtime.getIngredientFilter().setFilterText(text);
+          }
+        }
+      }
+
+      @Override
+      public String getSearch() {
+        if (runtime != null) {
+          if (runtime.getIngredientFilter() != null) {
+            return runtime.getIngredientFilter().getFilterText();
+          }
+        }
+        return "";
+      }
+
+      @Override
+      public String getName() {
+        return "JEI";
+      }
+    });
   }
 }

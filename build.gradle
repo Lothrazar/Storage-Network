@@ -127,8 +127,12 @@ repositories {
   	name = "curios"
     url = 'https://maven.theillusivec4.top/'
   }
-   maven { url = "https://modmaven.dev"  }    
-  maven { url = 'https://maven.blamejared.com' }    
+  maven { url = 'https://maven.blamejared.com' }
+  maven {
+      name = "TerraformersMC"
+      url = "https://maven.terraformersmc.com/"
+  }
+  maven { url = "https://modmaven.dev"  }
   maven { url = 'https://www.cursemaven.com'  }
 }
 
@@ -148,6 +152,9 @@ dependencies {
      compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
      compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
      runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+
+    compileOnly fg.deobf("dev.emi:emi-forge:${emi_version}+${mc_version}:api")
+    runtimeOnly fg.deobf("dev.emi:emi-forge:${emi_version}+${mc_version}")
 
 
   //  implementation fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")

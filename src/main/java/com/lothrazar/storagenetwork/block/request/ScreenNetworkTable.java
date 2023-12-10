@@ -243,4 +243,9 @@ public class ScreenNetworkTable extends AbstractContainerScreen<ContainerNetwork
   public void setAutoFocus(boolean b) {
     tile.setAutoFocus(b);
   }
+
+  @Override
+  public NetworkWidget getNetworkWidget() {
+    return network;
+  }
 }
