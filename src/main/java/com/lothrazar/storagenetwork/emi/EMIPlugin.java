@@ -18,38 +18,38 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 @EmiEntrypoint
 public class EMIPlugin implements EmiPlugin {
 
-    @Override
-    public void register(EmiRegistry registry) {
-        registry.addWorkstation(VanillaEmiRecipeCategories.CRAFTING, EmiStack.of(SsnRegistry.Blocks.REQUEST.get()));
-        registry.addRecipeHandler(SsnRegistry.Menus.REQUEST.get(), new EmiTransferHandler<ContainerNetworkCraftingTable>());
-        registry.addRecipeHandler(SsnRegistry.Menus.CRAFTING_REMOTE.get(), new EmiTransferHandler<ContainerNetworkCraftingRemote>());
-//        registry.addGenericDragDropHandler(new EmiGhostIngredientHandler());
-        registry.addGenericStackProvider((scr, x, y) -> {
-            if(scr instanceof ScreenNetworkTable || scr instanceof ScreenNetworkCraftingRemote) {
-                net.minecraft.world.inventory.Slot sl = ((AbstractContainerScreen<?>) scr).getSlotUnderMouse();
-                if(sl != null)return new EmiStackInteraction(EmiStack.of(sl.getItem()), null, false);
-            }
-            return EmiStackInteraction.EMPTY;
-        });
-    }
+  @Override
+  public void register(EmiRegistry registry) {
+    registry.addWorkstation(VanillaEmiRecipeCategories.CRAFTING, EmiStack.of(SsnRegistry.Blocks.REQUEST.get()));
+    registry.addRecipeHandler(SsnRegistry.Menus.REQUEST.get(), new EmiTransferHandler<ContainerNetworkCraftingTable>());
+    registry.addRecipeHandler(SsnRegistry.Menus.CRAFTING_REMOTE.get(), new EmiTransferHandler<ContainerNetworkCraftingRemote>());
+    //        registry.addGenericDragDropHandler(new EmiGhostIngredientHandler());
+    registry.addGenericStackProvider((scr, x, y) -> {
+      if (scr instanceof ScreenNetworkTable || scr instanceof ScreenNetworkCraftingRemote) {
+        net.minecraft.world.inventory.Slot sl = ((AbstractContainerScreen<?>) scr).getSlotUnderMouse();
+        if (sl != null) return new EmiStackInteraction(EmiStack.of(sl.getItem()), null, false);
+      }
+      return EmiStackInteraction.EMPTY;
+    });
+  }
 
-    static {
-        NetworkWidget.searchHandlers.add(new NetworkWidget.ISearchHandler() {
+  static {
+    NetworkWidget.searchHandlers.add(new NetworkWidget.ISearchHandler() {
 
-            @Override
-            public void setSearch(String set) {
-                EmiApi.setSearchText(set);
-            }
+      @Override
+      public void setSearch(String set) {
+        EmiApi.setSearchText(set);
+      }
 
-            @Override
-            public String getSearch() {
-                return EmiApi.getSearchText();
-            }
+      @Override
+      public String getSearch() {
+        return EmiApi.getSearchText();
+      }
 
-            @Override
-            public String getName() {
-                return "EMI";
-            }
-        });
-    }
+      @Override
+      public String getName() {
+        return "EMI";
+      }
+    });
+  }
 }

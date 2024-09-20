@@ -80,6 +80,7 @@ public class NetworkModule {
   public List<ItemStack> getStacks() {
     return getStacks(true);
   }
+
   /**
    * returns huge unsorted list of stacks
    * 

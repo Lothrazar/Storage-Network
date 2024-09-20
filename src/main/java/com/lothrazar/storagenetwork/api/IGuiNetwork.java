@@ -1,7 +1,6 @@
 package com.lothrazar.storagenetwork.api;
 
 import java.util.List;
-
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
 import net.minecraft.world.item.ItemStack;
 

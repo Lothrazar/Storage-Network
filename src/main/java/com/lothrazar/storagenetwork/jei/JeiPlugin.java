@@ -60,7 +60,6 @@ public class JeiPlugin implements IModPlugin {
     }, RecipeTypes.CRAFTING);
   }
 
-
   static {
     NetworkWidget.searchHandlers.add(new NetworkWidget.ISearchHandler() {
 

@@ -38,7 +38,6 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
   protected final ResultContainer resultInventory;
   protected Inventory playerInv;
   protected ResultSlot result;
-
   protected List<Slot> playerSlots = new ArrayList<Slot>();
   protected boolean recipeLocked = false;
   protected Player player;
@@ -59,6 +58,7 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
   public Slot getResultSlot() {
     return result;
   }
+
   public List<Slot> getPlayerSlots() {
     return playerSlots;
   }

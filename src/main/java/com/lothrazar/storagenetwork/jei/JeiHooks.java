@@ -1,6 +1,5 @@
 package com.lothrazar.storagenetwork.jei;
 
-import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.mojang.blaze3d.platform.InputConstants;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.helpers.IJeiHelpers;

@@ -32,8 +32,8 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.fml.ModList;
 
 public class NetworkWidget {
-  public static List<ISearchHandler> searchHandlers = new ArrayList<>();
 
+  public static List<ISearchHandler> searchHandlers = new ArrayList<>();
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
     return supplier.get();
   };
@@ -387,11 +387,11 @@ public class NetworkWidget {
   }
 
   public interface ISearchHandler {
+
     public abstract void setSearch(String set);
 
     public abstract String getSearch();
 
     public abstract String getName();
   }
-
 }

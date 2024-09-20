@@ -22,5 +22,6 @@
 	"1.20.1": {
 		"1.10.0":"Ported to 1.20.1, depends on flib-0.0.7+ . Fixed patchouli book.  Port to new non-deprecated curios datapack tags.  Includes pull requests merged into the 1.18 and 1.19 branches :  Merge pull request #492 from IIpragmaII/trunk/1.18 @IIpragmaII @VasurTrekkson Improved performance for export node.  fix priority german translation @lightlike .   Fixed recipes not showing when pressing the JEI recipe key @Demerso.   Create uk_ua.json @SKZGx   "
 		,"1.10.1":" Merge pull request #518 from ALFEECLARE:  add ja_jp translation."
+		,"1.10.2":"    Merge pull request #536 from maxpowa : Add support for EMI mod; this also fixes crash #513.   "
 	}
 }
