@@ -289,7 +289,11 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
     if (inventoryFace == null) {
       return;
     }
-    DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
+    DimPos connectablePos = connectable.getPos();
+    if (connectablePos == null) {
+      return;
+    }
+    DimPos inventoryPos = connectablePos.offset(inventoryFace);
     // Test whether the connected block has the IItemHandler capability
     IItemHandler itemHandler = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER,
         inventoryFace.getOpposite());

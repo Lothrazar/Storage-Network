@@ -53,6 +53,11 @@ public class ScreenNetworkCraftingRemote extends AbstractContainerScreen<Contain
   }
 
   @Override
+  public NetworkWidget getNetworkWidget() {
+    return network;
+  }
+
+  @Override
   public void setStacks(List<ItemStack> stacks) {
     network.stacks = stacks;
   }

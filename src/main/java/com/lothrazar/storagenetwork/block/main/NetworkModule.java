@@ -77,6 +77,9 @@ public class NetworkModule {
     return result;
   }
 
+  public List<ItemStack> getStacks() {
+    return getStacks(true);
+  }
   /**
    * returns huge unsorted list of stacks
    * 
@@ -84,9 +87,8 @@ public class NetworkModule {
    * 
    * @return
    */
-  public List<ItemStack> getStacks() {
+  public List<ItemStack> getStacks(boolean isFiltered) {
     selfValidate();
-    boolean isFiltered = true;
     List<ItemStack> stacks = Lists.newArrayList();
     try {
       for (IConnectableLink storage : getConnectableStorage()) {

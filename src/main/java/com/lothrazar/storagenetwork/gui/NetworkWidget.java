@@ -13,7 +13,6 @@ import com.lothrazar.storagenetwork.api.EnumSearchPrefix;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.block.request.ScreenNetworkTable;
 import com.lothrazar.storagenetwork.gui.ButtonRequest.TextureEnum;
-import com.lothrazar.storagenetwork.jei.JeiHooks;
 import com.lothrazar.storagenetwork.network.InsertMessage;
 import com.lothrazar.storagenetwork.network.RequestMessage;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
@@ -33,6 +32,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.fml.ModList;
 
 public class NetworkWidget {
+  public static List<ISearchHandler> searchHandlers = new ArrayList<>();
 
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
     return supplier.get();
@@ -61,6 +61,10 @@ public class NetworkWidget {
     lastClick = System.currentTimeMillis();
   }
 
+  public List<ItemStack> getStacks() {
+    return stacks;
+  }
+
   public void applySearchTextToSlots() {
     String searchText = searchBar.getValue();
     List<ItemStack> stacksToDisplay = searchText.equals("") ? Lists.newArrayList(stacks) : Lists.newArrayList();
@@ -82,7 +86,7 @@ public class NetworkWidget {
     }
     searchBar.setValue("");
     if (ModList.get().isLoaded("jei") && gui.isJeiSearchSynced()) {
-      JeiHooks.setFilterText("");
+      searchHandlers.forEach((handler) -> handler.setSearch(""));
     }
   }
 
@@ -198,7 +202,8 @@ public class NetworkWidget {
   private void initJei() {
     try {
       if (gui != null && searchBar != null && gui.isJeiSearchSynced()) {
-        searchBar.setValue(JeiHooks.getFilterText());
+        Optional<String> searchResult = searchHandlers.stream().map(ISearchHandler::getSearch).findFirst();
+        searchResult.ifPresent(s -> searchBar.setValue(s));
       }
     }
     catch (Exception e) {
@@ -208,7 +213,7 @@ public class NetworkWidget {
 
   public void syncTextToJei() {
     if (ModList.get().isLoaded("jei") && gui.isJeiSearchSynced()) {
-      JeiHooks.setFilterText(searchBar.getValue());
+      searchHandlers.forEach((handler) -> handler.setSearch(searchBar.getValue()));
     }
   }
 
@@ -380,4 +385,13 @@ public class NetworkWidget {
       jeiBtn.setTextureId(gui.isJeiSearchSynced() ? TextureEnum.JEI_GREEN : TextureEnum.JEI_RED);
     }
   }
+
+  public interface ISearchHandler {
+    public abstract void setSearch(String set);
+
+    public abstract String getSearch();
+
+    public abstract String getName();
+  }
+
 }
