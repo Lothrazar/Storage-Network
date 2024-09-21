@@ -29,10 +29,6 @@ public class JeiHooks {
     }
   }
 
-  private static String getJeiTextInternal() {
-    return getRuntime().getIngredientFilter().getFilterText();
-  }
-
   public static void testJeiKeybind(InputConstants.Key keyCode, ItemStack stackUnderMouse) {
     try {
       if (!isJeiLoaded() || getRuntime() == null) {

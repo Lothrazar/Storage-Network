@@ -5,6 +5,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkGuiSize;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
 import com.lothrazar.storagenetwork.network.ClearRecipeMessage;
 import com.lothrazar.storagenetwork.network.RequestMessage;
@@ -38,11 +39,9 @@ public class ScreenNetworkInventory extends AbstractContainerScreen<ContainerNet
   public ScreenNetworkInventory(ContainerNetworkInventory container, Inventory inv, Component name) {
     super(container, inv, name);
     tile = container.tile;
-    network = new NetworkWidget(this);
-    network.setLines(8);
+    network = new NetworkWidget(this, NetworkGuiSize.LARGE);
     imageWidth = WIDTH;
     imageHeight = HEIGHT;
-    network.fieldHeight = 180;
   }
 
   @Override

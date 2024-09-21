@@ -44,7 +44,7 @@ public class NetworkWidget {
   public ButtonRequest sortBtn;
   public ButtonRequest jeiBtn;
   public ButtonRequest focusBtn;
-  public int fieldHeight = 90;
+  private int fieldHeight = 90;
   private List<ItemSlotNetwork> slots;
   private final IGuiNetwork gui;
   private long lastClick;
@@ -53,8 +53,22 @@ public class NetworkWidget {
   private int lines = 4;
   private final int columns = 9;
 
+  @Deprecated
   public NetworkWidget(IGuiNetwork gui) {
+    this(gui, NetworkGuiSize.NORMAL);
+  }
+  public NetworkWidget(IGuiNetwork gui, NetworkGuiSize size) {
     this.gui = gui;
+    switch (size) {
+      case LARGE:
+        setLines(8);
+        setFieldHeight(180 - 8); // the jei -8 gets fixed here now
+      break;
+      case NORMAL:
+        setLines(4);
+        setFieldHeight(90);
+      break;
+    }
     stacks = Lists.newArrayList();
     slots = Lists.newArrayList();
     PacketRegistry.INSTANCE.sendToServer(new RequestMessage());
@@ -171,7 +185,7 @@ public class NetworkWidget {
           break;
         }
         int in = index;
-        //        StorageNetwork.LOGGER.info(in + "GUI STORAGE rebuildItemSlots "+stacksToDisplay.get(in));
+
         slots.add(new ItemSlotNetwork(gui, stacksToDisplay.get(in),
             gui.getGuiLeft() + 8 + col * 18,
             gui.getGuiTopFixJei() + 10 + row * 18,
@@ -301,21 +315,23 @@ public class NetworkWidget {
         && (mouseButton == UtilTileEntity.MOUSE_BTN_LEFT || mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT)
         && stackCarriedByMouse.isEmpty() &&
         this.canClick()) {
+      // Request an item (from the network) if we are in the upper section of the GUI 
       PacketRegistry.INSTANCE.sendToServer(new RequestMessage(mouseButton, this.stackUnderMouse.copy(), Screen.hasShiftDown(),
           Screen.hasAltDown() || Screen.hasControlDown()));
       this.lastClick = System.currentTimeMillis();
     }
     else if (!stackCarriedByMouse.isEmpty() && inField((int) mouseX, (int) mouseY) &&
         this.canClick()) {
-          //0 isd getDim()
+          // Insert the item held by the mouse into the network
           PacketRegistry.INSTANCE.sendToServer(new InsertMessage(0, mouseButton));
           this.lastClick = System.currentTimeMillis();
         }
   }
 
   private boolean inField(int mouseX, int mouseY) {
-    return mouseX > (gui.getGuiLeft() + 7) && mouseX < (gui.getGuiLeft() + ScreenNetworkTable.WIDTH - 7)
-        && mouseY > (gui.getGuiTopFixJei() + 7) && mouseY < (gui.getGuiTopFixJei() + fieldHeight);
+    boolean inField = mouseX > (gui.getGuiLeft() + 7) && mouseX < (gui.getGuiLeft() + ScreenNetworkTable.WIDTH - 7)
+        && mouseY > (gui.getGuiTopFixJei() + 7) && mouseY < (gui.getGuiTopFixJei() + getFieldHeight());
+    return inField;
   }
 
   public void initButtons() {
@@ -386,6 +402,14 @@ public class NetworkWidget {
     }
   }
 
+  public int getFieldHeight() {
+    return fieldHeight;
+  }
+
+  public void setFieldHeight(int fieldHeight) {
+    this.fieldHeight = fieldHeight;
+  }
+
   public interface ISearchHandler {
 
     public abstract void setSearch(String set);
@@ -393,5 +417,9 @@ public class NetworkWidget {
     public abstract String getSearch();
 
     public abstract String getName();
+  }
+
+  public enum NetworkGuiSize {
+    NORMAL, LARGE;
   }
 }
