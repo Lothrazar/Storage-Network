@@ -1,6 +1,6 @@
 package com.lothrazar.storagenetwork.gui;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -11,32 +11,24 @@ import net.minecraft.util.NonNullList;
 
 public class NetworkCraftingInventory extends CraftingInventory {
 
+  private static final int SIZE = 3;
   /** stupid thing is private with no getter so overwrite */
   private final NonNullList<ItemStack> stackList;
   private final Container eventHandler;
   public boolean skipEvents;
+  @Deprecated
+  private Map<Integer, ItemStack> matrix = new HashMap<>();
 
-  private NetworkCraftingInventory(Container eventHandlerIn, int width, int height) {
-    super(eventHandlerIn, width, height);
+  public NetworkCraftingInventory(Container eventHandlerIn) {
+    super(eventHandlerIn, SIZE, SIZE);
     eventHandler = eventHandlerIn;
-    stackList = NonNullList.<ItemStack> withSize(3 * 3, ItemStack.EMPTY);
+    stackList = NonNullList.<ItemStack> withSize(SIZE * SIZE, ItemStack.EMPTY);
   }
 
   public NetworkCraftingInventory(Container eventHandlerIn, Map<Integer, ItemStack> matrix) {
-    this(eventHandlerIn, 3, 3);
+    this(eventHandlerIn);
     skipEvents = true;
-    for (int i = 0; i < 9; i++) {
-      if (matrix.get(i) != null && matrix.get(i).isEmpty() == false) {
-        setInventorySlotContents(i, matrix.get(i));
-      }
-    }
-    skipEvents = false;
-  }
-
-  public NetworkCraftingInventory(Container eventHandlerIn, List<ItemStack> matrix) {
-    this(eventHandlerIn, 3, 3);
-    skipEvents = true;
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < SIZE * SIZE; i++) {
       if (matrix.get(i) != null && matrix.get(i).isEmpty() == false) {
         setInventorySlotContents(i, matrix.get(i));
       }

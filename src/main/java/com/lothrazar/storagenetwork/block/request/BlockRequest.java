@@ -7,9 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -40,15 +38,9 @@ public class BlockRequest extends BaseBlock {
   @Override
   public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
     if (state.getBlock() != newState.getBlock()) {
-      TileEntity tileentity = worldIn.getTileEntity(pos);
-      if (tileentity instanceof TileRequest) {
-        TileRequest tile = (TileRequest) tileentity;
-        for (ItemStack entry : tile.matrix.values()) {
-          if (!entry.isEmpty()) {
-            InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), entry);
-          }
-        }
-      }
+      //      TileEntity tileentity = worldIn.getTileEntity(pos);
+      //      Containers.dropContents(worldIn, pos, tileentity);
+      worldIn.updateComparatorOutputLevel(pos, getSelf());
       super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
   }

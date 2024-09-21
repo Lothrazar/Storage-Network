@@ -5,6 +5,7 @@ import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.ITileNetworkSync;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
+import com.lothrazar.storagenetwork.util.UtilInventory;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.block.BlockState;
@@ -24,10 +25,11 @@ public class TileRequest extends TileConnectable implements INamedContainerProvi
   public static final String NBT_JEI = StorageNetwork.MODID + "jei";
   private static final String NBT_DIR = StorageNetwork.MODID + "dir";
   private static final String NBT_SORT = StorageNetwork.MODID + "sort";
-  Map<Integer, ItemStack> matrix = new HashMap<>();
   private boolean downwards;
   private EnumSortType sort = EnumSortType.NAME;
   private boolean isJeiSearchSynced;
+  @Deprecated
+  private Map<Integer, ItemStack> matrix = new HashMap<>();
 
   public TileRequest() {
     super(SsnRegistry.REQUESTTILE);
@@ -42,13 +44,25 @@ public class TileRequest extends TileConnectable implements INamedContainerProvi
     if (compound.contains(NBT_JEI)) {
       this.setJeiSearchSynced(compound.getBoolean(NBT_JEI));
     }
-    ListNBT invList = compound.getList("matrix", Constants.NBT.TAG_COMPOUND);
-    matrix = new HashMap<>();
-    for (int i = 0; i < invList.size(); i++) {
-      CompoundNBT stackTag = invList.getCompound(i);
-      int slot = stackTag.getByte("Slot");
-      ItemStack s = ItemStack.read(stackTag);
-      matrix.put(slot, s);
+    //legacy support: instead of deleting items, in this one-off world upgrade transition
+    //drop them on the ground
+    //then forever more it will not be saved to this data location
+    if (compound.contains("matrix")) {
+      ListNBT invList = compound.getList("matrix", Constants.NBT.TAG_COMPOUND);
+      for (int i = 0; i < invList.size(); i++) {
+        CompoundNBT stackTag = invList.getCompound(i);
+        int slot = stackTag.getByte("Slot");
+        ItemStack s = ItemStack.read(stackTag);
+        if (world != null) {
+          StorageNetwork.LOGGER.info("world upgrade: item dropping onluy once so it doesnt get deleted; " + this.pos + ":" + s);
+          UtilInventory.dropItem(world, this.pos, s);
+          matrix.put(slot, ItemStack.EMPTY);
+        }
+        else {
+          //i was not able to drop it in the world. save it so its not deleted. will be hidden from player
+          matrix.put(slot, s);
+        }
+      }
     }
     super.read(bs, compound);
   }
@@ -58,16 +72,27 @@ public class TileRequest extends TileConnectable implements INamedContainerProvi
     compound.putBoolean(NBT_DIR, isDownwards());
     compound.putInt(NBT_SORT, getSort().ordinal());
     compound.putBoolean(NBT_JEI, this.isJeiSearchSynced());
-    ListNBT invList = new ListNBT();
-    for (int i = 0; i < 9; i++) {
-      if (matrix.get(i) != null && matrix.get(i).isEmpty() == false) {
-        CompoundNBT stackTag = new CompoundNBT();
-        stackTag.putByte("Slot", (byte) i);
-        matrix.get(i).write(stackTag);
-        invList.add(stackTag);
+    //legacy : only used when converting old worlds to new worlds 
+    if (matrix != null) {
+      ListNBT invList = new ListNBT();
+      for (int i = 0; i < 9; i++) {
+        if (matrix.get(i) != null && matrix.get(i).isEmpty() == false) {
+          if (world != null) {
+            StorageNetwork.LOGGER.info("World Upgrade: item dropping only once so it doesnt get deleted; " + this.pos + ":" + matrix.get(i));
+            UtilInventory.dropItem(world, this.pos, matrix.get(i));
+            matrix.put(i, ItemStack.EMPTY);
+          }
+          else {
+            //i was not able to drop it in the world. keep saving it and never delete items. will be hidden from player
+            CompoundNBT stackTag = new CompoundNBT();
+            stackTag.putByte("Slot", (byte) i);
+            matrix.get(i).write(stackTag);
+            invList.add(stackTag);
+          }
+        }
       }
+      compound.put("matrix", invList);
     }
-    compound.put("matrix", invList);
     return super.write(compound);
   }
 

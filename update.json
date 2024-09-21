@@ -1,7 +1,7 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/simple-storage-network",
   "promos": {
-    "1.16.5-latest": "1.5.3"
+    "1.16.5-latest": "1.5.4"
   },
   "1.16.5": {
    	"1.0.1":"Ported to the latest forge version to fix rendering issues (tooltips, player models transparent, etc)"
@@ -23,5 +23,6 @@
   	,"1.5.1":"Mod no longer crashes if JEI is not installed.  Fix remoteMaxRange config.  Created italian translation #408 by maicol07  "
   	,"1.5.2":"Fix #416 remotes not saving options settings. Fixed Network Collector Remote Void Items #414.  Crafting remote no longer saves crafting grid data, drops 3x3 on close (Fixes #434 and other isses).  This allows a new feature where the Crafting Remote can go into the ender chest or Curios slot and be opened by the key binding (i default). Patched some stackOverflow errors, please report if more come up.  Fix #254 Import Cables stuck on not importable items. "
   	,"1.5.3":"Fix  Curios and modifiers cause a crash #440 . "
+  	,"1.5.4":"The Storage Request Table 'storagenetwork:request' block no longer saves the contents of its crafting-grid; instead items are returned to the player on close, exactly matching vanilla crafting table behavior  (this was changed to prevent potential exploits. If any items are left behind in the grid during world upgrade they will be returned and not lost. No changes were made to the remotes or to other blocks)   "
   }
 }

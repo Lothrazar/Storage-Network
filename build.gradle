@@ -43,6 +43,8 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 		        properties 'mixin.env.disableRefMap': 'true'
 
+            args '--username=AnotherDev'
+             
             mods {
                 storagenetwork {
                     source sourceSets.main
@@ -149,14 +151,12 @@ task signJar(type: SignJar, dependsOn: jar) {
     outputFile = jar.archivePath
 }
 
-// build.dependsOn signJar
 
 task copyJar(type: Copy) {
     from jar
     into "${dist_folder}"
 }
 
-// build.finalizedBy copyJar
 
 task cleanJar {
   delete 'build/libs'

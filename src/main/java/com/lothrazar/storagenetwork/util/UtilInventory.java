@@ -118,7 +118,7 @@ public class UtilInventory {
   }
 
   public static void dropItem(World world, BlockPos pos, ItemStack stack) {
-    if (pos == null || world.isRemote || stack.isEmpty()) {
+    if (pos == null || world.isRemote || stack == null || stack.isEmpty()) {
       return;
     }
     world.addEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack));
