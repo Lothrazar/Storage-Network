@@ -2,7 +2,7 @@
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/simple-storage-network",
 	"promos": {
 		"1.18.1-latest": "1.6.0",
-		"1.18.2-latest": "1.7.0"
+		"1.18.2-latest": "1.7.1"
 	},
 	"1.18.2": {
 		"1.4.1": "First port to 1.17.1 ",
@@ -19,7 +19,7 @@
 
 		"1.7.0":"Added version warning, Does not work with any JEI versions in the 10.X series, only with 9.7.X (for example 9.7.1.255 or 9.7.2.281).  Community Pull Request Contributions:  Merge pull request #492 from IIpragmaII/trunk/1.18 @IIpragmaII @VasurTrekkson Improved performance for export node.  fix priority german translation @lightlike .   Fixed recipes not showing when pressing the JEI recipe key @Demerso.   Create uk_ua.json @SKZGx  .  "
 	
-	
+	  	,"1.7.1":"The Storage Request Table 'storagenetwork:request' block no longer saves the contents of its crafting-grid; instead items are returned to the player on close, exactly matching vanilla crafting table behavior  (this was changed to prevent potential exploits. If any items are left behind in the grid during world upgrade they will be returned and not lost. No changes were made to the remotes or to other blocks)   "
 
 	}
 }
