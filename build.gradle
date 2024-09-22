@@ -41,6 +41,8 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 		        properties 'mixin.env.disableRefMap': 'true'
 
+            args '--username=AnotherDev'
+            
             mods {
                 storagenetwork {
                     source sourceSets.main

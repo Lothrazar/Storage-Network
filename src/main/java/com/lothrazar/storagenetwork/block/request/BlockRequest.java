@@ -11,7 +11,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -47,15 +46,6 @@ public class BlockRequest extends BaseBlock {
       if (blockentity instanceof Container) {
         Containers.dropContents(worldIn, pos, (Container) blockentity);
         worldIn.updateNeighbourForOutputSignal(pos, this);
-      }
-      BlockEntity tileentity = worldIn.getBlockEntity(pos);
-      if (tileentity instanceof TileRequest) {
-        TileRequest tile = (TileRequest) tileentity;
-        for (ItemStack entry : tile.matrix.values()) {
-          if (!entry.isEmpty()) {
-            Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), entry);
-          }
-        }
       }
       super.onRemove(state, worldIn, pos, newState, isMoving);
     }

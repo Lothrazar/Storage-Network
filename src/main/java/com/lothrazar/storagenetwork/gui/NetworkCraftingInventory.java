@@ -1,6 +1,5 @@
 package com.lothrazar.storagenetwork.gui;
 
-import java.util.List;
 import java.util.Map;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.ContainerHelper;
@@ -16,25 +15,14 @@ public class NetworkCraftingInventory extends CraftingContainer {
   private final AbstractContainerMenu eventHandler;
   private boolean skipEvents;
 
-  private NetworkCraftingInventory(AbstractContainerMenu eventHandlerIn, int width, int height) {
-    super(eventHandlerIn, width, height);
+  public NetworkCraftingInventory(AbstractContainerMenu eventHandlerIn) {
+    super(eventHandlerIn, 3, 3);
     eventHandler = eventHandlerIn;
     stackList = NonNullList.<ItemStack> withSize(3 * 3, ItemStack.EMPTY);
   }
 
   public NetworkCraftingInventory(AbstractContainerMenu eventHandlerIn, Map<Integer, ItemStack> matrix) {
-    this(eventHandlerIn, 3, 3);
-    skipEvents = true;
-    for (int i = 0; i < 9; i++) {
-      if (matrix.get(i) != null && matrix.get(i).isEmpty() == false) {
-        setItem(i, matrix.get(i));
-      }
-    }
-    skipEvents = false;
-  }
-
-  public NetworkCraftingInventory(AbstractContainerMenu eventHandlerIn, List<ItemStack> matrix) {
-    this(eventHandlerIn, 3, 3);
+    this(eventHandlerIn);
     skipEvents = true;
     for (int i = 0; i < 9; i++) {
       if (matrix.get(i) != null && matrix.get(i).isEmpty() == false) {
