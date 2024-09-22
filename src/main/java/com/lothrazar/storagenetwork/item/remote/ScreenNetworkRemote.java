@@ -5,7 +5,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
-import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkGuiSize;
+import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkScreenSize;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
 import com.lothrazar.storagenetwork.network.SettingsSyncMessage;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
@@ -32,8 +32,8 @@ public class ScreenNetworkRemote extends AbstractContainerScreen<ContainerNetwor
   public ScreenNetworkRemote(ContainerNetworkRemote screenContainer, Inventory inv, Component titleIn) {
     super(screenContainer, inv, titleIn);
     //since the rightclick action forces only MAIN_HAND openings, is ok
-    this.remote = screenContainer.getRemote();//inv.player.getItemInHand(InteractionHand.MAIN_HAND);
-    network = new NetworkWidget(this, NetworkGuiSize.LARGE);
+    this.remote = screenContainer.getRemote();
+    network = new NetworkWidget(this, NetworkScreenSize.LARGE);
     this.imageWidth = WIDTH;
     this.imageHeight = HEIGHT;
   }

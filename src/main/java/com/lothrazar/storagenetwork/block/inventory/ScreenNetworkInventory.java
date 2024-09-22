@@ -5,10 +5,8 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
-import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkGuiSize;
+import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkScreenSize;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
-import com.lothrazar.storagenetwork.network.ClearRecipeMessage;
-import com.lothrazar.storagenetwork.network.RequestMessage;
 import com.lothrazar.storagenetwork.network.SettingsSyncMessage;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -39,7 +37,7 @@ public class ScreenNetworkInventory extends AbstractContainerScreen<ContainerNet
   public ScreenNetworkInventory(ContainerNetworkInventory container, Inventory inv, Component name) {
     super(container, inv, name);
     tile = container.tile;
-    network = new NetworkWidget(this, NetworkGuiSize.LARGE);
+    network = new NetworkWidget(this, NetworkScreenSize.LARGE);
     imageWidth = WIDTH;
     imageHeight = HEIGHT;
   }
@@ -130,9 +128,6 @@ public class ScreenNetworkInventory extends AbstractContainerScreen<ContainerNet
 
   @Override
   public void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
-    //    minecraft.getTextureManager().bind(texture);
-    //    RenderSystem.setShader(GameRenderer::getPositionTexShader);
-    //    RenderSystem.setShaderTexture(0, texture);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
     ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
@@ -174,14 +169,6 @@ public class ScreenNetworkInventory extends AbstractContainerScreen<ContainerNet
   public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
     super.mouseClicked(mouseX, mouseY, mouseButton);
     network.mouseClicked(mouseX, mouseY, mouseButton);
-    //recipe clear thingy
-    int rectX = 63;
-    int rectY = 110;
-    if (isHovering(rectX, rectY, 7, 7, mouseX, mouseY)) {
-      PacketRegistry.INSTANCE.sendToServer(new ClearRecipeMessage());
-      PacketRegistry.INSTANCE.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
-      return true;
-    }
     return true;
   }
 

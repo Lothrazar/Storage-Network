@@ -55,9 +55,10 @@ public class NetworkWidget {
 
   @Deprecated
   public NetworkWidget(IGuiNetwork gui) {
-    this(gui, NetworkGuiSize.NORMAL);
+    this(gui, NetworkScreenSize.NORMAL);
   }
-  public NetworkWidget(IGuiNetwork gui, NetworkGuiSize size) {
+
+  public NetworkWidget(IGuiNetwork gui, NetworkScreenSize size) {
     this.gui = gui;
     switch (size) {
       case LARGE:
@@ -73,6 +74,16 @@ public class NetworkWidget {
     slots = Lists.newArrayList();
     PacketRegistry.INSTANCE.sendToServer(new RequestMessage());
     lastClick = System.currentTimeMillis();
+    switch (size) {
+      case LARGE:
+        setLines(8);
+        setFieldHeight(180 - 8); // offset is important 
+      break;
+      case NORMAL:
+        setLines(4);
+        setFieldHeight(90);
+      break;
+    }
   }
 
   public List<ItemStack> getStacks() {
@@ -185,7 +196,6 @@ public class NetworkWidget {
           break;
         }
         int in = index;
-
         slots.add(new ItemSlotNetwork(gui, stacksToDisplay.get(in),
             gui.getGuiLeft() + 8 + col * 18,
             gui.getGuiTopFixJei() + 10 + row * 18,
@@ -419,7 +429,7 @@ public class NetworkWidget {
     public abstract String getName();
   }
 
-  public enum NetworkGuiSize {
+  public enum NetworkScreenSize {
     NORMAL, LARGE;
   }
 }
