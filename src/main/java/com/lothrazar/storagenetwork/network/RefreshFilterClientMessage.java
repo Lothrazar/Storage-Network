@@ -16,6 +16,7 @@ import net.minecraftforge.network.NetworkEvent;
  * <p>
  * Used by Containers displaying network inventory as well as most other packets that perform small actions
  */
+@SuppressWarnings("resource")
 public class RefreshFilterClientMessage {
 
   private int size;

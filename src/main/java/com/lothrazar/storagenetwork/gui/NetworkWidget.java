@@ -44,7 +44,7 @@ public class NetworkWidget {
   public ButtonRequest sortBtn;
   public ButtonRequest jeiBtn;
   public ButtonRequest focusBtn;
-  public int fieldHeight = 90;
+  private int fieldHeight = 90;
   private List<ItemSlotNetwork> slots;
   private final IGuiNetwork gui;
   private long lastClick;
@@ -53,12 +53,27 @@ public class NetworkWidget {
   private int lines = 4;
   private final int columns = 9;
 
+  @Deprecated
   public NetworkWidget(IGuiNetwork gui) {
+    this(gui, NetworkScreenSize.NORMAL);
+  }
+
+  public NetworkWidget(IGuiNetwork gui, NetworkScreenSize size) {
     this.gui = gui;
     stacks = Lists.newArrayList();
     slots = Lists.newArrayList();
     PacketRegistry.INSTANCE.sendToServer(new RequestMessage());
     lastClick = System.currentTimeMillis();
+    switch (size) {
+      case LARGE:
+        setLines(8);
+        setFieldHeight(180 - 8); // offset is important 
+      break;
+      case NORMAL:
+        setLines(4);
+        setFieldHeight(90);
+      break;
+    }
   }
 
   public void applySearchTextToSlots() {
@@ -310,7 +325,7 @@ public class NetworkWidget {
 
   private boolean inField(int mouseX, int mouseY) {
     return mouseX > (gui.getGuiLeft() + 7) && mouseX < (gui.getGuiLeft() + ScreenNetworkTable.WIDTH - 7)
-        && mouseY > (gui.getGuiTopFixJei() + 7) && mouseY < (gui.getGuiTopFixJei() + fieldHeight);
+        && mouseY > (gui.getGuiTopFixJei() + 7) && mouseY < (gui.getGuiTopFixJei() + getFieldHeight());
   }
 
   public void initButtons() {
@@ -379,5 +394,17 @@ public class NetworkWidget {
     if (jeiBtn != null && ModList.get().isLoaded("jei")) {
       jeiBtn.setTextureId(gui.isJeiSearchSynced() ? TextureEnum.JEI_GREEN : TextureEnum.JEI_RED);
     }
+  }
+
+  public int getFieldHeight() {
+    return fieldHeight;
+  }
+
+  public void setFieldHeight(int fieldHeight) {
+    this.fieldHeight = fieldHeight;
+  }
+
+  public enum NetworkScreenSize {
+    NORMAL, LARGE;
   }
 }
