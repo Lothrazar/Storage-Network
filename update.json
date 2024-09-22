@@ -1,21 +1,14 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/simple-storage-network",
 	"promos": {
-		"1.18.2-latest": "1.7.0",
-		"1.19.2-latest": "1.7.0",
-		"1.19.3-latest": "1.8.0",
-		"1.19.4-latest": "1.9.0"
+		"1.19.4-latest": "1.9.1"
 	},
-	"1.19.2": {
-		"1.7.0":"Merged 1.18.2-1.7.0.  Compatible with jei==11.4+, forge=43+.  Community Pull Request Contributions:  Merge pull request #492 from IIpragmaII/trunk/1.18 @IIpragmaII @VasurTrekkson Improved performance for export node.  fix priority german translation @lightlike .   Fixed recipes not showing when pressing the JEI recipe key @Demerso.   Create uk_ua.json @SKZGx  .  "
-	
-	},
-	"1.19.3": {
-		"1.8.0":"Merged 1.18.2-1.7.0.  Compatible with jei==11.4+, forge=43+.  Community Pull Request Contributions:  Merge pull request #492 from IIpragmaII/trunk/1.18 @IIpragmaII @VasurTrekkson Improved performance for export node.  fix priority german translation @lightlike .   Fixed recipes not showing when pressing the JEI recipe key @Demerso.   Create uk_ua.json @SKZGx  .  "
-	
-	},
+
 	"1.19.4": {
 		"1.9.0":"Ported to 1.19.4.  Previous changelog:  Community Pull Request Contributions:  Merge pull request #492 from IIpragmaII/trunk/1.18 @IIpragmaII @VasurTrekkson Improved performance for export node.  fix priority german translation @lightlike .   Fixed recipes not showing when pressing the JEI recipe key @Demerso.   Create uk_ua.json @SKZGx  .  "
-	
+
+		  
+		 ,"1.9.1":"The Storage Request Table 'storagenetwork:request' block no longer saves the contents of its crafting-grid; instead items are returned to the player on close, exactly matching vanilla crafting table behavior  (this was changed to prevent potential exploits. If any items are left behind in the grid during world upgrade they will be returned and not lost. No changes were made to the remotes or to other blocks)   "
+
 	}
 }
