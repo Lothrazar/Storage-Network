@@ -8,7 +8,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class UtilConnections {
@@ -48,7 +48,7 @@ public class UtilConnections {
     }
     BlockEntity neighbor = world.getBlockEntity(facingPos);
     if (neighbor != null
-        && neighbor.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()).orElse(null) != null) {
+        && neighbor.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite()).orElse(null) != null) {
       return true;
     }
     return false;
