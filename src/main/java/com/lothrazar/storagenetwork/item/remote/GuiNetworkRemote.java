@@ -4,6 +4,7 @@ import com.lothrazar.storagenetwork.StorageNetwork;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkGuiSize;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
 import com.lothrazar.storagenetwork.network.SettingsSyncMessage;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
@@ -32,11 +33,9 @@ public class GuiNetworkRemote extends ContainerScreen<ContainerNetworkRemote> im
     super(screenContainer, inv, titleIn);
     //since the rightclick action forces only MAIN_HAND openings, is ok
     this.remote = inv.player.getHeldItem(Hand.MAIN_HAND);
-    network = new NetworkWidget(this);
-    network.setLines(8);
+    network = new NetworkWidget(this, NetworkGuiSize.LARGE);
     this.xSize = WIDTH;
     this.ySize = HEIGHT;
-    network.fieldHeight = 180;
   }
 
   @Override

@@ -40,17 +40,32 @@ public class NetworkWidget {
   private int lines = 4;
   private int columns = 9;
   public ItemStack stackUnderMouse = ItemStack.EMPTY;
-  public int fieldHeight = 90;
+  private int fieldHeight = 90;
   public ButtonRequest directionBtn;
   public ButtonRequest sortBtn;
   public ButtonRequest jeiBtn;
 
+  @Deprecated
   public NetworkWidget(IGuiNetwork gui) {
+    this(gui, NetworkGuiSize.NORMAL);
+  }
+
+  public NetworkWidget(IGuiNetwork gui, NetworkGuiSize size) {
     this.gui = gui;
     stacks = Lists.newArrayList();
     slots = Lists.newArrayList();
     PacketRegistry.INSTANCE.sendToServer(new RequestMessage());
     lastClick = System.currentTimeMillis();
+    switch (size) {
+      case LARGE:
+        setLines(8);
+        setFieldHeight(180 - 8); // offset is important 
+      break;
+      case NORMAL:
+        setLines(4);
+        setFieldHeight(90);
+      break;
+    }
   }
 
   public void applySearchTextToSlots() {
@@ -297,7 +312,7 @@ public class NetworkWidget {
 
   private boolean inField(int mouseX, int mouseY) {
     return mouseX > (gui.getGuiLeft() + 7) && mouseX < (gui.getGuiLeft() + GuiNetworkTable.WIDTH - 7)
-        && mouseY > (gui.getGuiTop() + 7) && mouseY < (gui.getGuiTop() + fieldHeight);
+        && mouseY > (gui.getGuiTop() + 7) && mouseY < (gui.getGuiTop() + getFieldHeight());
   }
 
   public void initButtons() {
@@ -358,5 +373,17 @@ public class NetworkWidget {
     if (jeiBtn != null && ModList.get().isLoaded("jei")) {
       jeiBtn.setTextureId(gui.isJeiSearchSynced() ? TextureEnum.JEI_GREEN : TextureEnum.JEI_RED);
     }
+  }
+
+  public int getFieldHeight() {
+    return fieldHeight;
+  }
+
+  public void setFieldHeight(int fieldHeight) {
+    this.fieldHeight = fieldHeight;
+  }
+
+  public enum NetworkGuiSize {
+    NORMAL, LARGE;
   }
 }

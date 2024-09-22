@@ -4,6 +4,7 @@ import com.lothrazar.storagenetwork.StorageNetwork;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkGuiSize;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
 import com.lothrazar.storagenetwork.network.ClearRecipeMessage;
 import com.lothrazar.storagenetwork.network.RequestMessage;
@@ -35,7 +36,7 @@ public class GuiNetworkTable extends ContainerScreen<ContainerNetworkCraftingTab
   public GuiNetworkTable(ContainerNetworkCraftingTable container, PlayerInventory inv, ITextComponent name) {
     super(container, inv, name);
     tile = container.getTileRequest();
-    network = new NetworkWidget(this);
+    network = new NetworkWidget(this, NetworkGuiSize.NORMAL);
     xSize = WIDTH;
     ySize = HEIGHT;
   }

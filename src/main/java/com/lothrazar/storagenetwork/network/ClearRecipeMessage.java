@@ -1,5 +1,6 @@
 package com.lothrazar.storagenetwork.network;
 
+import com.lothrazar.storagenetwork.StorageNetwork;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
@@ -44,6 +45,11 @@ public class ClearRecipeMessage {
     if (player.openContainer instanceof ContainerNetwork) {
       ContainerNetwork container = (ContainerNetwork) player.openContainer;
       CraftingInventory craftMatrix = container.getCraftMatrix();
+      if (craftMatrix == null) {
+        // NullPointer fixed in NetworkInvenotry, second safety valve here
+        StorageNetwork.log("error: no crafting grid here");
+        return;
+      }
       TileMain root = container.getTileMain();
       for (int i = 0; i < 9; i++) {
         if (root == null) {

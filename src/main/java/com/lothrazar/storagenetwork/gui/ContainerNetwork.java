@@ -42,7 +42,7 @@ public abstract class ContainerNetwork extends Container {
   protected PlayerEntity player;
   protected World world;
   protected ICraftingRecipe recipeCurrent;
-  public NetworkCraftingInventory matrix;
+  public NetworkCraftingInventory matrix; // this is null if there is no crafting grid
 
   protected ContainerNetwork(ContainerType<?> type, int id) {
     super(type, id);

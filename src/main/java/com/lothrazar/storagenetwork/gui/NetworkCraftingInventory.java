@@ -1,6 +1,5 @@
 package com.lothrazar.storagenetwork.gui;
 
-import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -16,8 +15,6 @@ public class NetworkCraftingInventory extends CraftingInventory {
   private final NonNullList<ItemStack> stackList;
   private final Container eventHandler;
   public boolean skipEvents;
-  @Deprecated
-  private Map<Integer, ItemStack> matrix = new HashMap<>();
 
   public NetworkCraftingInventory(Container eventHandlerIn) {
     super(eventHandlerIn, SIZE, SIZE);

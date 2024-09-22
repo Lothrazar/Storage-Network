@@ -4,9 +4,8 @@ import com.lothrazar.storagenetwork.StorageNetwork;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkGuiSize;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
-import com.lothrazar.storagenetwork.network.ClearRecipeMessage;
-import com.lothrazar.storagenetwork.network.RequestMessage;
 import com.lothrazar.storagenetwork.network.SettingsSyncMessage;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -36,11 +35,9 @@ public class GuiNetworkInventory extends ContainerScreen<ContainerNetworkInvento
   public GuiNetworkInventory(ContainerNetworkInventory container, PlayerInventory inv, ITextComponent name) {
     super(container, inv, name);
     tile = container.tile;
-    network = new NetworkWidget(this);
-    network.setLines(8);
+    network = new NetworkWidget(this, NetworkGuiSize.LARGE);
     xSize = WIDTH;
     ySize = HEIGHT;
-    network.fieldHeight = 180;
   }
 
   @Override
@@ -158,14 +155,6 @@ public class GuiNetworkInventory extends ContainerScreen<ContainerNetworkInvento
   public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
     super.mouseClicked(mouseX, mouseY, mouseButton);
     network.mouseClicked(mouseX, mouseY, mouseButton);
-    //recipe clear thingy
-    int rectX = 63;
-    int rectY = 110;
-    if (isPointInRegion(rectX, rectY, 7, 7, mouseX, mouseY)) {
-      PacketRegistry.INSTANCE.sendToServer(new ClearRecipeMessage());
-      PacketRegistry.INSTANCE.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
-      return true;
-    }
     return true;
   }
 
