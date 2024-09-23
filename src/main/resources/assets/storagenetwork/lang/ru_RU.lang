@@ -40,8 +40,8 @@ gui.storagenetwork.gui.whitelist=Белый список
 gui.storagenetwork.gui.blacklist=Черный список
 
 gui.storagenetwork.sort=Направление сортировки
-gui.storagenetwork.priority.up=Приоритет выше (меньшее идет первым)
-gui.storagenetwork.priority.down=Приоритет ниже (меньшее идет первым)
+gui.storagenetwork.priority.up=Приоритет ниже
+gui.storagenetwork.priority.down=Приоритет выше
 
 gui.storagenetwork.req.tooltip_NAME=Сортировать по имени
 gui.storagenetwork.req.tooltip_MOD=Сортировать по моду

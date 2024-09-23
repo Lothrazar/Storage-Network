@@ -1,10 +1,13 @@
 package mrriegel.storagenetwork.proxy;
 
+import org.lwjgl.input.Keyboard;
+
 import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.block.cable.TesrCable;
 import mrriegel.storagenetwork.block.cable.TileCable;
 import mrriegel.storagenetwork.registry.ModBlocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -12,6 +15,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class ClientProxy extends CommonProxy {
+
+  public static KeyBinding[] keyBindings;
 
   @Override
   public EntityPlayer getClientPlayer() {
@@ -33,5 +38,11 @@ public class ClientProxy extends CommonProxy {
     TesrCable.addCableRender(ModBlocks.storageKabel, new ResourceLocation(StorageNetwork.MODID, "textures/tile/storage.png"));
     TesrCable.addCableRender(ModBlocks.processKabel, new ResourceLocation(StorageNetwork.MODID, "textures/tile/process.png"));
     TesrCable.addCableRender(ModBlocks.simple_kabel, new ResourceLocation(StorageNetwork.MODID, "textures/tile/simple.png"));
+
+    keyBindings = new KeyBinding[1];
+    keyBindings[0] = new KeyBinding("key.remote.desc", Keyboard.KEY_R, "key.storagenetwork.category");
+    for (KeyBinding binding : keyBindings) {
+        ClientRegistry.registerKeyBinding(binding);
+    }
   }
 }

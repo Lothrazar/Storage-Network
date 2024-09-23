@@ -54,7 +54,7 @@ public interface IConnectableLink {
   ItemStack extractStack(IItemStackMatcher matcher, final int size, boolean simulate);
 
   /**
-   * Storages with a higher priority (== lower number) are processed first. You probably want to add a way to configure the priority of your storage.
+   * Storages with a higher priority are preferred to store items. You probably want to add a way to configure the priority of your storage.
    *
    * @return Return the priority here
    */

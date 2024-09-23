@@ -11,7 +11,6 @@ import mrriegel.storagenetwork.block.cable.processing.TileCableProcess;
 import mrriegel.storagenetwork.registry.PacketRegistry;
 import mrriegel.storagenetwork.util.UtilTileEntity;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.WorldServer;
@@ -50,10 +49,10 @@ public class CableDataMessage implements IMessage, IMessageHandler<CableDataMess
       public void run() {
         CableMessageType type = CableMessageType.values()[message.id];
         if (player.openContainer instanceof ContainerCableIO) {
-          updateCableIO(player, type);
+          updateCableIO(message, player, type);
         }
         if (player.openContainer instanceof ContainerCableLink) {
-          updateCableLink(player, type);
+          updateCableLink(message, player, type);
         }
         if (player.openContainer instanceof ContainerCableProcessing) {
           updateProcessing(message, player, type);
@@ -85,7 +84,7 @@ public class CableDataMessage implements IMessage, IMessageHandler<CableDataMess
         UtilTileEntity.updateTile(tileCable.getWorld(), tileCable.getPos());
       }
 
-      private void updateCableLink(EntityPlayerMP player, CableMessageType type) {
+      private void updateCableLink(final CableDataMessage message, EntityPlayerMP player, CableMessageType type) {
         ContainerCableLink con = (ContainerCableLink) player.openContainer;
         if (con == null || con.link == null) {
           return;
@@ -99,34 +98,19 @@ public class CableDataMessage implements IMessage, IMessageHandler<CableDataMess
             con.link.filters.isWhitelist = !con.link.filters.isWhitelist;
           break;
           case PRIORITY_UP:
-            con.link.priority++;
+            con.link.priority = message.value;
             if (master != null) {
               master.clearCache();
             }
           break;
           case PRIORITY_DOWN:
-            con.link.priority--;
+            con.link.priority = message.value;
             if (master != null) {
               master.clearCache();
             }
           break;
           case IMPORT_FILTER:
-            // First clear out all filters
-            //            con.link.filters.clear();
-            //TODO: Fix this not auto sync to client 
-            //TODO: Fix this not auto sync to client   
-            int targetSlot = 0;
-            for (ItemStack filterSuggestion : con.link.getStoredStacks()) {
-              // Ignore stacks that are already filtered
-              if (con.link.filters.exactStackAlreadyInList(filterSuggestion)) {
-                continue;
-              }
-              con.link.filters.setStackInSlot(targetSlot, filterSuggestion.copy());
-              targetSlot++;
-              if (targetSlot >= con.link.filters.getSlots()) {
-                continue;
-              }
-            }
+            con.link.importFilterStacks();
             PacketRegistry.INSTANCE.sendTo(new RefreshFilterClientMessage(con.link.filters.getStacks()), player);
             con.tile.markDirty();
           break;
@@ -135,7 +119,7 @@ public class CableDataMessage implements IMessage, IMessageHandler<CableDataMess
         }
       }
 
-      private void updateCableIO(EntityPlayerMP player, CableMessageType type) {
+      private void updateCableIO(final CableDataMessage message, EntityPlayerMP player, CableMessageType type) {
         ContainerCableIO con = (ContainerCableIO) player.openContainer;
         if (con == null || con.cap == null) {
           return;
@@ -149,35 +133,23 @@ public class CableDataMessage implements IMessage, IMessageHandler<CableDataMess
             con.cap.filters.isWhitelist = !con.cap.filters.isWhitelist;
           break;
           case PRIORITY_UP:
-            con.cap.priority++;
+            con.cap.priority = message.value;
             if (master != null) {
               master.clearCache();
             }
           break;
           case PRIORITY_DOWN:
-            con.cap.priority--;
+            con.cap.priority = message.value;
             if (master != null) {
               master.clearCache();
             }
           break;
           case IMPORT_FILTER:
-            int targetSlot = 0;
-            for (ItemStack filterSuggestion : con.cap.getStacksForFilter()) {
-              // Ignore stacks that are already filtered 
-              if (con.cap.filters.exactStackAlreadyInList(filterSuggestion)) {
-                continue;
-              }
-              con.cap.filters.setStackInSlot(targetSlot, filterSuggestion.copy());
-              targetSlot++;
-              if (targetSlot >= con.cap.filters.getSlots()) {
-                continue;
-              }
-            }
+            con.cap.importFilterStacks();
           break;
           default:
           break;
         }
-        StorageNetwork.log("Send new refresh client msg");
         PacketRegistry.INSTANCE.sendTo(new RefreshFilterClientMessage(con.cap.filters.getStacks()), player);
         con.tile.markDirty();
       }

@@ -7,6 +7,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 
 public class ContainerControl extends Container implements IStorageContainer {
 
@@ -59,5 +60,10 @@ public class ContainerControl extends Container implements IStorageContainer {
   @Override
   public InventoryCrafting getCraftMatrix() {
     return null;
+  }
+
+  @Override
+  public ItemStack transferStackInSlot(EntityPlayer playerIn, int slotIndex) {
+    return ItemStack.EMPTY;
   }
 }

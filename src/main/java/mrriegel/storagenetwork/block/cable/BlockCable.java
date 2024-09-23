@@ -10,15 +10,18 @@ import mrriegel.storagenetwork.block.master.TileMaster;
 import mrriegel.storagenetwork.capabilities.StorageNetworkCapabilities;
 import mrriegel.storagenetwork.gui.GuiHandler;
 import mrriegel.storagenetwork.registry.ModBlocks;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -28,8 +31,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -45,6 +50,21 @@ public class BlockCable extends AbstractBlockConnectable {
     super(Material.ROCK, registryName);
     this.setHardness(1.4F);
     this.setCreativeTab(CreativeTab.tab);
+  }
+
+  protected TileCable getTileCable(IBlockAccess world, BlockPos pos) {
+    TileEntity tile = world.getTileEntity(pos);
+    if (tile != null && tile instanceof TileCable) {
+      return (TileCable) tile;
+    }
+    return null;
+  }
+
+  protected TileEntity getTileEntityNoUpdate(IBlockAccess world, BlockPos pos) {
+    if (!(world instanceof World))
+      return world.getTileEntity(pos);
+    TileEntity tile = ((World) world).getChunk(pos).getTileEntity(pos, EnumCreateEntityType.CHECK);
+    return tile;
   }
 
   @SuppressWarnings("rawtypes")
@@ -74,10 +94,18 @@ public class BlockCable extends AbstractBlockConnectable {
     return extendedBlockState.withProperty(BLOCK_NEIGHBORS, getBlockNeighbors(world, pos));
   }
 
+  // @Override
+  // public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+  //   TileCable tile = getTileCable(worldIn, pos);
+  //   if (tile != null && tile.facadeState != null)
+  //     return tile.facadeState;
+  //   return state;
+  // }
+
   @SuppressWarnings("unchecked")
   @Nullable
   public <V> V getClientSideTileEntity(IBlockAccess world, BlockPos pos, Class<V> tileEntityClassOrInterface) {
-    TileEntity tileEntity = world.getTileEntity(pos);
+    TileEntity tileEntity = getTileEntityNoUpdate(world, pos);
     if (tileEntity == null) {
       return null;
     }
@@ -89,7 +117,7 @@ public class BlockCable extends AbstractBlockConnectable {
 
   @Nullable
   private <V> V getClientSideCapability(IBlockAccess world, BlockPos pos, Capability<V> capability, EnumFacing side) {
-    TileEntity tileEntity = world.getTileEntity(pos);
+    TileEntity tileEntity = getTileEntityNoUpdate(world, pos);
     if (tileEntity == null) {
       return null;
     }
@@ -116,7 +144,10 @@ public class BlockCable extends AbstractBlockConnectable {
   }
 
   @Override
-  public BlockFaceShape getBlockFaceShape(IBlockAccess p_193383_1_, IBlockState p_193383_2_, BlockPos p_193383_3_, EnumFacing p_193383_4_) {
+  public BlockFaceShape getBlockFaceShape(IBlockAccess world, IBlockState state, BlockPos pos, EnumFacing side) {
+    TileCable tile = getTileCable(world, pos);
+    if (tile != null && tile.facadeState != null)
+      return tile.facadeState.getBlockFaceShape(new BlockAccessFacade(world), pos, side);
     return BlockFaceShape.MIDDLE_POLE_THIN;
   }
 
@@ -128,6 +159,25 @@ public class BlockCable extends AbstractBlockConnectable {
 
   @Override
   public boolean canBeConnectedTo(IBlockAccess world, BlockPos pos, EnumFacing facing) {
+    TileCable tile = getTileCable(world, pos);
+    if (tile != null && tile.facadeState != null)
+      return tile.facadeState.getBlock().canBeConnectedTo(new BlockAccessFacade(world), pos, facing);
+    return false;
+  }
+
+  @Override
+  public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+    TileCable tile = getTileCable(world, pos);
+    if (tile != null && tile.facadeState != null)
+      return tile.facadeState.isSideSolid(new BlockAccessFacade(world), pos, side);
+    return false;
+  }
+
+  @Override
+  public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+    TileCable tile = getTileCable(world, pos);
+    if (tile != null && tile.facadeState != null)
+      return tile.facadeState.doesSideBlockRendering(new BlockAccessFacade(world), pos, face);
     return false;
   }
 
@@ -153,13 +203,11 @@ public class BlockCable extends AbstractBlockConnectable {
 
   @Override
   public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    TileEntity tile = worldIn.getTileEntity(pos);
-    if (!(tile instanceof TileCable)) {
-      return false;
-    }
-    if (worldIn.isRemote) {
+    if (worldIn.isRemote)
       return true;
-    }
+    TileCable tile = getTileCable(worldIn, pos);
+    if (tile == null)
+      return false;
     // TODO: Move gui open actions to the block classes
     if (tile.getBlockType() == ModBlocks.exKabel) {
       playerIn.openGui(StorageNetwork.instance, GuiHandler.GuiIDs.EXPORT.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
@@ -182,9 +230,53 @@ public class BlockCable extends AbstractBlockConnectable {
 
   @SuppressWarnings("deprecation")
   @Override
+  public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+    if (!playerIn.isSneaking()) {
+      StorageNetwork.log("no sneak");
+      return;
+    }
+    TileCable tile = getTileCable(worldIn, pos);
+    if (tile == null) {
+      StorageNetwork.log("no tile");
+      return;
+    }
+    ItemStack heldStack = playerIn.getHeldItemMainhand();
+    if (heldStack == null || heldStack.isEmpty()) {
+      tile.facadeState = null;
+      worldIn.markAndNotifyBlock(pos.toImmutable(), worldIn.getChunk(pos), getDefaultState(), getDefaultState(), 1 | 2);
+      tile.markDirty();
+      StorageNetwork.log("unset facade");
+      return;
+    }
+    Block block = Block.getBlockFromItem(heldStack.getItem());
+    if (block == null || block == Blocks.AIR) {
+      StorageNetwork.log("no block");
+      return;
+    }
+    int meta = heldStack.getMetadata();
+    RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
+    float f = (float) (mouseOver.hitVec.x - (double) pos.getX());
+    float f1 = (float) (mouseOver.hitVec.y - (double) pos.getY());
+    float f2 = (float) (mouseOver.hitVec.z - (double) pos.getZ());
+    IBlockState state = block.getStateForPlacement(worldIn, pos, mouseOver.sideHit, f, f1, f2, meta, playerIn);
+    if (state == null || state.getRenderType() != EnumBlockRenderType.MODEL) {
+      StorageNetwork.log("no model");
+      return;
+    }
+    tile.facadeState = state;
+    worldIn.markAndNotifyBlock(pos.toImmutable(), worldIn.getChunk(pos), getDefaultState(), getDefaultState(), 1 | 2);
+    tile.markDirty();
+    StorageNetwork.log("set facade");
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_185477_7_) {
-    TileEntity tileHere = worldIn.getTileEntity(pos);
-    if (!(tileHere instanceof TileCable)) {
+    TileCable tile = getTileCable(worldIn, pos);
+    if (tile == null)
+      return;
+    if (tile.facadeState != null) {
+      tile.facadeState.addCollisionBoxToList(worldIn, pos, entityBox, collidingBoxes, entityIn, p_185477_7_);
       return;
     }
     float f = 0.3125F;
@@ -223,17 +315,16 @@ public class BlockCable extends AbstractBlockConnectable {
 
   @Override
   public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileEntity tileHere = world.getTileEntity(pos);
-    if (tileHere == null || !(tileHere instanceof TileCable)) {
-      return FULL_BLOCK_AABB;
-    }
+    TileCable tile = getTileCable(world, pos);
+    if (tile != null && tile.facadeState != null)
+      return tile.facadeState.getBoundingBox(new BlockAccessFacade(world), pos);
     UnlistedPropertyBlockNeighbors.BlockNeighbors neighbors = getBlockNeighbors(world, pos);
-    float x1 = 0.37F;
-    float x2 = 0.63F;
-    float y1 = 0.37F;
-    float y2 = 0.63F;
-    float z1 = 0.37F;
-    float z2 = 0.63F;
+    float x1 = 0.375F;
+    float x2 = 0.625F;
+    float y1 = 0.375F;
+    float y2 = 0.625F;
+    float z1 = 0.375F;
+    float z2 = 0.625F;
     if (neighbors.north() != UnlistedPropertyBlockNeighbors.EnumNeighborType.NONE) {
       y1 = 0f;
     }

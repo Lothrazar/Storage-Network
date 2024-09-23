@@ -2,10 +2,12 @@ package mrriegel.storagenetwork.block.cable;
 
 import java.io.IOException;
 import java.util.List;
+
 import org.lwjgl.input.Mouse;
 import com.google.common.collect.Lists;
 import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.gui.ItemSlotNetwork;
+import mrriegel.storagenetwork.jei.JeiHooks;
 import mrriegel.storagenetwork.network.CableDataMessage;
 import mrriegel.storagenetwork.network.CableFilterMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
@@ -13,6 +15,7 @@ import mrriegel.storagenetwork.util.UtilTileEntity;
 import mrriegel.storagenetwork.util.inventory.FilterItemStackHandler;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -23,8 +26,9 @@ import net.minecraftforge.items.ItemHandlerHelper;
 public abstract class GuiCableBase extends GuiContainer {
 
   public static final int SLOT_SIZE = 18;
-  public static final int TEXTBOX_WIDTH = 26;
+  public static final int TEXTBOX_WIDTH = 36;
   protected List<ItemSlotNetwork> itemSlotsGhost;
+  protected ItemStack stackUnderMouse = ItemStack.EMPTY;
   protected ResourceLocation texture = new ResourceLocation(StorageNetwork.MODID, "textures/gui/cable.png");
   protected GuiCableButton btnImport;
   public GuiCheckBox checkNbtBtn;
@@ -50,8 +54,6 @@ public abstract class GuiCableBase extends GuiContainer {
       return;
     }
     if (btnImport != null && button.id == btnImport.id) {
-      // First clear out all filters
-      stackHandler.clear();
       importSlotsButtonPressed();
       PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id));
     }
@@ -117,6 +119,10 @@ public abstract class GuiCableBase extends GuiContainer {
     if (wheel == 0) {
       return;
     }
+    int change = GuiScreen.isShiftKeyDown() ? 8 : 1;
+    if (GuiScreen.isAltKeyDown()) {
+      change *= 2;
+    }
     boolean wheelUp = wheel > 0;
     int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
     int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
@@ -126,28 +132,39 @@ public abstract class GuiCableBase extends GuiContainer {
         continue;
       }
       if (wheelUp)
-        itemSlot.getStack().grow(1);
+        itemSlot.getStack().grow(change);
       else
-        itemSlot.getStack().shrink(1);
+        itemSlot.getStack().shrink(change);
       if (itemSlot.getStack().getCount() >= 64) {
         itemSlot.getStack().setCount(64);
       }
       //and save changes OFC
       FilterItemStackHandler stackHandler = getFilterHandler();
       PacketRegistry.INSTANCE.sendToServer(new CableFilterMessage(i, itemSlot.getStack(), stackHandler.ores, stackHandler.meta, stackHandler.nbt));
-      //for anyone to override
-      mouseWheelOverSlot(i, wheelUp);
       return;
     }
   }
 
-  protected void mouseWheelOverSlot(int slot, boolean wheelUp) {}
+  @Override
+  protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    if (!this.checkHotbarKeys(keyCode)) {
+      if (!stackUnderMouse.isEmpty()) {
+        try {
+          JeiHooks.testJeiKeybind(keyCode, stackUnderMouse);
+        }
+        catch (Throwable e) {
+        }
+      }
+    }
+    super.keyTyped(typedChar, keyCode);
+  }
 
   @Override
   public void drawScreen(int mouseX, int mouseY, float partialTicks) {
     super.drawScreen(mouseX, mouseY, partialTicks);
     super.renderHoveredToolTip(mouseX, mouseY);
     drawTooltips(mouseX, mouseY);
+    updateHovered(mouseX, mouseY);
   }
 
   protected void drawTooltips(int mouseX, int mouseY) {
@@ -158,6 +175,21 @@ public abstract class GuiCableBase extends GuiContainer {
     }
     if (btnImport != null && btnImport.isMouseOver()) {
       drawHoveringText(Lists.newArrayList(I18n.format("gui.storagenetwork.gui.import")), mouseX, mouseY);
+    }
+  }
+
+  protected void updateHovered(int mouseX, int mouseY) {
+    // get the filter stack under the mouse so it can work with jei
+    stackUnderMouse = ItemStack.EMPTY;
+    for (ItemSlotNetwork slot : itemSlotsGhost) {
+      slot.drawSlot(mouseX, mouseY);
+      if (slot.isMouseOverSlot(mouseX, mouseY)) {
+        stackUnderMouse = slot.getStack();
+        break;
+      }
+    }
+    if (itemSlotsGhost.isEmpty()) {
+      stackUnderMouse = ItemStack.EMPTY;
     }
   }
 

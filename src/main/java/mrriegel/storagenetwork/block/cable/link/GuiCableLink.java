@@ -9,6 +9,7 @@ import mrriegel.storagenetwork.network.CableDataMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
 import mrriegel.storagenetwork.util.inventory.FilterItemStackHandler;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
@@ -30,18 +31,8 @@ public class GuiCableLink extends GuiCable {
   @Override
   public void importSlotsButtonPressed() {
     super.importSlotsButtonPressed();
-    int targetSlot = 0;
-    for (ItemStack filterSuggestion : containerCableLink.link.getStoredStacks()) {
-      // Ignore stacks that are already filtered
-      if (containerCableLink.link.filters.isStackFiltered(filterSuggestion)) {
-        continue;
-      }
-      containerCableLink.link.filters.setStackInSlot(targetSlot, filterSuggestion.copy());
-      targetSlot++;
-      if (targetSlot >= containerCableLink.link.filters.getSlots()) {
-        break;
-      }
-    }
+    // import here for faster responsiveness I guess
+    containerCableLink.link.importFilterStacks();
   }
 
   @Override
@@ -84,7 +75,7 @@ public class GuiCableLink extends GuiCable {
       for (int col = 0; col < cols; col++) {
         ItemStack stack = containerCableLink.link.filters.getStackInSlot(index);
         int x = 8 + col * SLOT_SIZE;
-        itemSlotsGhost.add(new ItemSlotNetwork(this, stack, guiLeft + x, guiTop + y, stack.getCount(), guiLeft, guiTop, true));
+        itemSlotsGhost.add(new ItemSlotNetwork(this, stack, guiLeft + x, guiTop + y, stack.getCount(), guiLeft, guiTop, false));
         index++;
       }
       //move down to second row 
@@ -112,13 +103,17 @@ public class GuiCableLink extends GuiCable {
     if (containerCableLink == null || containerCableLink.link == null) {
       return;
     }
+    int change = GuiScreen.isShiftKeyDown() ? 10 : 1;
+    if (GuiScreen.isAltKeyDown()) {
+      change *= 5;
+    }
     if (button.id == btnMinus.id) {
-      containerCableLink.link.priority--;
-      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id));
+      containerCableLink.link.priority -= change;
+      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, containerCableLink.link.priority));
     }
     else if (button.id == btnPlus.id) {
-      containerCableLink.link.priority++;
-      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id));
+      containerCableLink.link.priority += change;
+      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, containerCableLink.link.priority));
     }
     else if (button.id == btnInputOutputStorage.id) {
       containerCableLink.link.filterDirection = containerCableLink.link.filterDirection.next();

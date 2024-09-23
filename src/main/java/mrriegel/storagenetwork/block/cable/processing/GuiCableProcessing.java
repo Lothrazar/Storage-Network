@@ -10,7 +10,6 @@ import mrriegel.storagenetwork.gui.IPublicGuiContainer;
 import mrriegel.storagenetwork.gui.ItemSlotNetwork;
 import mrriegel.storagenetwork.network.CableDataMessage;
 import mrriegel.storagenetwork.network.CableDataMessage.CableMessageType;
-import mrriegel.storagenetwork.network.CableFilterMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
 import mrriegel.storagenetwork.util.inventory.FilterItemStackHandler;
 import net.minecraft.client.gui.GuiButton;
@@ -138,16 +137,8 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
   public void initGui() {
     super.initGui();
     int x = 0, y = 0;
-    //we need some way to let players know if recipe is invalid
-    //    buttonRecipe = new GuiCableButton(CableMessageType.TOGGLE_P_RESTARTTRIGGER, guiLeft + 5, guiTop + 5, "S");
-    //    buttonRecipe.setCable(tile);
-    //    this.addButton(buttonRecipe);
-    btnImport = new GuiCableButton(CableMessageType.IMPORT_FILTER, guiLeft + 78, guiTop + 5, "I");
-    this.addButton(btnImport);
-    btnImport.x += 56;
-    //move priority over
-    //add custom buttons
-    //a click will swap it to EXPORTING with CableDataMessage
+    // import button doesn't make sense here, better to have jei "+"
+    // reset button: a click will swap it to EXPORTING with CableDataMessage
     pbtnReset = new GuiCableButton(CableMessageType.TOGGLE_P_RESTARTTRIGGER, guiLeft + 154, guiTop + 5, "R");
     this.addButton(pbtnReset);
     int column = 76, ctr = 24;
@@ -185,32 +176,13 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
       PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, newFace));
     }
     else if (pbtnBottomface != null && button.id == pbtnBottomface.id) {
-      //
       int newFace = (tile.getFacingBottomRow().ordinal() + 1) % EnumFacing.values().length;
       tile.processingBottom = EnumFacing.values()[newFace];
       PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, newFace));
     }
-  }
-
-  @Override
-  protected void mouseWheelOverSlot(int slot, boolean wheelUp) {
-    super.mouseWheelOverSlot(slot, wheelUp);
-    if (tile == null || tile.filters == null) {
-      return;
-    }
-    FilterItemStackHandler filters = tile.filters;
-    ItemStack filter = filters.getStackInSlot(slot);
-    boolean changed = false;
-    if (wheelUp && filter.getCount() < 64) {
-      filter.setCount(filter.getCount() + 1);
-      changed = true;
-    }
-    else if (!wheelUp && filter.getCount() > 1) {
-      filter.setCount(filter.getCount() - 1);
-      changed = true;
-    }
-    if (changed) {
-      PacketRegistry.INSTANCE.sendToServer(new CableFilterMessage(slot, filter, filters.ores, filters.meta, checkNbtBtn.isChecked()));
+    else if (pbtnReset != null && button.id == pbtnReset.id) {
+      // value not used for this message
+      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, 0));
     }
   }
 

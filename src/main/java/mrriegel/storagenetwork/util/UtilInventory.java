@@ -74,10 +74,9 @@ public class UtilInventory {
       if (ItemHandlerHelper.canItemStacksStack(inv.getStackInSlot(i), stack)) {
         found += inv.getStackInSlot(i).getCount();
       }
-    }
-    //do you have all 4? or do you need 2 still
-    if (found >= minimumCount) {
-      return 0;
+      if (found >= minimumCount) {
+        return 0;
+      }
     }
     return minimumCount - found;
   }
@@ -95,6 +94,7 @@ public class UtilInventory {
     return amount;
   }
 
+  // this doesn't look like it works right if multiple slots match but wouldn't stack
   public static ItemStack extractItem(IItemHandler inv, ItemStackMatcher fil, int num, boolean simulate) {
     if (inv == null || fil == null) {
       return ItemStack.EMPTY;
@@ -103,13 +103,15 @@ public class UtilInventory {
     for (int i = 0; i < inv.getSlots(); i++) {
       ItemStack slot = inv.getStackInSlot(i);
       if (fil.match(slot)) {
-        ItemStack ex = inv.extractItem(i, 1, simulate);
-        if (!ex.isEmpty()) {
-          extracted++;
-          if (extracted == num)
-            return ItemHandlerHelper.copyStackWithSize(slot, num);
-          else
-            i--;
+        ItemStack ex = inv.extractItem(i, num - extracted, simulate);
+        if (ex.isEmpty()) {
+          continue;
+        }
+        int exFromSlot = ex.getCount();
+        extracted += exFromSlot;
+        if (extracted == num) {
+          ex.setCount(num);
+          return ex;
         }
       }
     }

@@ -4,7 +4,7 @@ import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.capabilities.StorageNetworkCapabilities;
 import mrriegel.storagenetwork.config.ConfigHandler;
 import mrriegel.storagenetwork.gui.GuiHandler;
-import mrriegel.storagenetwork.jei.JeiSettings;
+import mrriegel.storagenetwork.jei.JeiHooks;
 import mrriegel.storagenetwork.registry.PacketRegistry;
 import mrriegel.storagenetwork.util.UtilTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,7 +25,7 @@ public class CommonProxy {
   public void preInit(FMLPreInitializationEvent event) {
     StorageNetworkCapabilities.initCapabilities();
     ConfigHandler.refreshConfig(event.getSuggestedConfigurationFile());
-    JeiSettings.setJeiLoaded(Loader.isModLoaded("jei"));
+    JeiHooks.setJeiLoaded(Loader.isModLoaded("jei"));
     PacketRegistry.init();
   }
 

@@ -73,8 +73,8 @@ gui.storagenetwork.gui.whitelist=Allow-list
 gui.storagenetwork.gui.blacklist=Ignore-list
 
 gui.storagenetwork.sort=Sort Direction
-gui.storagenetwork.priority.up=Demote Priority (smaller goes first)
-gui.storagenetwork.priority.down=Promote Priority (smaller goes first)
+gui.storagenetwork.priority.up=Promote Priority
+gui.storagenetwork.priority.down=Demote Priority
 
 gui.storagenetwork.req.tooltip_NAME=Sort by name
 gui.storagenetwork.req.tooltip_MOD=Sort by mod
@@ -94,6 +94,8 @@ gui.storagenetwork.fil.tooltip_3=Clear text with right-click or X button
 gui.storagenetwork.tooltip_clear=Clear Search
 gui.storagenetwork.fil.tooltip_jei_on=JEI search enabled
 gui.storagenetwork.fil.tooltip_jei_off=JEI search disabled
+gui.storagenetwork.fil.tooltip_keep_on=Keep search enabled
+gui.storagenetwork.fil.tooltip_keep_off=Keep search disabled
 
 tile.storagenetwork:controller.name=Controller
 tooltip.storagenetwork.controller=Manage all Processing Cables in the network
@@ -119,4 +121,6 @@ processing.empty.ingredients=Empty Ingredients
 gui.storagenetwork.processing.recipe=Ingredients for each cycle will be sent as if coming from this block-side
 gui.storagenetwork.processing.extract=When pulling processing results it will be taken as if from this block-side
 
+key.remote.desc=Open Remote
+key.storagenetwork.category=Simple Storage Network
 

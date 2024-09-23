@@ -1,6 +1,7 @@
 package mrriegel.storagenetwork.block.master;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -199,6 +200,7 @@ public class TileMaster extends TileEntity implements ITickable, INetworkMaster 
     }
     // 1. Try to insert into a recent slot for the same item.
     //    We do this to avoid having to search for the appropriate inventory repeatedly.
+    // (nothing appears to ever be added to the cache as far as I can tell, as it might break priority)
     String key = getStackKey(stack);
     if (hasCachedSlot(stack)) {
       DimPos cachedStoragePos = getCachedSlot(stack);
@@ -224,6 +226,7 @@ public class TileMaster extends TileEntity implements ITickable, INetworkMaster 
     }
     // 3. Otherwise try to find a new inventory that can take the remainder of the itemstack
     List<IConnectableLink> storages = getSortedConnectableStorage();
+    Collections.reverse(storages);
     for (IConnectableLink storage : storages) {
       // Ignore storages that can not import
       if (!storage.getSupportedTransferDirection().match(EnumStorageDirection.IN)) {
@@ -235,6 +238,9 @@ public class TileMaster extends TileEntity implements ITickable, INetworkMaster 
       }
       // If it can we need to know, i.e. store the remainder
       stack = storage.insertStack(stack, simulate);
+      if (stack.isEmpty()) {
+        break;
+      }
     }
     return stack.getCount();
   }

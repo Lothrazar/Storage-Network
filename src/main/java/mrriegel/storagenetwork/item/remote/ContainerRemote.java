@@ -17,19 +17,19 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ContainerRemote extends ContainerNetworkBase {
 
   private final ItemStack remoteItemStack;
-  private final EnumHand hand;
+  private final int remoteSlot;
 
-  public ContainerRemote(final InventoryPlayer playerInv, EnumHand hand) {
+  public ContainerRemote(final InventoryPlayer playerInv, int remoteSlot) {
     this.playerInv = playerInv;
+    this.remoteSlot = remoteSlot;
     result = new InventoryCraftResult();
-    remoteItemStack = playerInv.player.getHeldItem(hand);
+    remoteItemStack = playerInv.getStackInSlot(remoteSlot);
     isSimple = getItemRemote().getMetadata() == RemoteType.SIMPLE.ordinal();
     List<ItemStack> storage = new ArrayList<ItemStack>();
     for (int i = 0; i < 9; i++) {
@@ -48,7 +48,6 @@ public class ContainerRemote extends ContainerNetworkBase {
     if (this.matrix != null) {
       this.onCraftMatrixChanged(this.matrix);
     }
-    this.hand = hand;
   }
 
   public @Nonnull ItemStack getItemRemote() {
@@ -83,7 +82,7 @@ public class ContainerRemote extends ContainerNetworkBase {
       List<ItemStack> list = tileMaster.getStacks();
       PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()), (EntityPlayerMP) playerIn);
     }
-    return playerIn.getHeldItem(this.hand) == remoteItemStack;
+    return playerIn.inventory.getStackInSlot(this.remoteSlot) == remoteItemStack;
   }
 
   @Override
@@ -106,9 +105,33 @@ public class ContainerRemote extends ContainerNetworkBase {
   }
 
   @Override
+  protected void bindPlayerInvo(final InventoryPlayer playerInv) {
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 9; ++j) {
+        int slot = j + i * 9 + 9;
+        if (slot == remoteSlot)
+          this.addSlotToContainer(new Slot(playerInv, slot, 8 + j * 18, 174 + i * 18) {
+
+            @Override
+            public boolean isItemValid(ItemStack stack) {
+              return false;
+            }
+
+            @Override
+            public boolean canTakeStack(EntityPlayer playerIn) {
+              return false;
+            }
+          });
+        else
+          this.addSlotToContainer(new Slot(playerInv, slot, 8 + j * 18, 174 + i * 18));
+      }
+    }
+  }
+
+  @Override
   public void bindHotbar() {
     for (int i = 0; i < 9; ++i) {
-      if (i == playerInv.currentItem)
+      if (i == remoteSlot)
         this.addSlotToContainer(new Slot(playerInv, i, 8 + i * 18, 232) {
 
           @Override

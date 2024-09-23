@@ -13,6 +13,7 @@ import mrriegel.storagenetwork.network.CableLimitMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
 import mrriegel.storagenetwork.util.inventory.FilterItemStackHandler;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -37,18 +38,8 @@ public class GuiCableIO extends GuiCable {
   @Override
   public void importSlotsButtonPressed() {
     super.importSlotsButtonPressed();
-    int targetSlot = 0;
-    for (ItemStack filterSuggestion : containerCableIO.cap.getStacksForFilter()) {
-      // Ignore stacks that are already filtered
-      if (containerCableIO.cap.filters.isStackFiltered(filterSuggestion)) {
-        continue;
-      }
-      containerCableIO.cap.filters.setStackInSlot(targetSlot, filterSuggestion.copy());
-      targetSlot++;
-      if (targetSlot >= containerCableIO.cap.filters.getSlots()) {
-        break;
-      }
-    }
+    // import here for faster responsiveness I guess
+    containerCableIO.cap.importFilterStacks();
   }
 
   @Override
@@ -63,15 +54,14 @@ public class GuiCableIO extends GuiCable {
       }
     });
     Keyboard.enableRepeatEvents(true);
-    fieldOperationLimit = new GuiTextField(99, fontRenderer, guiLeft + 54, guiTop + 69, TEXTBOX_WIDTH, fontRenderer.FONT_HEIGHT);
-    fieldOperationLimit.setMaxStringLength(3);
+    fieldOperationLimit = new GuiTextField(99, fontRenderer, guiLeft + 50, guiTop + 69, TEXTBOX_WIDTH, fontRenderer.FONT_HEIGHT);
+    fieldOperationLimit.setMaxStringLength(5);
     fieldOperationLimit.setEnableBackgroundDrawing(false);
     fieldOperationLimit.setVisible(true);
     fieldOperationLimit.setTextColor(16777215);
-    fieldOperationLimit.setCanLoseFocus(false);
-    fieldOperationLimit.setFocused(true);
+    fieldOperationLimit.setFocused(false);
     fieldOperationLimit.setText("" + this.containerCableIO.cap.operationLimit);
-    fieldOperationLimit.width = 20;
+    fieldOperationLimit.width = TEXTBOX_WIDTH - 6;
     btnOperationToggle = new GuiCableButton(CableDataMessage.CableMessageType.TOGGLE_MODE, guiLeft + 28, guiTop + 66, "");
     btnOperationToggle.setCustomDrawMethod(guiCableButton -> {
       // TODO: Do these < and > in the GUI need to get swapped?
@@ -105,7 +95,7 @@ public class GuiCableIO extends GuiCable {
       this.mc.getTextureManager().bindTexture(texture);
       this.drawTexturedModalRect(xMiddle + 7, yMiddle + 65, u, v, SLOT_SIZE, SLOT_SIZE);//the extra slot
       //also draw textbox
-      this.drawTexturedModalRect(xMiddle + 50, yMiddle + 67, 0, 171, TEXTBOX_WIDTH, 12);
+      this.drawTexturedModalRect(xMiddle + 47, yMiddle + 67, 0, 171, TEXTBOX_WIDTH, 12);
       fieldOperationLimit.drawTextBox();
       operationItemSlot.drawSlot(mouseX, mouseY);
     }
@@ -168,13 +158,17 @@ public class GuiCableIO extends GuiCable {
     if (containerCableIO == null || containerCableIO.cap == null) {
       return;
     }
+    int change = GuiScreen.isShiftKeyDown() ? 10 : 1;
+    if (GuiScreen.isAltKeyDown()) {
+      change *= 5;
+    }
     if (button.id == btnMinus.id) {
-      containerCableIO.cap.priority--;
-      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id));
+      containerCableIO.cap.priority -= change;
+      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, containerCableIO.cap.priority));
     }
     else if (button.id == btnPlus.id) {
-      containerCableIO.cap.priority++;
-      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id));
+      containerCableIO.cap.priority += change;
+      PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, containerCableIO.cap.priority));
     }
     else if (button.id == btnOperationToggle.id) {
       containerCableIO.cap.operationMustBeSmaller = !containerCableIO.cap.operationMustBeSmaller;
@@ -185,13 +179,14 @@ public class GuiCableIO extends GuiCable {
   @Override
   protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
     super.mouseClicked(mouseX, mouseY, mouseButton);
-    ItemStack stackCarriedByMouse = mc.player.inventory.getItemStack().copy();
     if (containerCableIO.cap.upgrades.getUpgradesOfType(EnumUpgradeType.OPERATION) < 1) {
       return;
     }
+    fieldOperationLimit.mouseClicked(mouseX, mouseY, mouseButton);
     if (!operationItemSlot.isMouseOverSlot(mouseX, mouseY)) {
       return;
     }
+    ItemStack stackCarriedByMouse = mc.player.inventory.getItemStack().copy();
     operationItemSlot.setStack(stackCarriedByMouse);
     int num = fieldOperationLimit.getText().isEmpty() ? 0 : Integer.valueOf(fieldOperationLimit.getText());
     PacketRegistry.INSTANCE.sendToServer(new CableLimitMessage(num, stackCarriedByMouse));
@@ -202,24 +197,20 @@ public class GuiCableIO extends GuiCable {
     super.keyTyped(typedChar, keyCode);
     if (!this.checkHotbarKeys(keyCode)) {
       Keyboard.enableRepeatEvents(true);
-      String s = "";
       if (hasOperationUpgrade(EnumUpgradeType.OPERATION)) {
-        s = fieldOperationLimit.getText();
-      }
-      if (hasOperationUpgrade(EnumUpgradeType.OPERATION) && this.fieldOperationLimit.textboxKeyTyped(typedChar, keyCode)) {
-        if (!StringUtils.isNumeric(fieldOperationLimit.getText()) && !fieldOperationLimit.getText().isEmpty()) fieldOperationLimit.setText(s);
-        int num = 0;
-        try {
-          num = fieldOperationLimit.getText().isEmpty() ? 0 : Integer.valueOf(fieldOperationLimit.getText());
+        String s = fieldOperationLimit.getText();
+        if (fieldOperationLimit.isFocused() && this.fieldOperationLimit.textboxKeyTyped(typedChar, keyCode)) {
+          if (!StringUtils.isNumeric(fieldOperationLimit.getText()) && !fieldOperationLimit.getText().isEmpty()) fieldOperationLimit.setText(s);
+          int num = 0;
+          try {
+            num = fieldOperationLimit.getText().isEmpty() ? 0 : Integer.valueOf(fieldOperationLimit.getText());
+          }
+          catch (Exception e) {
+            fieldOperationLimit.setText("0");
+          }
+          containerCableIO.cap.operationLimit = num;
+          PacketRegistry.INSTANCE.sendToServer(new CableLimitMessage(num, operationItemSlot.getStack()));
         }
-        catch (Exception e) {
-          fieldOperationLimit.setText("0");
-        }
-        containerCableIO.cap.operationLimit = num;
-        PacketRegistry.INSTANCE.sendToServer(new CableLimitMessage(num, operationItemSlot.getStack()));
-      }
-      else {
-        super.keyTyped(typedChar, keyCode);
       }
     }
   }

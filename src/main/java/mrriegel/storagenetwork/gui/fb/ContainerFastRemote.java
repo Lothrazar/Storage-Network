@@ -9,21 +9,22 @@ import mrriegel.storagenetwork.registry.PacketRegistry;
 import mrriegel.storagenetwork.util.NBTHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ContainerFastRemote extends ContainerFastNetworkCrafter {
 
   final ItemStack remoteItemStack;
-  private final EnumHand hand;
+  private final int remoteSlot;
 
-  public ContainerFastRemote(EntityPlayer player, World world, EnumHand hand) {
+  public ContainerFastRemote(EntityPlayer player, World world, int remoteSlot) {
     super(player, world, BlockPos.ORIGIN);
-    remoteItemStack = player.getHeldItem(hand);
+    this.remoteSlot = remoteSlot;
+    remoteItemStack = player.inventory.getStackInSlot(remoteSlot);
     this.inventorySlots.clear();
     this.inventoryItemStacks.clear();
     for (int i = 0; i < 9; i++) {
@@ -36,7 +37,6 @@ public class ContainerFastRemote extends ContainerFastNetworkCrafter {
     bindGrid();
     bindPlayerInvo(player.inventory);
     bindHotbar(player);
-    this.hand = hand;
   }
 
   @Override
@@ -50,7 +50,7 @@ public class ContainerFastRemote extends ContainerFastNetworkCrafter {
       forceSync = false;
       PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(tileMaster.getStacks(), new ArrayList<>()), (EntityPlayerMP) playerIn);
     }
-    return playerIn.getHeldItem(this.hand) == remoteItemStack;
+    return playerIn.inventory.getStackInSlot(this.remoteSlot) == remoteItemStack;
   }
 
   @Override
@@ -76,9 +76,33 @@ public class ContainerFastRemote extends ContainerFastNetworkCrafter {
   }
 
   @Override
+  protected void bindPlayerInvo(final InventoryPlayer playerInv) {
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 9; ++j) {
+        int slot = j + i * 9 + 9;
+        if (slot == remoteSlot)
+          this.addSlotToContainer(new Slot(playerInv, slot, 8 + j * 18, 174 + i * 18) {
+
+            @Override
+            public boolean isItemValid(ItemStack stack) {
+              return false;
+            }
+
+            @Override
+            public boolean canTakeStack(EntityPlayer playerIn) {
+              return false;
+            }
+          });
+        else
+          this.addSlotToContainer(new Slot(playerInv, slot, 8 + j * 18, 174 + i * 18));
+      }
+    }
+  }
+
+  @Override
   public void bindHotbar(EntityPlayer player) {
     for (int i = 0; i < 9; ++i) {
-      if (i == player.inventory.currentItem)
+      if (i == remoteSlot)
         this.addSlotToContainer(new Slot(player.inventory, i, 8 + i * 18, 232) {
 
           @Override
@@ -103,8 +127,8 @@ public class ContainerFastRemote extends ContainerFastNetworkCrafter {
 
   public static class Client extends ContainerFastRemote {
 
-    public Client(EntityPlayer player, World world, EnumHand hand) {
-      super(player, world, hand);
+    public Client(EntityPlayer player, World world, int remoteSlot) {
+      super(player, world, remoteSlot);
     }
 
     @Override
