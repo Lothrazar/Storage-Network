@@ -8,6 +8,7 @@ import mrriegel.storagenetwork.api.capability.IConnectable;
 import mrriegel.storagenetwork.block.AbstractBlockConnectable;
 import mrriegel.storagenetwork.block.master.TileMaster;
 import mrriegel.storagenetwork.capabilities.StorageNetworkCapabilities;
+import mrriegel.storagenetwork.config.ConfigHandler;
 import mrriegel.storagenetwork.gui.GuiHandler;
 import mrriegel.storagenetwork.network.CableFacadeMessage;
 import mrriegel.storagenetwork.registry.ModBlocks;
@@ -233,18 +234,29 @@ public class BlockCable extends AbstractBlockConnectable {
       StorageNetwork.log("no sneak");
       return;
     }
+    ItemStack heldStack = playerIn.getHeldItemMainhand();
     TileCable tile = getTileCable(worldIn, pos);
     if (tile == null) {
       StorageNetwork.log("no tile");
       return;
     }
-    ItemStack heldStack = playerIn.getHeldItemMainhand();
-    //TODO: config file check here
+    //
     if (heldStack == null || heldStack.isEmpty()) {
       // erase facade
       PacketRegistry.INSTANCE.sendToServer(new CableFacadeMessage(pos, true));
+      // fix to refresh client when you set facade, reload world, and unset afte rthat
+      //avoid seeing through world so now it eventually updates
+      worldIn.scheduleBlockUpdate(pos, tile.getBlockType(), 1, 1);
+      worldIn.markAndNotifyBlock(pos.toImmutable(), worldIn.getChunk(pos), tile.getBlockType()
+          .getDefaultState(), tile.getBlockType().getDefaultState(),
+          3);
     }
     else {
+      //its not an empty hand, so check config and fire it off
+      if (!ConfigHandler.isFacadeAllowed(heldStack)) {
+        StorageNetwork.log("not allowed as a facade from config file");
+        return;
+      }
       Block block = Block.getBlockFromItem(heldStack.getItem());
       if (block == null || block == Blocks.AIR) {
         StorageNetwork.log("no block");

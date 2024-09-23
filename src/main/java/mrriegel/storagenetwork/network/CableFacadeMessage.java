@@ -48,9 +48,10 @@ public class CableFacadeMessage implements IMessage, IMessageHandler<CableFacade
       public void run() {
         TileCable tile = BlockCable.getTileCable(world, message.pos);
         if (message.erase) {
-          StorageNetwork.log("unset facade");
+          StorageNetwork.log("unset facade ");
           tile.setFacadeState(null);
-          world.markAndNotifyBlock(message.pos.toImmutable(), world.getChunk(message.pos), tile.getBlockType().getDefaultState(), tile.getBlockType().getDefaultState(), 1 | 2);
+          world.markAndNotifyBlock(message.pos.toImmutable(), world.getChunk(message.pos), tile.getBlockType().getDefaultState(), tile.getBlockType().getDefaultState(),
+              3);
           tile.markDirty();
         }
         else {

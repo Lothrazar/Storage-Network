@@ -2,6 +2,7 @@ package mrriegel.storagenetwork.config;
 
 import java.io.File;
 import mrriegel.storagenetwork.block.master.TileMaster;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 
 public class ConfigHandler {
@@ -12,6 +13,17 @@ public class ConfigHandler {
   public static boolean allowFastWorkBenchIntegration;
   public static boolean logEverything;
   public static boolean reloadNetworkWhenUnloadChunk;
+  private static String[] cableBlacklist;
+
+  public static boolean isFacadeAllowed(ItemStack item) {
+    String itemId = item.getItem().getRegistryName().toString();
+    for (String s : cableBlacklist) {
+      if (itemId.equals(s)) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   public static void refreshConfig(File file) {
     config = new Configuration(file);
@@ -33,6 +45,10 @@ public class ConfigHandler {
     TileMaster.blacklist = config.getStringList("BlacklistBlocks", category, new String[] {
         "extrautils2:playerchest"
     }, "Disable these blocks from ever being able to connect to the network, they will be treated as a non-inventory.");
-    //    TileMaster.blacklist 
+    // just a few to get it started. other flowers are kinda weird but leave that up to uesr
+    cableBlacklist = config.getStringList("BlacklistFacadeCableItems", category, new String[] {
+        "minecraft:double_plant", "minecraft:ladder", "minecraft:rail", "minecraft:detector_rail", "minecraft:activator_rail", "minecraft:golden_rail",
+        "minecraft:waterlily"
+    }, "Disable these blocks from being used as a facade for a cable block (sneak-left-click feature). Note this is the ID of the item held by the player when setting the facade, not the block ID");
   }
 }

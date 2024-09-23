@@ -14,6 +14,9 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
  */
 public class TileCable extends TileConnectable {
 
+  private static final String NBT_META = "meta";
+  private static final String NBT_BLOCK = "block";
+  private static final String NBT_FACADE = "facade";
   private IBlockState facadeState = null;
 
   public TileCable() {
@@ -24,12 +27,12 @@ public class TileCable extends TileConnectable {
   @Override
   public void readFromNBT(NBTTagCompound compound) {
     super.readFromNBT(compound);
-    if (compound.hasKey("facade")) {
+    if (compound.hasKey(NBT_FACADE)) {
       setFacadeState(null); // null until we have it set
-      NBTTagCompound facadeTag = compound.getCompoundTag("facade");
-      if (facadeTag.hasKey("block")) {
-        Block facade = Block.getBlockFromName(facadeTag.getString("block"));
-        setFacadeState(facade.getStateFromMeta(facadeTag.getInteger("meta")));
+      NBTTagCompound facadeTag = compound.getCompoundTag(NBT_FACADE);
+      if (facadeTag.hasKey(NBT_BLOCK)) {
+        Block facade = Block.getBlockFromName(facadeTag.getString(NBT_BLOCK));
+        setFacadeState(facade.getStateFromMeta(facadeTag.getInteger(NBT_META)));
       }
     }
   }
@@ -39,10 +42,10 @@ public class TileCable extends TileConnectable {
     super.writeToNBT(compound);
     NBTTagCompound facadeTag = new NBTTagCompound();
     if (facadeState != null) {
-      facadeTag.setString("block", ForgeRegistries.BLOCKS.getKey(getFacadeState().getBlock()).toString());
-      facadeTag.setInteger("meta", getFacadeState().getBlock().getMetaFromState(getFacadeState()));
+      facadeTag.setString(NBT_BLOCK, ForgeRegistries.BLOCKS.getKey(getFacadeState().getBlock()).toString());
+      facadeTag.setInteger(NBT_META, getFacadeState().getBlock().getMetaFromState(getFacadeState()));
     }
-    compound.setTag("facade", facadeTag);
+    compound.setTag(NBT_FACADE, facadeTag);
     return compound;
   }
 

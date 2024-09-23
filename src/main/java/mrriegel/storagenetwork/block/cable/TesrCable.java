@@ -2,9 +2,7 @@ package mrriegel.storagenetwork.block.cable;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.lwjgl.opengl.GL11;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -48,25 +46,19 @@ public class TesrCable extends TileEntitySpecialRenderer<TileCable> {
     GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     GlStateManager.enableBlend();
     GlStateManager.disableCull();
-
     if (Minecraft.isAmbientOcclusionEnabled()) {
       GlStateManager.shadeModel(GL11.GL_SMOOTH);
-    } else {
+    }
+    else {
       GlStateManager.shadeModel(GL11.GL_FLAT);
     }
-
     buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-
     IBlockAccess renderAccess = MinecraftForgeClient.getRegionRenderCache(world, tePos);
     buffer.setTranslation(x - tePos.getX(), y - tePos.getY(), z - tePos.getZ());
-
     BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
     dispatcher.renderBlock(block, tePos, new BlockAccessFacade(renderAccess), buffer);
-
     buffer.setTranslation(0, 0, 0);
-
     tessellator.draw();
-
     RenderHelper.enableStandardItemLighting();
   }
 
