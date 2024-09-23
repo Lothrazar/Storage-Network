@@ -13,6 +13,7 @@ public class ConfigHandler {
   public static boolean allowFastWorkBenchIntegration;
   public static boolean logEverything;
   public static boolean reloadNetworkWhenUnloadChunk;
+  public static boolean facadesUseCollisionBoundingBox;
   private static String[] cableBlacklist;
 
   public static boolean isFacadeAllowed(ItemStack item) {
@@ -50,5 +51,6 @@ public class ConfigHandler {
         "minecraft:double_plant", "minecraft:ladder", "minecraft:rail", "minecraft:detector_rail", "minecraft:activator_rail", "minecraft:golden_rail",
         "minecraft:waterlily"
     }, "Disable these blocks from being used as a facade for a cable block (sneak-left-click feature). Note this is the ID of the item held by the player when setting the facade, not the block ID");
+    facadesUseCollisionBoundingBox = config.getBoolean("facadesUseCollisionBoundingBox", category, true, "If this is true, cables with facades will also use the collision block from the block facade (ie stairs, carpet, etc). ");
   }
 }

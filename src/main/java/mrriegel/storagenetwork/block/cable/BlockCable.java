@@ -155,24 +155,27 @@ public class BlockCable extends AbstractBlockConnectable {
   @Override
   public boolean canBeConnectedTo(IBlockAccess world, BlockPos pos, EnumFacing facing) {
     TileCable tile = getTileCable(world, pos);
-    if (tile != null && tile.getFacadeState() != null)
+    if (tile != null && tile.getFacadeState() != null) {
       return tile.getFacadeState().getBlock().canBeConnectedTo(new BlockAccessFacade(world), pos, facing);
+    }
     return false;
   }
 
   @Override
   public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
     TileCable tile = getTileCable(world, pos);
-    if (tile != null && tile.getFacadeState() != null)
+    if (tile != null && tile.getFacadeState() != null) {
       return tile.getFacadeState().isSideSolid(new BlockAccessFacade(world), pos, side);
+    }
     return false;
   }
 
   @Override
   public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
     TileCable tile = getTileCable(world, pos);
-    if (tile != null && tile.getFacadeState() != null)
+    if (tile != null && tile.getFacadeState() != null) {
       return tile.getFacadeState().doesSideBlockRendering(new BlockAccessFacade(world), pos, face);
+    }
     return false;
   }
 
@@ -198,11 +201,13 @@ public class BlockCable extends AbstractBlockConnectable {
 
   @Override
   public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-    if (worldIn.isRemote)
+    if (worldIn.isRemote) {
       return true;
+    }
     TileCable tile = getTileCable(worldIn, pos);
-    if (tile == null)
+    if (tile == null) {
       return false;
+    }
     // TODO: Move gui open actions to the block classes
     if (tile.getBlockType() == ModBlocks.exKabel) {
       playerIn.openGui(StorageNetwork.instance, GuiHandler.GuiIDs.EXPORT.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
@@ -281,9 +286,11 @@ public class BlockCable extends AbstractBlockConnectable {
   @Override
   public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_185477_7_) {
     TileCable tile = getTileCable(worldIn, pos);
-    if (tile == null)
+    if (tile == null) {
       return;
-    if (tile.getFacadeState() != null) {
+    }
+    if (ConfigHandler.facadesUseCollisionBoundingBox
+        && tile.getFacadeState() != null) {
       tile.getFacadeState().addCollisionBoxToList(worldIn, pos, entityBox, collidingBoxes, entityIn, p_185477_7_);
       return;
     }
@@ -323,9 +330,14 @@ public class BlockCable extends AbstractBlockConnectable {
 
   @Override
   public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-    TileCable tile = getTileCable(world, pos);
-    if (tile != null && tile.getFacadeState() != null)
-      return tile.getFacadeState().getBoundingBox(new BlockAccessFacade(world), pos);
+    if (ConfigHandler.facadesUseCollisionBoundingBox) {
+      //config says we are allowed to use bounding box of what it was
+      TileCable tile = getTileCable(world, pos);
+      if (tile != null && tile.getFacadeState() != null) {
+        return tile.getFacadeState().getBoundingBox(new BlockAccessFacade(world), pos);
+      }
+    }
+    //
     UnlistedPropertyBlockNeighbors.BlockNeighbors neighbors = getBlockNeighbors(world, pos);
     float x1 = 0.375F;
     float x2 = 0.625F;
