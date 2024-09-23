@@ -7,7 +7,6 @@ import mrriegel.storagenetwork.gui.ContainerNetworkBase;
 import mrriegel.storagenetwork.gui.InventoryCraftingNetwork;
 import mrriegel.storagenetwork.network.StackRefreshClientMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
-import mrriegel.storagenetwork.util.UtilTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -36,6 +35,14 @@ public class ContainerRequest extends ContainerNetworkBase {
   }
 
   @Override
+  public void onContainerClosed(EntityPlayer playerIn) {
+    if (!playerIn.world.isRemote) {
+      this.clearContainer(playerIn, playerIn.world, matrix);
+    }
+    super.onContainerClosed(playerIn);
+  }
+
+  @Override
   public void bindHotbar() {
     //player hotbar
     for (int i = 0; i < 9; ++i) {
@@ -56,10 +63,10 @@ public class ContainerRequest extends ContainerNetworkBase {
   public void slotChanged() {
     //parent is abstract
     //seems to not happen from -shiftclick- crafting
-    for (int i = 0; i < 9; i++) {
-      getTileRequest().matrix.put(i, matrix.getStackInSlot(i));
-    }
-    UtilTileEntity.updateTile(getTileRequest().getWorld(), getTileRequest().getPos());
+    //    for (int i = 0; i < 9; i++) {
+    //      getTileRequest().matrix.put(i, matrix.getStackInSlot(i));
+    //    }
+    //    UtilTileEntity.updateTile(getTileRequest().getWorld(), getTileRequest().getPos());
   }
 
   @Override

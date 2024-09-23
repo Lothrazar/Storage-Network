@@ -7,7 +7,6 @@ import mrriegel.storagenetwork.block.master.TileMaster;
 import mrriegel.storagenetwork.block.request.TileRequest;
 import mrriegel.storagenetwork.network.StackRefreshClientMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
-import mrriegel.storagenetwork.util.UtilTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
@@ -48,10 +47,10 @@ public class ContainerFastRequest extends ContainerFastNetworkCrafter {
 
   @Override
   public void onContainerClosed(EntityPlayer player) {
-    for (int i = 0; i < 9; i++) {
-      getTileRequest().matrix.put(i, craftMatrix.getStackInSlot(i));
+    if (!player.world.isRemote) {
+      this.clearContainer(player, player.world, craftMatrix);
     }
-    UtilTileEntity.updateTile(getTileRequest().getWorld(), getTileRequest().getPos());
+    super.onContainerClosed(player);
   }
 
   @Override
