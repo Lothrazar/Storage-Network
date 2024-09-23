@@ -9,7 +9,9 @@ import mrriegel.storagenetwork.block.AbstractBlockConnectable;
 import mrriegel.storagenetwork.block.master.TileMaster;
 import mrriegel.storagenetwork.capabilities.StorageNetworkCapabilities;
 import mrriegel.storagenetwork.gui.GuiHandler;
+import mrriegel.storagenetwork.network.CableFacadeMessage;
 import mrriegel.storagenetwork.registry.ModBlocks;
+import mrriegel.storagenetwork.registry.PacketRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -52,9 +54,9 @@ public class BlockCable extends AbstractBlockConnectable {
     this.setCreativeTab(CreativeTab.tab);
   }
 
-  protected TileCable getTileCable(IBlockAccess world, BlockPos pos) {
+  public static TileCable getTileCable(IBlockAccess world, BlockPos pos) {
     TileEntity tile = world.getTileEntity(pos);
-    if (tile != null && tile instanceof TileCable) {
+    if (tile instanceof TileCable) {
       return (TileCable) tile;
     }
     return null;
@@ -223,6 +225,10 @@ public class BlockCable extends AbstractBlockConnectable {
   @SuppressWarnings("deprecation")
   @Override
   public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+    if (!worldIn.isRemote) {
+      StorageNetwork.log("client only ahead");
+      return;
+    }
     if (!playerIn.isSneaking()) {
       StorageNetwork.log("no sneak");
       return;
@@ -233,32 +239,30 @@ public class BlockCable extends AbstractBlockConnectable {
       return;
     }
     ItemStack heldStack = playerIn.getHeldItemMainhand();
+    //TODO: config file check here
     if (heldStack == null || heldStack.isEmpty()) {
-      tile.setFacadeState(null);
-      worldIn.markAndNotifyBlock(pos.toImmutable(), worldIn.getChunk(pos), getDefaultState(), getDefaultState(), 1 | 2);
-      tile.markDirty();
-      StorageNetwork.log("unset facade");
-      return;
+      // erase facade
+      PacketRegistry.INSTANCE.sendToServer(new CableFacadeMessage(pos, true));
     }
-    Block block = Block.getBlockFromItem(heldStack.getItem());
-    if (block == null || block == Blocks.AIR) {
-      StorageNetwork.log("no block");
-      return;
+    else {
+      Block block = Block.getBlockFromItem(heldStack.getItem());
+      if (block == null || block == Blocks.AIR) {
+        StorageNetwork.log("no block");
+        return;
+      }
+      int meta = heldStack.getMetadata();
+      RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver; // ! Client Only
+      float f = (float) (mouseOver.hitVec.x - pos.getX());
+      float f1 = (float) (mouseOver.hitVec.y - pos.getY());
+      float f2 = (float) (mouseOver.hitVec.z - pos.getZ());
+      IBlockState state = block.getStateForPlacement(worldIn, pos, mouseOver.sideHit, f, f1, f2, meta, playerIn);
+      if (state == null || state.getRenderType() != EnumBlockRenderType.MODEL) {
+        StorageNetwork.log("no model");
+        return;
+      }
+      //new facade
+      PacketRegistry.INSTANCE.sendToServer(new CableFacadeMessage(pos, state));
     }
-    int meta = heldStack.getMetadata();
-    RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
-    float f = (float) (mouseOver.hitVec.x - pos.getX());
-    float f1 = (float) (mouseOver.hitVec.y - pos.getY());
-    float f2 = (float) (mouseOver.hitVec.z - pos.getZ());
-    IBlockState state = block.getStateForPlacement(worldIn, pos, mouseOver.sideHit, f, f1, f2, meta, playerIn);
-    if (state == null || state.getRenderType() != EnumBlockRenderType.MODEL) {
-      StorageNetwork.log("no model");
-      return;
-    }
-    tile.setFacadeState(state);
-    worldIn.markAndNotifyBlock(pos.toImmutable(), worldIn.getChunk(pos), getDefaultState(), getDefaultState(), 1 | 2);
-    tile.markDirty();
-    StorageNetwork.log("set facade");
   }
 
   @SuppressWarnings("deprecation")
