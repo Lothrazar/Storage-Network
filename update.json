@@ -2,7 +2,7 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/simple-storage-network",
   "promos": {
     "1.11.2-latest": "1.0.5",
-    "1.12.2-latest": "1.9.0"
+    "1.12.2-latest": "2.0.0"
   },
   "1.11.2":{
 	"1.0.0":"First Release"
@@ -79,6 +79,6 @@
   	,"1.8.1":"Pull Request by  itgenie98: Fix hardcoded value in TileMaster"
   	,"1.8.2":"Performance increase: ItemStacks are no longer repeatedly copied while doing sorting/imports/exports, reducing RAM use/CPU load."
     ,"1.8.3": "Fix Network Collector sometimes voiding an item if it picks up something new not already in the network. Add optional Baubles support #272. Fix #254 Import Cables stuck on not importable items.  Fix #365 Storage Inventory screen rendering player hotbar off-screen "
-    ,"1.9.0": "Add storage remote hotkey #447. Change priority behavior for insertion to make more sense. Improve processing cable performance, add JEI recipe filling, and default inactive. Fix various GUI issues. Correct cable placement collision box."
+    ,"2.0.0": "Add storage remote hotkey #447. Change priority behavior for insertion to make more sense. Improve processing cable performance, add JEI recipe filling, and default inactive. Fix various GUI issues. Correct cable placement collision box."
   }
 }
