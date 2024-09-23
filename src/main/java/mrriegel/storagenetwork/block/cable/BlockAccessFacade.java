@@ -34,8 +34,8 @@ public class BlockAccessFacade implements IBlockAccess {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof TileCable) {
             TileCable cable = (TileCable) te;
-            if (cable.facadeState != null)
-                return cable.facadeState;
+            if (cable.getFacadeState() != null)
+                return cable.getFacadeState();
         }
         return world.getBlockState(pos);
     }

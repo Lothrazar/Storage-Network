@@ -85,7 +85,7 @@ public class TesrCable extends TileEntitySpecialRenderer<TileCable> {
     if (neighbors == null) {
       return;
     }
-    IBlockState facadeState = te.facadeState;
+    IBlockState facadeState = te.getFacadeState();
     if (facadeState != null) {
       renderFacadeBlock(facadeState, te.getWorld(), te.getPos(), x, y, z);
       return;
