@@ -2,7 +2,6 @@ package mrriegel.storagenetwork.jei;
 
 import java.util.ArrayList;
 import java.util.Map;
-
 import mezz.jei.api.gui.IGuiIngredient;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
@@ -23,13 +22,10 @@ public class ProcessRecipeTransferHandler implements IRecipeTransferHandler<Cont
   @Override
   public IRecipeTransferError transferRecipe(ContainerCableProcessing container, IRecipeLayout recipeLayout, EntityPlayer player,
       boolean maxTransfer, boolean doTransfer) {
-
     if (!doTransfer) {
       return null;
     }
-
     Map<Integer, ? extends IGuiIngredient<ItemStack>> ingredients = recipeLayout.getItemStacks().getGuiIngredients();
-
     ArrayList<ItemStack> inputs = new ArrayList<>(9), outputs = new ArrayList<>(9);
     for (Map.Entry<Integer, ? extends IGuiIngredient<ItemStack>> entry : ingredients.entrySet()) {
       IGuiIngredient<ItemStack> ingredient = entry.getValue();
@@ -40,7 +36,8 @@ public class ProcessRecipeTransferHandler implements IRecipeTransferHandler<Cont
       }
       if (ingredient.isInput()) {
         inputs.add(displayed);
-      } else {
+      }
+      else {
         outputs.add(displayed);
       }
     }

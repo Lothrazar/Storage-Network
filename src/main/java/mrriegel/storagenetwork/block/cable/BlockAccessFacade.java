@@ -11,59 +11,59 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockAccessFacade implements IBlockAccess {
-    
-    private IBlockAccess world;
 
-    public BlockAccessFacade(IBlockAccess world) {
-        this.world = world;
-    }
+  private IBlockAccess world;
 
-    @Override
-    public TileEntity getTileEntity(BlockPos pos) {
-        return world.getTileEntity(pos);
-    }
+  public BlockAccessFacade(IBlockAccess world) {
+    this.world = world;
+  }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public int getCombinedLight(BlockPos pos, int lightValue) {
-        return world.getCombinedLight(pos, lightValue);
-    }
+  @Override
+  public TileEntity getTileEntity(BlockPos pos) {
+    return world.getTileEntity(pos);
+  }
 
-    @Override
-    public IBlockState getBlockState(BlockPos pos) {
-        TileEntity te = world.getTileEntity(pos);
-        if (te instanceof TileCable) {
-            TileCable cable = (TileCable) te;
-            if (cable.getFacadeState() != null)
-                return cable.getFacadeState();
-        }
-        return world.getBlockState(pos);
-    }
+  @Override
+  @SideOnly(Side.CLIENT)
+  public int getCombinedLight(BlockPos pos, int lightValue) {
+    return world.getCombinedLight(pos, lightValue);
+  }
 
-    @Override
-    public boolean isAirBlock(BlockPos pos) {
-        return world.isAirBlock(pos);
+  @Override
+  public IBlockState getBlockState(BlockPos pos) {
+    TileEntity te = world.getTileEntity(pos);
+    if (te instanceof TileCable) {
+      TileCable cable = (TileCable) te;
+      if (cable.getFacadeState() != null)
+        return cable.getFacadeState();
     }
+    return world.getBlockState(pos);
+  }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public Biome getBiome(BlockPos pos) {
-        return world.getBiome(pos);
-    }
+  @Override
+  public boolean isAirBlock(BlockPos pos) {
+    return world.isAirBlock(pos);
+  }
 
-    @Override
-    public int getStrongPower(BlockPos pos, EnumFacing direction) {
-        return world.getStrongPower(pos, direction);
-    }
+  @Override
+  @SideOnly(Side.CLIENT)
+  public Biome getBiome(BlockPos pos) {
+    return world.getBiome(pos);
+  }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public WorldType getWorldType() {
-        return world.getWorldType();
-    }
+  @Override
+  public int getStrongPower(BlockPos pos, EnumFacing direction) {
+    return world.getStrongPower(pos, direction);
+  }
 
-    @Override
-    public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
-        return world.isSideSolid(pos, side, _default);
-    }
+  @Override
+  @SideOnly(Side.CLIENT)
+  public WorldType getWorldType() {
+    return world.getWorldType();
+  }
+
+  @Override
+  public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
+    return world.isSideSolid(pos, side, _default);
+  }
 }

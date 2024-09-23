@@ -1,7 +1,6 @@
 package mrriegel.storagenetwork.network;
 
 import java.util.ArrayList;
-
 import io.netty.buffer.ByteBuf;
 import mrriegel.storagenetwork.block.cable.ContainerCable;
 import mrriegel.storagenetwork.block.cable.TileCable;

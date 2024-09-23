@@ -159,7 +159,8 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<NBTTagCompo
     }
   }
 
-  @Override public FilterItemStackHandler getFilters() {
+  @Override
+  public FilterItemStackHandler getFilters() {
     return filters;
   }
 

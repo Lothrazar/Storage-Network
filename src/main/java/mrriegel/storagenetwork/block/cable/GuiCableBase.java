@@ -2,7 +2,6 @@ package mrriegel.storagenetwork.block.cable;
 
 import java.io.IOException;
 import java.util.List;
-
 import org.lwjgl.input.Mouse;
 import com.google.common.collect.Lists;
 import mrriegel.storagenetwork.StorageNetwork;
@@ -152,8 +151,7 @@ public abstract class GuiCableBase extends GuiContainer {
         try {
           JeiHooks.testJeiKeybind(keyCode, stackUnderMouse);
         }
-        catch (Throwable e) {
-        }
+        catch (Throwable e) {}
       }
     }
     super.keyTyped(typedChar, keyCode);

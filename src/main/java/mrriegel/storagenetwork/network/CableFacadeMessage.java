@@ -55,7 +55,7 @@ public class CableFacadeMessage implements IMessage, IMessageHandler<CableFacade
           tile.markDirty();
         }
         else {
-          StorageNetwork.log("set facade" + message.block);
+          StorageNetwork.log("set facade: " + message.block);
           tile.setFacadeState(message.block, message.meta);
           world.markAndNotifyBlock(message.pos.toImmutable(), world.getChunk(message.pos), tile.getBlockType().getDefaultState(), tile.getBlockType().getDefaultState(), 1 | 2);
           tile.markDirty();

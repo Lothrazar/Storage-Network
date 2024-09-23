@@ -3,7 +3,6 @@ package mrriegel.storagenetwork.block.cable.processing;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-
 import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.block.cable.TileCableWithFacing;
 import mrriegel.storagenetwork.block.master.TileMaster;
@@ -98,7 +97,8 @@ public class TileCableProcess extends TileCableWithFacing {
           }
           // done inserting item, increment it in the request
           processRequest.increaseStackIndex();
-        } else {
+        }
+        else {
           // couldn't insert item, wait to insert more or change mode until we succeed
           exportedAll = false;
           break;
@@ -107,7 +107,8 @@ public class TileCableProcess extends TileCableWithFacing {
       if (exportedAll) {
         processRequest.setStatus(ProcessRequestModel.ProcessStatus.IMPORTING);
       }
-    } else if (processRequest.getStatus() == ProcessRequestModel.ProcessStatus.IMPORTING) {
+    }
+    else if (processRequest.getStatus() == ProcessRequestModel.ProcessStatus.IMPORTING) {
       // try to find/get from the blocks outputs into network
       // look for "output" items that can be from target
       // do one by one here as well because we can

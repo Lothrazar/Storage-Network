@@ -1,9 +1,9 @@
 package mrriegel.storagenetwork.item;
 
-import baubles.api.cap.BaublesCapabilities;
-import baubles.api.cap.IBaublesItemHandler;
 import java.util.List;
 import javax.annotation.Nullable;
+import baubles.api.cap.BaublesCapabilities;
+import baubles.api.cap.IBaublesItemHandler;
 import mrriegel.storagenetwork.CreativeTab;
 import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.block.master.TileMaster;
@@ -60,7 +60,7 @@ public class ItemCollector extends Item implements baubles.api.IBauble {
     }
     try {
       // fml.common.Loader replaced in future with fml.ModList
-      if(net.minecraftforge.fml.common.Loader.isModLoaded("baubles")) {
+      if (net.minecraftforge.fml.common.Loader.isModLoaded("baubles")) {
         net.minecraftforge.common.capabilities.Capability<IBaublesItemHandler> b = BaublesCapabilities.CAPABILITY_BAUBLES;
         if (player.hasCapability(b, null)) {
           baubles.api.cap.IBaublesItemHandler baubles = player.getCapability(b, null);
@@ -71,8 +71,8 @@ public class ItemCollector extends Item implements baubles.api.IBauble {
           }
         }
       }
-    } catch (Exception e) {
     }
+    catch (Exception e) {}
     return ItemStack.EMPTY;
   }
 
@@ -129,18 +129,15 @@ public class ItemCollector extends Item implements baubles.api.IBauble {
 
   @Override
   @Optional.Method(modid = "baubles")
-  public void onEquipped(ItemStack arg0, EntityLivingBase arg1) {
-  }
+  public void onEquipped(ItemStack arg0, EntityLivingBase arg1) {}
 
   @Override
   @Optional.Method(modid = "baubles")
-  public void onUnequipped(ItemStack arg0, EntityLivingBase arg1) {
-  }
+  public void onUnequipped(ItemStack arg0, EntityLivingBase arg1) {}
 
   @Override
   @Optional.Method(modid = "baubles")
-  public void onWornTick(ItemStack stack, EntityLivingBase plr) {
-  }
+  public void onWornTick(ItemStack stack, EntityLivingBase plr) {}
 
   @Override
   @Optional.Method(modid = "baubles")

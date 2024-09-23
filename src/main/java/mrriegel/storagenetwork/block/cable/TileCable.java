@@ -64,6 +64,7 @@ public class TileCable extends TileConnectable {
     this.facadeState = facadeState;
   }
 
+  @SuppressWarnings("deprecation")
   public void setFacadeState(String block, int meta) {
     Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block));
     this.facadeState = b.getStateFromMeta(meta);
