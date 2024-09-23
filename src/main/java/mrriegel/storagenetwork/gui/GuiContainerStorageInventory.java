@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -122,7 +121,7 @@ public abstract class GuiContainerStorageInventory extends GuiContainer implemen
     this.addButton(directionBtn);
     sortBtn = new GuiStorageButton(1, guiLeft + 21, searchBar.y - 3, "");
     this.addButton(sortBtn);
-    keepBtn = new GuiStorageButton(6, guiLeft + 35, guiTop + 93, "");
+    keepBtn = new GuiStorageButton(6, guiLeft + 35, searchBar.y - 3, "");
     this.addButton(keepBtn);
     jeiBtn = new GuiStorageButton(4, guiLeft + 49, searchBar.y - 3, "");
     if (JeiHooks.isJeiLoaded()) {
