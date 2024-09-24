@@ -2,6 +2,7 @@ package com.lothrazar.storagenetwork.block;
 
 import com.lothrazar.storagenetwork.api.EnumConnectType;
 import com.lothrazar.storagenetwork.block.cable.BlockCable;
+import com.lothrazar.storagenetwork.block.cable.TileCable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.util.UtilConnections;
 import net.minecraft.core.BlockPos;
@@ -10,9 +11,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileCableWithFacing extends TileConnectable {
+public class TileCableWithFacing extends TileCable {
 
-  Direction direction = null;
+  private Direction direction = null;
 
   public TileCableWithFacing(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
     super(tileEntityTypeIn, pos, state);

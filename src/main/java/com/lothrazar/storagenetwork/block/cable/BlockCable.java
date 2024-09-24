@@ -9,6 +9,7 @@ import com.lothrazar.storagenetwork.api.EnumConnectType;
 import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
 import com.lothrazar.storagenetwork.capability.CapabilityConnectableAutoIO;
+import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import com.lothrazar.storagenetwork.util.ShapeBuilder;
 import com.lothrazar.storagenetwork.util.UtilConnections;
@@ -124,6 +125,12 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
 
   @Override
   public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+    TileCable tile = TileCable.getTileCable(worldIn, pos);
+    if (tile != null
+        && ConfigRegistry.facadesUseCollisionBoundingBox.get()
+        && tile.getFacadeState() != null) {
+      return tile.getFacadeState().getShape(worldIn, pos, context);
+    }
     return ShapeCache.getOrCreate(state, ShapeBuilder::createShape);
   }
 

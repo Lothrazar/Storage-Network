@@ -2,6 +2,7 @@ package com.lothrazar.storagenetwork.registry;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.network.CableDataMessage;
+import com.lothrazar.storagenetwork.network.CableFacadeMessage;
 import com.lothrazar.storagenetwork.network.CableIOMessage;
 import com.lothrazar.storagenetwork.network.CableLimitMessage;
 import com.lothrazar.storagenetwork.network.ClearRecipeMessage;
@@ -46,5 +47,6 @@ public class PacketRegistry {
     INSTANCE.registerMessage(id++, RefreshFilterClientMessage.class, RefreshFilterClientMessage::encode, RefreshFilterClientMessage::decode, RefreshFilterClientMessage::handle);
     INSTANCE.registerMessage(id++, SortClientMessage.class, SortClientMessage::encode, SortClientMessage::decode, SortClientMessage::handle);
     INSTANCE.registerMessage(id++, KeybindCurioMessage.class, KeybindCurioMessage::encode, KeybindCurioMessage::decode, KeybindCurioMessage::handle);
+    INSTANCE.registerMessage(id++, CableFacadeMessage.class, CableFacadeMessage::encode, CableFacadeMessage::decode, CableFacadeMessage::handle);
   }
 }
