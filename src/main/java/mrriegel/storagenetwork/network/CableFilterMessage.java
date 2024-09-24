@@ -3,11 +3,11 @@ package mrriegel.storagenetwork.network;
 import io.netty.buffer.ByteBuf;
 import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.block.cable.ContainerCable;
-import mrriegel.storagenetwork.block.cable.TileCable;
 import mrriegel.storagenetwork.block.cable.io.ContainerCableIO;
 import mrriegel.storagenetwork.block.cable.link.ContainerCableLink;
 import mrriegel.storagenetwork.block.cable.processing.ContainerCableProcessing;
 import mrriegel.storagenetwork.block.cable.processing.TileCableProcess;
+import mrriegel.storagenetwork.registry.PacketRegistry;
 import mrriegel.storagenetwork.util.UtilTileEntity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -41,7 +41,7 @@ public class CableFilterMessage implements IMessage, IMessageHandler<CableFilter
     IThreadListener mainThread = (WorldServer) player.world;
     mainThread.addScheduledTask(() -> {
       if (player.openContainer instanceof ContainerCable) {
-        TileCable tileCable = ((ContainerCable) player.openContainer).tile;
+        //        TileCable tileCable = ((ContainerCable) player.openContainer).tile;
         //        if (tileCable instanceof TileCableProcess) {
         //          TileCableProcess processCable = (TileCableProcess) tileCable;
         //          if (message.stack != null && message.index >= 0) {
@@ -81,6 +81,7 @@ public class CableFilterMessage implements IMessage, IMessageHandler<CableFilter
         UtilTileEntity.updateTile(con.tile.getWorld(), con.tile.getPos());
       }
       if (player.openContainer instanceof ContainerCableProcessing) {
+        StorageNetwork.log("CableFilterMessage in processing   " + message.index);
         ContainerCableProcessing con = (ContainerCableProcessing) player.openContainer;
         if (!(con.tile instanceof TileCableProcess)) {
           return;
@@ -88,11 +89,15 @@ public class CableFilterMessage implements IMessage, IMessageHandler<CableFilter
         TileCableProcess tileCable = (TileCableProcess) con.tile;
         StorageNetwork.log("CableFilter Messageinput or output for filter?? " + message.index);
         if (message.stack != null && message.index >= 0) {
-          tileCable.filterInput.setStackInSlot(message.index, message.stack);
+          tileCable.filters.setStackInSlot(message.index, message.stack);
         }
-        tileCable.filterInput.ores = message.ore;
-        tileCable.filterInput.meta = message.meta;
-        tileCable.filterInput.nbt = message.nbt;
+        tileCable.filters.ores = message.ore;
+        tileCable.filters.meta = message.meta;
+        tileCable.filters.nbt = message.nbt;
+        //sync back to client
+        StorageNetwork.log("sync bac kt oprocess cable ");
+        PacketRegistry.INSTANCE.sendTo(new RefreshFilterClientMessage(tileCable.filters.getStacks()),
+            player);
         tileCable.markDirty();
       }
     });

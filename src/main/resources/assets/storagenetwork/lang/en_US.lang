@@ -64,6 +64,8 @@ gui.storagenetwork.operate.tooltip.less=less
 
 gui.storagenetwork.refresh=Refresh processing transactions, so if it is stuck waiting for a result, this will swap it back to recipe mode to gather ingredients.  
 
+
+
 gui.storagenetwork.checkbox.meta=Meta
 gui.storagenetwork.checkbox.ore=OreDict
 gui.storagenetwork.checkbox.nbt=NBT
@@ -117,6 +119,8 @@ processing.buttons.toggle.false=Only process the requested number
 processing.buttons.minus=Reduce requested
 processing.buttons.plus=Increase requested
 processing.empty.ingredients=Empty Ingredients
+
+gui.storagenetwork.processing.import=Import recipe ingredients and output from connected machine (this resets your filters)
 
 gui.storagenetwork.processing.recipe=Ingredients for each cycle will be sent as if coming from this block-side
 gui.storagenetwork.processing.extract=When pulling processing results it will be taken as if from this block-side

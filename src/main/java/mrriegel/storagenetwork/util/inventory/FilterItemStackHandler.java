@@ -17,7 +17,7 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
   public boolean isWhitelist = true;
 
   public FilterItemStackHandler() {
-    super(FILTER_SIZE);
+    this(FILTER_SIZE);
   }
 
   public FilterItemStackHandler(int size) {
@@ -94,5 +94,38 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
     rulesTag.setBoolean("whitelist", isWhitelist);
     result.setTag("rules", rulesTag);
     return result;
+  }
+
+  //some but not all treat input/output differeintly. top half vs bototm half
+  public List<ItemStack> getInputs() {
+    List<ItemStack> result = new ArrayList<>();
+    for (int slot = 0; slot < 9; slot++) {
+      ItemStack stack = this.getStackInSlot(slot);
+      if (stack == null || stack.isEmpty()) {
+        continue;
+      }
+      result.add(stack);
+    }
+    return result;
+  }
+
+  public List<ItemStack> getOutputs() {
+    List<ItemStack> result = new ArrayList<>();
+    for (int slot = 9; slot < 18; slot++) {
+      ItemStack stack = this.getStackInSlot(slot);
+      if (stack == null || stack.isEmpty()) {
+        continue;
+      }
+      result.add(stack);
+    }
+    return result;
+  }
+
+  public boolean isOutputEmpty() {
+    return getOutputs().isEmpty();
+  }
+
+  public boolean isInputEmpty() {
+    return getInputs().isEmpty();
   }
 }

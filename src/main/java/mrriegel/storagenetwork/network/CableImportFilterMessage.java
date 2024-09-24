@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.block.cable.processing.ContainerCableProcessing;
 import mrriegel.storagenetwork.block.cable.processing.TileCableProcess;
+import mrriegel.storagenetwork.registry.PacketRegistry;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.WorldServer;
@@ -32,9 +33,14 @@ public class CableImportFilterMessage implements IMessage, IMessageHandler<Cable
         StorageNetwork.log("cab proc import filter clicked " + con.tile);
         if (con.tile instanceof TileCableProcess) {
           TileCableProcess proc = (TileCableProcess) con.tile;
+          if (proc.getDirection() == null) {
+            return; // it has no attached machine. button effectively disabled 
+          }
           proc.importFilters();
-          //        con.cap.operationLimit = message.limit;
-          //        con.cap.operationStack = message.stack;
+          //sync back to client 
+          PacketRegistry.INSTANCE.sendTo(new RefreshFilterClientMessage(proc.filters.getStacks()),
+              player);
+          //
           con.tile.markDirty();
         }
       }

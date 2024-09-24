@@ -20,8 +20,7 @@ public class TileCableProcess extends TileCableWithFacing {
   private ProcessRequestModel processModel = new ProcessRequestModel();
   public EnumFacing processingInput = EnumFacing.UP;
   public EnumFacing processingOut = EnumFacing.DOWN;
-  public FilterItemStackHandler filterInput = new FilterItemStackHandler(9);
-  public FilterItemStackHandler filterOutput = new FilterItemStackHandler(9);
+  public FilterItemStackHandler filters = new FilterItemStackHandler();
 
   @Override
   public void readFromNBT(NBTTagCompound compound) {
@@ -31,9 +30,9 @@ public class TileCableProcess extends TileCableWithFacing {
     pm.readFromNBT(compound);
     this.setProcessModel(pm);
     NBTTagCompound filters = compound.getCompoundTag("filters");
-    this.filterInput.deserializeNBT(filters);
-    filters = compound.getCompoundTag("filtersOut");
-    this.filterOutput.deserializeNBT(filters);
+    this.filters.deserializeNBT(filters);
+    //    filters = compound.getCompoundTag("filtersOut");
+    //    this.filterOutput.deserializeNBT(filters);
     super.readFromNBT(compound);
   }
 
@@ -43,10 +42,10 @@ public class TileCableProcess extends TileCableWithFacing {
     this.processModel.writeToNBT(compound);
     compound.setInteger("processingBottom", processingOut.ordinal());
     compound.setInteger("processingTop", processingInput.ordinal());
-    NBTTagCompound filters = this.filterInput.serializeNBT();
+    NBTTagCompound filters = this.filters.serializeNBT();
     compound.setTag("filters", filters);
-    filters = this.filterOutput.serializeNBT();
-    compound.setTag("filtersOut", filters);
+    //    filters = this.filterOutput.serializeNBT();
+    //    compound.setTag("filtersOut", filters);
     return compound;
   }
 
@@ -83,8 +82,8 @@ public class TileCableProcess extends TileCableWithFacing {
       // the right one
       boolean exportedAll = true;
       for (ItemStack ingred : ingredients.subList(processRequest.getStackIndex(), ingredients.size())) {
-        ItemStackMatcher matcher = new ItemStackMatcher(ingred.copy(), this.filterInput.meta, this.filterInput.ores,
-            this.filterInput.nbt);
+        ItemStackMatcher matcher = new ItemStackMatcher(ingred.copy(), this.filters.meta, this.filters.ores,
+            this.filters.nbt);
         ItemStack requestedFromNetwork = master.request(matcher, ingred.getCount(), true);
         int found = requestedFromNetwork.getCount();
         // StorageNetwork.log("ingr size " + ingred.getSize() + " found +" + found + "
@@ -132,7 +131,7 @@ public class TileCableProcess extends TileCableWithFacing {
           importedAll = false;
           break;
         }
-        // StorageNetwork.log("IMPORTING: " + out.toString());
+        StorageNetwork.log(this.pos + "IMPORTING: " + out.toString());
         // new extract item using capabilities
         ItemStack extracted = UtilInventory.extractItem(inventoryLinked, new ItemStackMatcher(out), out.getCount(), false);
         master.insertStack(extracted, false);
@@ -141,7 +140,7 @@ public class TileCableProcess extends TileCableWithFacing {
       }
       if (importedAll) {
         // change mode back to exporting
-        // StorageNetwork.log("IMPORTING: TO STATUS EXPORTING ");
+        StorageNetwork.log(this.pos + "IMPORTING: TO STATUS EXPORTING ");
         processRequest.setStatus(ProcessRequestModel.ProcessStatus.EXPORTING);
         if (processRequest.isAlwaysActive() == false) {
           processRequest.reduceCount();
@@ -152,6 +151,9 @@ public class TileCableProcess extends TileCableWithFacing {
   }
 
   private IItemHandler getInventoryLinked(EnumFacing inOrOut) {
+    if (this.getFacingPosition() == null) {
+      return null;
+    }
     IItemHandler inventoryLinked = UtilInventory.getItemHandler(world.getTileEntity(this.getFacingPosition()),
         inOrOut);
     return inventoryLinked;
@@ -166,19 +168,19 @@ public class TileCableProcess extends TileCableWithFacing {
   }
 
   public List<ItemStack> getProcessIngredients() {
-    return filterInput.getStacks().stream().map(stack -> stack.copy()).collect(Collectors.toList());
+    return filters.getInputs().stream().map(stack -> stack.copy()).collect(Collectors.toList());
   }
 
   public List<ItemStack> getProcessOutputs() {
-    return filterOutput.getStacks().stream().map(stack -> stack.copy()).collect(Collectors.toList());
+    return filters.getOutputs().stream().map(stack -> stack.copy()).collect(Collectors.toList());
   }
 
   @Nonnull
   public ItemStack getFirstRecipeOut() {
-    if (filterOutput.getStackMatchers().isEmpty()) {
+    if (filters.isOutputEmpty()) {
       return ItemStack.EMPTY;
     }
-    return filterOutput.getStackInSlot(0);
+    return filters.getOutputs().get(0);//todo: test
   }
 
   public EnumFacing getFacingOut() {
@@ -208,31 +210,43 @@ public class TileCableProcess extends TileCableWithFacing {
     this.setProcessModel(request);
   }
 
-  public void importFilters() {
+  /**
+   * Import recipe filters, based on the sided inventory directions and extractability
+   * 
+   * in the user interface, inputs on the left and out on the right
+   */
+  public void importFilters() { //first, clear the filter out before importing
+    //
     final IItemHandler input = getInventoryLinkedInput();
     final IItemHandler output = getInventoryLinkedOutput();
-    //final    boolean simulate = true;
-    StorageNetwork.log("import filters from the targets " + output);
+    if (input == null || output == null) {
+      return;
+    }
+    clearFilters();
     for (int i = 0; i < input.getSlots(); i++) {
-      this.filterInput.setStackInSlot(i, ItemStack.EMPTY);
+      //oh we are importing? wipe it all out
       //actually. only run it if i am allowed to insert?
       //but no, it might be full if we check insertItem 
       ItemStack test = input.getStackInSlot(i).copy(); //dont extract here
-      StorageNetwork.log(i + "  input side  " + this.processingInput + ":" + test);
       if (!test.isEmpty()) {
         test.setCount(1);
-        this.filterInput.setStackInSlot(i, test);
+        this.filters.setStackInSlot(i, test);
       }
     }
     for (int i = 0; i < output.getSlots(); i++) {
-      this.filterOutput.setStackInSlot(i, ItemStack.EMPTY);
-      //      ItemStack test = output.getStackInSlot(i);
       ItemStack test = output.extractItem(i, 1, true);
-      StorageNetwork.log(i + " output side  " + this.processingOut + ":" + test);
       if (!test.isEmpty()) {
         test.setCount(1);
-        this.filterOutput.setStackInSlot(i, test);
+        this.filters.setStackInSlot(9 + i, test);
       }
+    }
+  }
+
+  private void clearFilters() {
+    for (int i = 0; i < filters.getSlots(); i++) {
+      this.filters.extractItem(i, 64, false);
+      this.filters.setStackInSlot(i, ItemStack.EMPTY);
+      StorageNetwork.log("Erase filter " + i);
     }
   }
 }

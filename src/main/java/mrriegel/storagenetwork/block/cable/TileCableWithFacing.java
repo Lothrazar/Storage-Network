@@ -25,6 +25,9 @@ public class TileCableWithFacing extends TileCable {
   }
 
   public BlockPos getFacingPosition() {
+    if (direction == null) {
+      return null;
+    }
     return this.getPos().offset(direction);
   }
 

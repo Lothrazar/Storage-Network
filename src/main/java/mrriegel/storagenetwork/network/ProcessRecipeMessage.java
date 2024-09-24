@@ -50,11 +50,11 @@ public class ProcessRecipeMessage implements IMessage, IMessageHandler<ProcessRe
         if (tileCable instanceof TileCableProcess) {
           TileCableProcess processCable = (TileCableProcess) tileCable;
           StorageNetwork.log("ProcessRecipe mess or output for filter?? " + message);
-          for (int i = 0; i < 9; i++) {
-            processCable.filterInput.setStackInSlot(i, message.inputs.get(i));
+          for (int i = 0; i < 9; i++) { // processCable.filters.getSlots()
+            processCable.filters.setStackInSlot(i, message.inputs.get(i));
             //            processCable.filters.setStackInSlot(i + 9, message.outputs.get(i));
           }
-          PacketRegistry.INSTANCE.sendTo(new RefreshFilterClientMessage(processCable.filterInput.getStacks()),
+          PacketRegistry.INSTANCE.sendTo(new RefreshFilterClientMessage(processCable.filters.getStacks()),
               player);
           processCable.markDirty();
         }

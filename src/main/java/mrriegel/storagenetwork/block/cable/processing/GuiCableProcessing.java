@@ -11,6 +11,7 @@ import mrriegel.storagenetwork.network.CableDataMessage;
 import mrriegel.storagenetwork.network.CableDataMessage.CableMessageType;
 import mrriegel.storagenetwork.network.CableImportFilterMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
+import mrriegel.storagenetwork.util.inventory.FilterItemStackHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
@@ -57,7 +58,7 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
     for (int row = 0; row < 3; row++) {
       for (int col = 0; col < 3; col++) {
         int index = col + (3 * row);
-        ItemStack stack = tile.filterInput.getStackInSlot(index);
+        ItemStack stack = tile.filters.getStackInSlot(index);
         int num = stack.getCount();
         int x = col * SLOT_SIZE + 8;
         int y = row * SLOT_SIZE + 26;
@@ -68,7 +69,7 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
     for (int row = 0; row < 3; row++) {
       for (int col = 0; col < 3; col++) {
         int index = 9 + col + (3 * row);
-        ItemStack stack = tile.filterOutput.getStackInSlot(col + (3 * row));
+        ItemStack stack = tile.filters.getStackInSlot(index);
         int num = stack.getCount();
         //
         int x = col * SLOT_SIZE + 116;
@@ -93,18 +94,18 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
     pbtnInRecipe.displayString = tile.getFacingInput().name().substring(0, 2);
     int x = -90;
     int y = 48;
-    //    if (tile.filters.isOutputEmpty() || tile.filters.isInputEmpty()) {
-    //      ///also tooltip here?
-    //      x = -102;
-    //      this.drawString("tile.storagenetwork:recipe.invalid", x, y);
-    //      if (tile.filters.isOutputEmpty())
-    //        this.drawString("tile.storagenetwork:recipe.invalidright", x, y += 12);
-    //      if (tile.filters.isInputEmpty())
-    //        this.drawString("tile.storagenetwork:recipe.invalidleft", x, y += 12);
-    //    }
-    //    else {
-    //      this.drawString("tile.storagenetwork:recipe.valid", x, y);
-    //    }
+    if (tile.filters.isOutputEmpty() || tile.filters.isInputEmpty()) {
+      ///also tooltip here?
+      x = -102;
+      this.drawString("tile.storagenetwork:recipe.invalid", x, y);
+      if (tile.filters.isOutputEmpty())
+        this.drawString("tile.storagenetwork:recipe.invalidright", x, y += 12);
+      if (tile.filters.isInputEmpty())
+        this.drawString("tile.storagenetwork:recipe.invalidleft", x, y += 12);
+    }
+    else {
+      this.drawString("tile.storagenetwork:recipe.valid", x, y);
+    }
     ProcessRequestModel p = tile.getProcessModel();
     x = -90;
     y = 4;
@@ -155,23 +156,23 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
     x = 64;
     y = 62;
     checkOreBtn = new GuiCheckBox(10, guiLeft + x, guiTop + y, I18n.format("gui.storagenetwork.checkbox.ore"), true);
-    checkOreBtn.setIsChecked(tile.filterInput.ores);
+    checkOreBtn.setIsChecked(tile.filters.ores);
     this.addButton(checkOreBtn);
     y += 12;
     checkMetaBtn = new GuiCheckBox(11, guiLeft + x, guiTop + y, I18n.format("gui.storagenetwork.checkbox.meta"), true);
-    checkMetaBtn.setIsChecked(tile.filterInput.meta);
+    checkMetaBtn.setIsChecked(tile.filters.meta);
     this.addButton(checkMetaBtn);
     //
     y -= 24;
     checkNbtBtn = new GuiCheckBox(12, guiLeft + x, guiTop + y, I18n.format("gui.storagenetwork.checkbox.nbt"), true);
-    checkNbtBtn.setIsChecked(tile.filterInput.nbt);
+    checkNbtBtn.setIsChecked(tile.filters.nbt);
     this.addButton(checkNbtBtn);
   }
-  //  @Deprecated
-  //  @Override
-  //  public FilterItemStackHandler getFilterHandler() {
-  //    return tile.filterInput;
-  //  }
+
+  @Override
+  public FilterItemStackHandler getFilterHandler() {
+    return tile.filters; // stil used for nbt/meta 
+  }
 
   @Override
   protected void actionPerformed(GuiButton button) throws IOException {
