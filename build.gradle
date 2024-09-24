@@ -51,16 +51,15 @@ dependencies {
    deobfCompile "mezz.jei:jei_${mc_version}:${jei_version}"
    deobfCompile "fastworkbench:FastWorkbench:${mc_version}:${fb_version}"
 
-    // fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
-
-   deobfCompile  "vazkii.patchouli:Patchouli:${patchouli_version}"
    deobfCompile "baubles:Baubles:1.12:${baubles_version}"
+   
 //  optional:
-//   deobfCompile "compact-machines:compactmachines3-${mc_version}:${cm_version}:${cm_build}" 
+   deobfCompile "compact-machines:compactmachines3-${mc_version}:${cm_version}:${cm_build}" 
+   deobfCompile  "vazkii.patchouli:Patchouli:${patchouli_version}"
 }
+
 repositories {
     maven { url "https://dvs1.progwml6.com/files/maven"    }
-  //  maven { url "https://modmaven.k-4u.nl"  }
     maven { url "https://modmaven.dev/"  }
     maven { url "https://maven.theillusivec4.top/"    }
     maven { url "https://maven.blamejared.com" }
@@ -69,7 +68,6 @@ repositories {
     maven { url 'https://www.cursemaven.com'  }
     maven {   url "https://maven.thiakil.com/"    } 
 // ?? http://maven.thiakil.com/com/azanor/baubles/Baubles/
-    // ?? https://files.minecraftforge.net/maven/
     //   maven {   url "https://tehnut.info/maven/"    } // 404s
 
 }
@@ -88,12 +86,6 @@ processResources {
 
 build.dependsOn signJar
 
-//build.finalizedBy copyJar
-
-task copyJar(type: Copy) {
-    from jar
-    into "${dist_folder}"
-}
 
 task cleanJar {
     delete 'build/libs'
