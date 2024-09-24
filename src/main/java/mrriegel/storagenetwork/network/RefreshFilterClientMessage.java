@@ -3,6 +3,7 @@ package mrriegel.storagenetwork.network;
 import java.util.List;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
+import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.block.cable.GuiCableBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -38,6 +39,7 @@ public class RefreshFilterClientMessage implements IMessage, IMessageHandler<Ref
 
       @Override
       public void run() {
+        StorageNetwork.log("RefreshFilter TODO: if process is it in or out  " + message);
         if (Minecraft.getMinecraft().currentScreen instanceof GuiCableBase) {
           GuiCableBase gui = (GuiCableBase) Minecraft.getMinecraft().currentScreen;
           gui.setFilterItems(message.stacks);

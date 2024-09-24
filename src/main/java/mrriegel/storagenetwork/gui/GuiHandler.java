@@ -59,7 +59,7 @@ public class GuiHandler implements IGuiHandler {
       return new ContainerCableIO((TileCable) world.getTileEntity(pos), player.inventory);
     }
     if (ID == GuiIDs.PROCESSING.ordinal()) {
-      return new ContainerCableProcessing((TileCable) world.getTileEntity(pos), player.inventory);
+      return new ContainerCableProcessing((TileCableProcess) world.getTileEntity(pos), player.inventory);
     }
     if (ID == GuiIDs.CONTROLLER.ordinal()) {
       TileMaster master = ((TileControl) world.getTileEntity(pos)).getMaster().getTileEntity(TileMaster.class);
@@ -104,7 +104,8 @@ public class GuiHandler implements IGuiHandler {
       return new GuiCableIO(new ContainerCableIO(tile, player.inventory));
     }
     if (ID == GuiIDs.PROCESSING.ordinal()) {
-      return new GuiCableProcessing((TileCableProcess) world.getTileEntity(pos), new ContainerCableProcessing((TileCable) world.getTileEntity(pos), player.inventory));
+      TileCableProcess tileProc = (TileCableProcess) world.getTileEntity(pos);
+      return new GuiCableProcessing(tileProc, new ContainerCableProcessing(tileProc, player.inventory));
     }
     if (ID == GuiIDs.CONTROLLER.ordinal()) {
       TileMaster master = ((TileControl) world.getTileEntity(pos)).getMaster().getTileEntity(TileMaster.class);

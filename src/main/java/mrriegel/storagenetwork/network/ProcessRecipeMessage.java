@@ -2,6 +2,7 @@ package mrriegel.storagenetwork.network;
 
 import java.util.ArrayList;
 import io.netty.buffer.ByteBuf;
+import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.block.cable.ContainerCable;
 import mrriegel.storagenetwork.block.cable.TileCable;
 import mrriegel.storagenetwork.block.cable.processing.TileCableProcess;
@@ -48,11 +49,13 @@ public class ProcessRecipeMessage implements IMessage, IMessageHandler<ProcessRe
         TileCable tileCable = ((ContainerCable) player.openContainer).tile;
         if (tileCable instanceof TileCableProcess) {
           TileCableProcess processCable = (TileCableProcess) tileCable;
+          StorageNetwork.log("ProcessRecipe mess or output for filter?? " + message);
           for (int i = 0; i < 9; i++) {
-            processCable.filters.setStackInSlot(i, message.inputs.get(i));
-            processCable.filters.setStackInSlot(i + 9, message.outputs.get(i));
+            processCable.filterInput.setStackInSlot(i, message.inputs.get(i));
+            //            processCable.filters.setStackInSlot(i + 9, message.outputs.get(i));
           }
-          PacketRegistry.INSTANCE.sendTo(new RefreshFilterClientMessage(processCable.filters.getStacks()), player);
+          PacketRegistry.INSTANCE.sendTo(new RefreshFilterClientMessage(processCable.filterInput.getStacks()),
+              player);
           processCable.markDirty();
         }
       }

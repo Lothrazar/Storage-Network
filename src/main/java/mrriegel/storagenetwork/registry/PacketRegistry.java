@@ -5,6 +5,7 @@ import mrriegel.storagenetwork.network.CableControlMessage;
 import mrriegel.storagenetwork.network.CableDataMessage;
 import mrriegel.storagenetwork.network.CableFacadeMessage;
 import mrriegel.storagenetwork.network.CableFilterMessage;
+import mrriegel.storagenetwork.network.CableImportFilterMessage;
 import mrriegel.storagenetwork.network.CableLimitMessage;
 import mrriegel.storagenetwork.network.CableRefreshClientMessage;
 import mrriegel.storagenetwork.network.ClearRecipeMessage;
@@ -44,5 +45,6 @@ public class PacketRegistry {
     INSTANCE.registerMessage(RefreshFilterClientMessage.class, RefreshFilterClientMessage.class, id++, Side.CLIENT);
     INSTANCE.registerMessage(OpenRemoteMessage.class, OpenRemoteMessage.class, id++, Side.SERVER);
     INSTANCE.registerMessage(CableFacadeMessage.class, CableFacadeMessage.class, id++, Side.SERVER);
+    INSTANCE.registerMessage(CableImportFilterMessage.class, CableImportFilterMessage.class, id++, Side.SERVER);
   }
 }

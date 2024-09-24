@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.item.ItemStack;
 
+@Deprecated
 public class ProcessingItemStackHandler extends FilterItemStackHandler {
 
   public List<ItemStack> getInputs() {

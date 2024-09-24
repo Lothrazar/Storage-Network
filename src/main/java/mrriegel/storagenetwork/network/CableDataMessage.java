@@ -71,10 +71,10 @@ public class CableDataMessage implements IMessage, IMessageHandler<CableDataMess
             tileCable.getRequest().setStatus(ProcessRequestModel.ProcessStatus.EXPORTING);
           break;
           case P_FACE_BOTTOM:
-            tileCable.processingBottom = EnumFacing.values()[message.value];
+            tileCable.processingOut = EnumFacing.values()[message.value];
           break;
           case P_FACE_TOP:
-            tileCable.processingTop = EnumFacing.values()[message.value];
+            tileCable.processingInput = EnumFacing.values()[message.value];
           //                StorageNetwork.log(tileCable.processingTop.name() + " server is ?" + message.value);
           break;
           default:

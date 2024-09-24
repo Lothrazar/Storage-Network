@@ -1,6 +1,7 @@
 package mrriegel.storagenetwork.network;
 
 import io.netty.buffer.ByteBuf;
+import mrriegel.storagenetwork.StorageNetwork;
 import mrriegel.storagenetwork.block.cable.ContainerCable;
 import mrriegel.storagenetwork.block.cable.TileCable;
 import mrriegel.storagenetwork.block.cable.io.ContainerCableIO;
@@ -41,16 +42,16 @@ public class CableFilterMessage implements IMessage, IMessageHandler<CableFilter
     mainThread.addScheduledTask(() -> {
       if (player.openContainer instanceof ContainerCable) {
         TileCable tileCable = ((ContainerCable) player.openContainer).tile;
-        if (tileCable instanceof TileCableProcess) {
-          TileCableProcess processCable = (TileCableProcess) tileCable;
-          if (message.stack != null && message.index >= 0) {
-            processCable.filters.setStackInSlot(message.index, message.stack);
-          }
-          processCable.filters.ores = message.ore;
-          processCable.filters.meta = message.meta;
-          processCable.filters.nbt = message.nbt;
-          processCable.markDirty();
-        }
+        //        if (tileCable instanceof TileCableProcess) {
+        //          TileCableProcess processCable = (TileCableProcess) tileCable;
+        //          if (message.stack != null && message.index >= 0) {
+        //            processCable.filterInput.setStackInSlot(message.index, message.stack);
+        //          }
+        //          processCable.filterInput.ores = message.ore;
+        //          processCable.filterInput.meta = message.meta;
+        //          processCable.filterInput.nbt = message.nbt;
+        //          processCable.markDirty();
+        //        }
       }
       if (player.openContainer instanceof ContainerCableLink) {
         ContainerCableLink con = (ContainerCableLink) player.openContainer;
@@ -85,12 +86,13 @@ public class CableFilterMessage implements IMessage, IMessageHandler<CableFilter
           return;
         }
         TileCableProcess tileCable = (TileCableProcess) con.tile;
+        StorageNetwork.log("CableFilter Messageinput or output for filter?? " + message.index);
         if (message.stack != null && message.index >= 0) {
-          tileCable.filters.setStackInSlot(message.index, message.stack);
+          tileCable.filterInput.setStackInSlot(message.index, message.stack);
         }
-        tileCable.filters.ores = message.ore;
-        tileCable.filters.meta = message.meta;
-        tileCable.filters.nbt = message.nbt;
+        tileCable.filterInput.ores = message.ore;
+        tileCable.filterInput.meta = message.meta;
+        tileCable.filterInput.nbt = message.nbt;
         tileCable.markDirty();
       }
     });

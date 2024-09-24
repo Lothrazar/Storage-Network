@@ -20,6 +20,10 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
     super(FILTER_SIZE);
   }
 
+  public FilterItemStackHandler(int size) {
+    super(size);
+  }
+
   public void setMatchOreDict(boolean ores) {
     this.ores = ores;
   }

@@ -33,7 +33,7 @@ public abstract class GuiCableBase extends GuiContainer {
   public GuiCheckBox checkNbtBtn;
   public GuiCheckBox checkOreBtn;
   public GuiCheckBox checkMetaBtn;
-  ContainerCable containerCable;
+  protected ContainerCable containerCable;
 
   public GuiCableBase(ContainerCable containerCable) {
     super(containerCable);

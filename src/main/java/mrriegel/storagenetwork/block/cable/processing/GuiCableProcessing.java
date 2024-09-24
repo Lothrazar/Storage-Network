@@ -3,15 +3,14 @@ package mrriegel.storagenetwork.block.cable.processing;
 import java.io.IOException;
 import com.google.common.collect.Lists;
 import mrriegel.storagenetwork.StorageNetwork;
-import mrriegel.storagenetwork.block.cable.ContainerCable;
 import mrriegel.storagenetwork.block.cable.GuiCableBase;
 import mrriegel.storagenetwork.block.cable.GuiCableButton;
 import mrriegel.storagenetwork.gui.IPublicGuiContainer;
 import mrriegel.storagenetwork.gui.ItemSlotNetwork;
 import mrriegel.storagenetwork.network.CableDataMessage;
 import mrriegel.storagenetwork.network.CableDataMessage.CableMessageType;
+import mrriegel.storagenetwork.network.CableImportFilterMessage;
 import mrriegel.storagenetwork.registry.PacketRegistry;
-import mrriegel.storagenetwork.util.inventory.FilterItemStackHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
@@ -23,12 +22,13 @@ import net.minecraftforge.fml.client.config.GuiCheckBox;
 public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContainer {
 
   protected GuiCableButton pbtnReset;
-  protected GuiCableButton pbtnBottomface;
-  protected GuiCableButton pbtnTopface;
+  protected GuiCableButton pbtnOut;
+  protected GuiCableButton pbtnInRecipe;
+  protected GuiButton btnImport;
   private TileCableProcess tile;
 
-  public GuiCableProcessing(TileCableProcess tileEntity, ContainerCable inventorySlotsIn) {
-    super(inventorySlotsIn);
+  public GuiCableProcessing(TileCableProcess tileEntity, ContainerCableProcessing containerCable) {
+    super(containerCable);
     this.tile = tileEntity;
   }
 
@@ -57,7 +57,7 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
     for (int row = 0; row < 3; row++) {
       for (int col = 0; col < 3; col++) {
         int index = col + (3 * row);
-        ItemStack stack = tile.filters.getStackInSlot(index);
+        ItemStack stack = tile.filterInput.getStackInSlot(index);
         int num = stack.getCount();
         int x = col * SLOT_SIZE + 8;
         int y = row * SLOT_SIZE + 26;
@@ -68,7 +68,7 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
     for (int row = 0; row < 3; row++) {
       for (int col = 0; col < 3; col++) {
         int index = 9 + col + (3 * row);
-        ItemStack stack = tile.filters.getStackInSlot(index);
+        ItemStack stack = tile.filterOutput.getStackInSlot(col + (3 * row));
         int num = stack.getCount();
         //
         int x = col * SLOT_SIZE + 116;
@@ -89,22 +89,22 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
   @Override
   protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
     super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-    pbtnBottomface.displayString = tile.getFacingBottomRow().name().substring(0, 2);
-    pbtnTopface.displayString = tile.getFacingTopRow().name().substring(0, 2);
+    pbtnOut.displayString = tile.getFacingOut().name().substring(0, 2);
+    pbtnInRecipe.displayString = tile.getFacingInput().name().substring(0, 2);
     int x = -90;
     int y = 48;
-    if (tile.filters.isOutputEmpty() || tile.filters.isInputEmpty()) {
-      ///also tooltip here?
-      x = -102;
-      this.drawString("tile.storagenetwork:recipe.invalid", x, y);
-      if (tile.filters.isOutputEmpty())
-        this.drawString("tile.storagenetwork:recipe.invalidright", x, y += 12);
-      if (tile.filters.isInputEmpty())
-        this.drawString("tile.storagenetwork:recipe.invalidleft", x, y += 12);
-    }
-    else {
-      this.drawString("tile.storagenetwork:recipe.valid", x, y);
-    }
+    //    if (tile.filters.isOutputEmpty() || tile.filters.isInputEmpty()) {
+    //      ///also tooltip here?
+    //      x = -102;
+    //      this.drawString("tile.storagenetwork:recipe.invalid", x, y);
+    //      if (tile.filters.isOutputEmpty())
+    //        this.drawString("tile.storagenetwork:recipe.invalidright", x, y += 12);
+    //      if (tile.filters.isInputEmpty())
+    //        this.drawString("tile.storagenetwork:recipe.invalidleft", x, y += 12);
+    //    }
+    //    else {
+    //      this.drawString("tile.storagenetwork:recipe.valid", x, y);
+    //    }
     ProcessRequestModel p = tile.getProcessModel();
     x = -90;
     y = 4;
@@ -125,11 +125,14 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
     if (pbtnReset.isMouseOver()) {
       drawHoveringText(Lists.newArrayList(I18n.format("gui.storagenetwork.refresh")), mouseX, mouseY);
     }
-    if (pbtnTopface.isMouseOver()) {
+    if (pbtnInRecipe.isMouseOver()) {
       this.drawHoveringText(Lists.newArrayList(I18n.format("gui.storagenetwork.processing.recipe")), mouseX, mouseY, fontRenderer);
     }
-    if (pbtnBottomface.isMouseOver()) {
+    if (pbtnOut.isMouseOver()) {
       this.drawHoveringText(Lists.newArrayList(I18n.format("gui.storagenetwork.processing.extract")), mouseX, mouseY, fontRenderer);
+    }
+    if (btnImport.isMouseOver()) {
+      this.drawHoveringText(Lists.newArrayList(I18n.format("gui.storagenetwork.processing.import")), mouseX, mouseY, fontRenderer);
     }
   }
 
@@ -141,48 +144,54 @@ public class GuiCableProcessing extends GuiCableBase implements IPublicGuiContai
     // reset button: a click will swap it to EXPORTING with CableDataMessage
     pbtnReset = new GuiCableButton(CableMessageType.TOGGLE_P_RESTARTTRIGGER, guiLeft + 154, guiTop + 5, "R");
     this.addButton(pbtnReset);
+    btnImport = new GuiCableButton(
+        CableMessageType.IMPORT_FILTER, guiLeft + 94, guiTop + 5, "I");
+    this.addButton(btnImport);
     int column = 76, ctr = 24;
-    pbtnBottomface = new GuiCableButton(CableMessageType.P_FACE_BOTTOM, guiLeft + column + 20, guiTop + ctr, "");
-    this.addButton(pbtnBottomface);
-    pbtnTopface = new GuiCableButton(CableMessageType.P_FACE_TOP, guiLeft + column - 12, guiTop + ctr, "");
-    this.addButton(pbtnTopface);
+    pbtnOut = new GuiCableButton(CableMessageType.P_FACE_BOTTOM, guiLeft + column + 20, guiTop + ctr, "");
+    this.addButton(pbtnOut);
+    pbtnInRecipe = new GuiCableButton(CableMessageType.P_FACE_TOP, guiLeft + column - 12, guiTop + ctr, "");
+    this.addButton(pbtnInRecipe);
     x = 64;
     y = 62;
     checkOreBtn = new GuiCheckBox(10, guiLeft + x, guiTop + y, I18n.format("gui.storagenetwork.checkbox.ore"), true);
-    checkOreBtn.setIsChecked(tile.filters.ores);
+    checkOreBtn.setIsChecked(tile.filterInput.ores);
     this.addButton(checkOreBtn);
     y += 12;
     checkMetaBtn = new GuiCheckBox(11, guiLeft + x, guiTop + y, I18n.format("gui.storagenetwork.checkbox.meta"), true);
-    checkMetaBtn.setIsChecked(tile.filters.meta);
+    checkMetaBtn.setIsChecked(tile.filterInput.meta);
     this.addButton(checkMetaBtn);
     //
     y -= 24;
     checkNbtBtn = new GuiCheckBox(12, guiLeft + x, guiTop + y, I18n.format("gui.storagenetwork.checkbox.nbt"), true);
-    checkNbtBtn.setIsChecked(tile.filters.nbt);
+    checkNbtBtn.setIsChecked(tile.filterInput.nbt);
     this.addButton(checkNbtBtn);
   }
-
-  @Override
-  public FilterItemStackHandler getFilterHandler() {
-    return tile.filters;
-  }
+  //  @Deprecated
+  //  @Override
+  //  public FilterItemStackHandler getFilterHandler() {
+  //    return tile.filterInput;
+  //  }
 
   @Override
   protected void actionPerformed(GuiButton button) throws IOException {
     super.actionPerformed(button);
-    if (pbtnTopface != null && button.id == pbtnTopface.id) {
-      int newFace = (tile.getFacingTopRow().ordinal() + 1) % EnumFacing.values().length;
-      tile.processingTop = EnumFacing.values()[newFace];
+    if (pbtnInRecipe != null && button.id == pbtnInRecipe.id) {
+      int newFace = (tile.getFacingInput().ordinal() + 1) % EnumFacing.values().length;
+      tile.processingInput = EnumFacing.values()[newFace];
       PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, newFace));
     }
-    else if (pbtnBottomface != null && button.id == pbtnBottomface.id) {
-      int newFace = (tile.getFacingBottomRow().ordinal() + 1) % EnumFacing.values().length;
-      tile.processingBottom = EnumFacing.values()[newFace];
+    else if (pbtnOut != null && button.id == pbtnOut.id) {
+      int newFace = (tile.getFacingOut().ordinal() + 1) % EnumFacing.values().length;
+      tile.processingOut = EnumFacing.values()[newFace];
       PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, newFace));
     }
     else if (pbtnReset != null && button.id == pbtnReset.id) {
       // value not used for this message
       PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(button.id, 0));
+    }
+    else if (btnImport != null && button.id == btnImport.id) {
+      PacketRegistry.INSTANCE.sendToServer(new CableImportFilterMessage());
     }
   }
 
