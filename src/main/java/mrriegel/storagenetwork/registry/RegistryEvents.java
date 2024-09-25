@@ -98,7 +98,7 @@ public class RegistryEvents {
     ModelLoader.setCustomModelResourceLocation(ModItems.collector_remote, 0, new ModelResourceLocation(StorageNetwork.MODID + ":collector_remote", "inventory"));
     ModelLoader.setCustomModelResourceLocation(ModItems.picker_remote, 0, new ModelResourceLocation(StorageNetwork.MODID + ":picker_remote", "inventory"));
     for (EnumUpgradeType type : EnumUpgradeType.values()) {
-      ModelLoader.setCustomModelResourceLocation(ModItems.upgrade, type.getId(), new ModelResourceLocation(StorageNetwork.MODID + ":upgrade_" + type.getId(), "inventory"));
+      ModelLoader.setCustomModelResourceLocation(ModItems.upgrade, type.ordinal(), new ModelResourceLocation(StorageNetwork.MODID + ":upgrade_" + type.ordinal(), "inventory"));
     }
     for (RemoteType type : RemoteType.values()) {
       ModelLoader.setCustomModelResourceLocation(ModItems.remote, type.ordinal(), new ModelResourceLocation(StorageNetwork.MODID + ":remote_" + type.ordinal(), "inventory"));

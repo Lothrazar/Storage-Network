@@ -36,6 +36,8 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<NBTTagCompo
   public boolean operationMustBeSmaller = true;
   public int priority = 0;
   protected EnumFacing inventoryFace;
+  public static final int IO_DEFAULT_SPEED = 30;
+  public static final int DEFAULT_ITEMS_PER = 4;
 
   public CapabilityConnectableAutoIO(EnumStorageDirection direction) {
     this.connectable = new CapabilityConnectable();
@@ -107,7 +109,10 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<NBTTagCompo
 
   @Override
   public int getTransferRate() {
-    return upgrades.getUpgradesOfType(EnumUpgradeType.STACK) > 0 ? 64 : 4;
+    if (upgrades.getUpgradesOfType(EnumUpgradeType.SINGLE) > 0) {
+      return 1; //override others
+    }
+    return upgrades.getUpgradesOfType(EnumUpgradeType.STACK) > 0 ? 64 : DEFAULT_ITEMS_PER;
   }
 
   @Override
@@ -198,11 +203,8 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<NBTTagCompo
 
   @Override
   public boolean runNow(DimPos connectablePos, INetworkMaster master) {
-    int speed = Math.max(upgrades.getUpgradesOfType(EnumUpgradeType.SPEED) + 1, 1);
-    int speedRatio = (30 / speed);
-    if (speedRatio <= 1) {
-      speedRatio = 1;
-    }
+    int speedRatio = upgrades.getSpeedRatio();
+    //  
     boolean cooldownOk = (connectablePos.getWorld().getTotalWorldTime() % speedRatio == 0);
     boolean operationLimitOk = doesPassOperationFilterLimit(master);
     return cooldownOk && operationLimitOk;

@@ -55,7 +55,7 @@ dependencies {
    
 //  optional:
    deobfCompile "compact-machines:compactmachines3-${mc_version}:${cm_version}:${cm_build}" 
-   deobfCompile  "vazkii.patchouli:Patchouli:${patchouli_version}"
+//   deobfCompile  "vazkii.patchouli:Patchouli:${patchouli_version}"
 }
 
 repositories {

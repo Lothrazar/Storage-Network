@@ -1,0 +1,26 @@
+{
+
+  "type": "minecraft:crafting_shaped",
+  "group": "storagenetwork",
+  "pattern": [
+    " r ",
+    "cic",
+	" r "
+  ],
+  "key": {
+    "c": {
+      "item": "minecraft:iron_ingot"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    },
+    "i":  {
+	  "item": "storagenetwork:kabel"
+	}
+  },
+  "result": {
+    "item": "storagenetwork:upgrade",
+	"data":5,
+	 "count": 4
+  }
+}

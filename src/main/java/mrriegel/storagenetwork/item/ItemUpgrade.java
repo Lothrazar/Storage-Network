@@ -29,7 +29,7 @@ public class ItemUpgrade extends Item {
   public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list) {
     if (isInCreativeTab(tab)) {
       for (EnumUpgradeType upgradeType : EnumUpgradeType.values()) {
-        list.add(new ItemStack(this, 1, upgradeType.getId()));
+        list.add(new ItemStack(this, 1, upgradeType.ordinal()));
       }
     }
   }

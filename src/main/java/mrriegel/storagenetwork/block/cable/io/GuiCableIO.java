@@ -83,7 +83,7 @@ public class GuiCableIO extends GuiCable {
     int yMiddle = (this.height - this.ySize) / 2;
     int u = 176;
     int v = 34;
-    for (int ug = 0; ug < EnumUpgradeType.values().length; ug++) {
+    for (int ug = 0; ug < 4; ug++) {
       this.drawTexturedModalRect(xMiddle + 97 + ug * SLOT_SIZE, yMiddle + 5, u, v, SLOT_SIZE, SLOT_SIZE);
     }
     if (containerCableIO == null || containerCableIO.cap == null) {

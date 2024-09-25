@@ -25,10 +25,14 @@ item.storagenetwork:upgrade_0.name=Speed Upgrade
 item.storagenetwork:upgrade_1.name=Operation Upgrade
 item.storagenetwork:upgrade_2.name=Stack Upgrade
 item.storagenetwork:upgrade_3.name=Stock Upgrade
+item.storagenetwork:upgrade_4.name=Singleton Upgrade
+item.storagenetwork:upgrade_5.name=Slowness Upgrade
 tooltip.storagenetwork.upgrade_0=Increases the speed of importing/exporting
 tooltip.storagenetwork.upgrade_1=Activity of the cable depends on the amount of items
 tooltip.storagenetwork.upgrade_2=Increases the stack size of task
 tooltip.storagenetwork.upgrade_3=Keeps a specific amount of items in the attached inventory (only in export cable)
+tooltip.storagenetwork.upgrade_4=Sets the stack size of the task to 1
+tooltip.storagenetwork.upgrade_5=Slows down the speed of importing/exporting
 
 
 item.storagenetwork:remote_0.name=Storage Remote
