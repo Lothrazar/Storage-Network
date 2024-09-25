@@ -9,7 +9,8 @@
   ],
   "key": {
     "c": {
-      "item": "minecraft:coal"
+      "item": "minecraft:coal",
+	  "data":0
     },
     "r": {
       "item": "minecraft:redstone"
