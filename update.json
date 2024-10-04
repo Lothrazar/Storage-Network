@@ -10,5 +10,6 @@
 
 	  	,"1.11.1":"The Storage Request Table 'storagenetwork:request' block no longer saves the contents of its crafting-grid; instead items are returned to the player on close, exactly matching vanilla crafting table behavior  (this was changed to prevent potential exploits. If any items are left behind in the grid during world upgrade they will be returned and not lost. No changes were made to the remotes or to other blocks). Fixed a null pointer exception "
 
+		,"1.11.2":"Ported the Cable Facades feature (from Minecraft 1.12.2), so that you can shift-left-click with a block on a cable to hide it with a facade.  Disable this feature or ignore cretain blocks with the config file"
 	}
 }

@@ -28,7 +28,7 @@ public class ConfigRegistry {
   public static IntValue ITEMRANGE;
   public static IntValue RECIPEMAXTAGS;
   private static ConfigValue<List<String>> CABLEIGNORELIST;
-  public static BooleanValue facadesUseCollisionBoundingBox;
+  public static BooleanValue enableFacades;
   static {
     initConfig();
   }
@@ -62,13 +62,25 @@ public class ConfigRegistry {
     RECIPEMAXTAGS = COMMON_BUILDER.comment("\r\n When matching items to recipes in the JEI + button, this is the maximum number of tags to serialize over the network when on a server.  Reduce if you get errors relating to Packet Sizes being too large (Minecraft 1.12.2 had this hardcoded at 5).")
         .defineInRange("jeiMaximumRecipeTags", 64, 5, 128);
     //
-    list = Arrays.asList("minecraft:golden_rail", "minecraft:ladder", "minecraft:rail", "minecraft:detector_rail", "minecraft:activator_rail",
-        "minecraft:double_plant",
-        "minecraft:waterlily");
-    CABLEIGNORELIST = COMMON_BUILDER.comment("\r\n Disable these blocks from ever being able to connect to the network, they will be treated as a non-inventory.")
-        .define("BlacklistFacadeCableItems", list);
-    facadesUseCollisionBoundingBox = COMMON_BUILDER.comment("If this is true, cables with facades will also use the collision block from the block facade (ie stairs, carpet, etc). ")
-        .define("facadesUseCollisionBoundingBox", true);
+    COMMON_BUILDER.push("facades");
+    list = Arrays.asList("minecraft:ladder", "minecraft:double_plant", "minecraft:waterlily",
+        "minecraft:torch", "minecraft:*_torch", "minecraft:redstone", "minecraft:iron_bars",
+        "minecraft:chest", "minecraft:ender_chest", "minecraft:sculk_vein", "minecraft:string", "minecraft:vine",
+        "minecraft:rail",
+        "minecraft:*_rail",
+        "minecraft:brewing_stand",
+        "minecraft:*_dripleaf",
+        "minecraft:*_pane",
+        "minecraft:*_sapling", "minecraft:*_sign",
+        "minecraft:*_door",
+        "minecraft:*_banner", "minecraft:*_shulker_box",
+        "cyclic:*_pipe", "cyclic:*_bars",
+        "storagenetwork:*");
+    CABLEIGNORELIST = COMMON_BUILDER.comment("\r\n These items are not able to be used as Facade blocks for cables (shift-left-click to add or remove block facades while in not-creative)")
+        .define("itemsNotAllowed", list);
+    enableFacades = COMMON_BUILDER.comment("Change this to 'false' to disable facades.  The facade feature lets you hide cables with blocks (does not consume the item, use shift-left-click when not creative)")
+        .define("enabled", true);
+    COMMON_BUILDER.pop();
     COMMON_BUILDER.pop();
     COMMON_CONFIG = COMMON_BUILDER.build();
   }

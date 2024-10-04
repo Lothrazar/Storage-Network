@@ -2,11 +2,7 @@ package com.lothrazar.storagenetwork.registry;
 
 import org.lwjgl.glfw.GLFW;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.lothrazar.storagenetwork.block.facade.TesrCable;
-import com.lothrazar.storagenetwork.block.facade.TesrExportCable;
-import com.lothrazar.storagenetwork.block.facade.TesrImportCable;
-import com.lothrazar.storagenetwork.block.facade.TesrImportFilterCable;
-import com.lothrazar.storagenetwork.block.facade.TesrStorageCable;
+import com.lothrazar.storagenetwork.block.cable.CableFacadeRenderer;
 import com.lothrazar.storagenetwork.registry.SsnRegistry.Tiles;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
@@ -25,10 +21,10 @@ public class ClientEventRegistry {
 
   @SubscribeEvent
   public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-    event.registerBlockEntityRenderer(Tiles.KABEL.get(), TesrCable::new);
-    event.registerBlockEntityRenderer(Tiles.EXPORT_KABEL.get(), TesrExportCable::new);
-    event.registerBlockEntityRenderer(Tiles.STORAGE_KABEL.get(), TesrStorageCable::new);
-    event.registerBlockEntityRenderer(Tiles.IMPORT_FILTER_KABEL.get(), TesrImportFilterCable::new);
-    event.registerBlockEntityRenderer(Tiles.IMPORT_KABEL.get(), TesrImportCable::new);
+    event.registerBlockEntityRenderer(Tiles.KABEL.get(), CableFacadeRenderer::new);
+    event.registerBlockEntityRenderer(Tiles.EXPORT_KABEL.get(), CableFacadeRenderer::new);
+    event.registerBlockEntityRenderer(Tiles.STORAGE_KABEL.get(), CableFacadeRenderer::new);
+    event.registerBlockEntityRenderer(Tiles.IMPORT_FILTER_KABEL.get(), CableFacadeRenderer::new);
+    event.registerBlockEntityRenderer(Tiles.IMPORT_KABEL.get(), CableFacadeRenderer::new);
   }
 }
