@@ -41,10 +41,13 @@ public class TileCable extends TileConnectable {
 
   @Override
   public void saveAdditional(CompoundTag compound) {
-    super.saveAdditional(compound);
-    if (facadeState != null) {
+    if (facadeState == null) {
+      compound.remove(NBT_FACADE);
+    }
+    else {
       compound.put(NBT_FACADE, facadeState);
     }
+    super.saveAdditional(compound);
   }
 
   public static TileCable getTileCable(BlockGetter world, BlockPos pos) {
