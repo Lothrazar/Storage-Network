@@ -1,7 +1,7 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/simple-storage-network",
 	"promos": {
-		"1.20.1-latest": "1.11.2"
+		"1.20.1-latest": "1.11.3"
 	},
 	"1.20.1": {
 		"1.10.0":"Ported to 1.20.1, depends on flib-0.0.7+ . Fixed patchouli book.  Port to new non-deprecated curios datapack tags.  Includes pull requests merged into the 1.18 and 1.19 branches :  Merge pull request #492 from IIpragmaII/trunk/1.18 @IIpragmaII @VasurTrekkson Improved performance for export node.  fix priority german translation @lightlike .   Fixed recipes not showing when pressing the JEI recipe key @Demerso.   Create uk_ua.json @SKZGx   "
@@ -11,5 +11,6 @@
 	  	,"1.11.1":"The Storage Request Table 'storagenetwork:request' block no longer saves the contents of its crafting-grid; instead items are returned to the player on close, exactly matching vanilla crafting table behavior  (this was changed to prevent potential exploits. If any items are left behind in the grid during world upgrade they will be returned and not lost. No changes were made to the remotes or to other blocks). Fixed a null pointer exception "
 
 		,"1.11.2":"Ported the Cable Facades feature (from Minecraft 1.12.2), so that you can shift-left-click with a block on a cable to hide it with a facade.  Disable this feature or ignore certain blocks with the config file"
+		,"1.11.3":"Fixed item tooltips not rendering in Storage Remote.  "
 	}
 }

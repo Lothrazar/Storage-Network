@@ -6,6 +6,7 @@ import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
 import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkScreenSize;
+import com.lothrazar.storagenetwork.gui.TextboxInteger;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
 import com.lothrazar.storagenetwork.network.SettingsSyncMessage;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
@@ -131,7 +132,7 @@ public class ScreenNetworkInventory extends AbstractContainerScreen<ContainerNet
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
     ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
-    //good stuff
+
     network.applySearchTextToSlots();
     network.renderItemSlots(ms, mouseX, mouseY, font);
   }
@@ -176,13 +177,13 @@ public class ScreenNetworkInventory extends AbstractContainerScreen<ContainerNet
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int b) {
     InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
-    if (keyCode == 256) {
+    if (keyCode == TextboxInteger.KEY_ESC) {
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.
     }
     if (network.searchBar.isFocused()) {
       network.searchBar.keyPressed(keyCode, scanCode, b);
-      if (keyCode == 259) { // BACKSPACE
+      if (keyCode == TextboxInteger.KEY_BACKSPACE) { // BACKSPACE
         network.syncTextToJei();
       }
       return true;

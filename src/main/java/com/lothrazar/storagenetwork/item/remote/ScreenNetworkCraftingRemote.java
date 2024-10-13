@@ -6,6 +6,7 @@ import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
 import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkScreenSize;
+import com.lothrazar.storagenetwork.gui.TextboxInteger;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
 import com.lothrazar.storagenetwork.network.ClearRecipeMessage;
 import com.lothrazar.storagenetwork.network.RequestMessage;
@@ -23,11 +24,9 @@ import net.minecraftforge.fml.ModList;
 
 public class ScreenNetworkCraftingRemote extends AbstractContainerScreen<ContainerNetworkCraftingRemote> implements IGuiNetwork {
 
-  private static final int KEY_BACKSPACE = 259;
-  private static final int KEY_ESC = 256;
   private static final int HEIGHT = 256;
   private static final int WIDTH = 176;
-  private final ResourceLocation textureCraft = new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/request.png");
+  private static final ResourceLocation textureCraft = new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/request.png");
   private final NetworkWidget network;
   private final ItemStack remote;
   private int topOffset;
@@ -139,12 +138,10 @@ public class ScreenNetworkCraftingRemote extends AbstractContainerScreen<Contain
 
   @Override
   protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
-    //    this.minecraft.getTextureManager().bind(textureCraft);
-    //    RenderSystem.setShader(GameRenderer::getPositionTexShader);
-    //    RenderSystem.setShaderTexture(0, textureCraft);
-    int k = (this.width - this.imageWidth) / 2;
-    int l = (this.height - this.imageHeight) / 2;
-    ms.blit(textureCraft, k, l, 0, 0, this.imageWidth, this.imageHeight);
+
+    int xCenter = (this.width - this.imageWidth) / 2;
+    int yCenter = (this.height - this.imageHeight) / 2;
+    ms.blit(textureCraft, xCenter, yCenter, 0, 0, this.imageWidth, this.imageHeight);
     network.applySearchTextToSlots();
     network.renderItemSlots(ms, mouseX, mouseY, font);
   }
@@ -192,12 +189,12 @@ public class ScreenNetworkCraftingRemote extends AbstractContainerScreen<Contain
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int b) {
     InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
-    if (keyCode == KEY_ESC) {
+    if (keyCode == TextboxInteger.KEY_ESC) {
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.
     }
     if (network.searchBar.isFocused()) {
-      if (keyCode == KEY_BACKSPACE) { // BACKSPACE
+      if (keyCode == TextboxInteger.KEY_BACKSPACE) { // BACKSPACE
         network.syncTextToJei();
       }
       network.searchBar.keyPressed(keyCode, scanCode, b);
@@ -212,6 +209,7 @@ public class ScreenNetworkCraftingRemote extends AbstractContainerScreen<Contain
       }
     }
     //Regardless of above branch, also check this
+
     if (minecraft.options.keyInventory.isActiveAndMatches(mouseKey)) {
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.

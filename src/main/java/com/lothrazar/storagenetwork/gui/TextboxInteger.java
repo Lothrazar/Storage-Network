@@ -12,8 +12,9 @@ import net.minecraft.client.gui.components.EditBox;
  */
 public class TextboxInteger extends EditBox {
 
-  private static final int KEY_DELETE = 261;
-  private static final int KEY_BACKSPACE = 259;
+  public static final int KEY_ESC = 256;
+  public static final int KEY_DELETE = 261;
+  public static final int KEY_BACKSPACE = 259;
 
   public TextboxInteger(Font fontIn, int xIn, int yIn, int widthIn) {
     super(fontIn, xIn, yIn, widthIn, 16, null);

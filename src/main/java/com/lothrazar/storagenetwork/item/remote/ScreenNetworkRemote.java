@@ -6,6 +6,7 @@ import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
 import com.lothrazar.storagenetwork.gui.NetworkWidget.NetworkScreenSize;
+import com.lothrazar.storagenetwork.gui.TextboxInteger;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
 import com.lothrazar.storagenetwork.network.SettingsSyncMessage;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
@@ -39,9 +40,13 @@ public class ScreenNetworkRemote extends AbstractContainerScreen<ContainerNetwor
   }
 
   @Override
+  public void drawGradient(GuiGraphics ms, int x, int y, int x2, int y2, int u, int v) {
+    ms.fillGradient(x, y, x2, y2, u, v);
+  }
+
+  @Override
   public void renderStackTooltip(GuiGraphics ms, ItemStack stack, int mousex, int mousey) {
-    //  stack,
-    super.renderTooltip(ms, mousex, mousey);
+    ms.renderTooltip(font, stack, mousex, mousey);
   }
 
   @Override
@@ -72,6 +77,11 @@ public class ScreenNetworkRemote extends AbstractContainerScreen<ContainerNetwor
   @Override
   public void setSort(EnumSortType val) {
     ItemStorageCraftingRemote.setSort(remote, val);
+  }
+
+  @Override
+  public boolean getAutoFocus() {
+    return ItemStorageCraftingRemote.getAutoFocus(remote);
   }
 
   @Override
@@ -126,12 +136,9 @@ public class ScreenNetworkRemote extends AbstractContainerScreen<ContainerNetwor
 
   @Override
   protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
-    //    this.minecraft.getTextureManager().bind(texture);
-    //    RenderSystem.setShader(GameRenderer::getPositionTexShader);
-    //    RenderSystem.setShaderTexture(0, texture);
-    int k = (this.width - this.imageWidth) / 2;
-    int l = (this.height - this.imageHeight) / 2;
-    ms.blit(texture, k, l, 0, 0, this.imageWidth, this.imageHeight);
+    int xCenter = (this.width - this.imageWidth) / 2;
+    int yCenter = (this.height - this.imageHeight) / 2;
+    ms.blit(texture, xCenter, yCenter, 0, 0, this.imageWidth, this.imageHeight);
     network.applySearchTextToSlots();
     network.renderItemSlots(ms, mouseX, mouseY, font);
   }
@@ -169,12 +176,12 @@ public class ScreenNetworkRemote extends AbstractContainerScreen<ContainerNetwor
   @Override
   public boolean keyPressed(int keyCode, int scanCode, int b) {
     InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
-    if (keyCode == 256) {
+    if (keyCode == TextboxInteger.KEY_ESC) {
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.
     }
     if (network.searchBar.isFocused()) {
-      if (keyCode == 259) { // BACKSPACE
+      if (keyCode == TextboxInteger.KEY_BACKSPACE) {
         network.syncTextToJei();
       }
       network.searchBar.keyPressed(keyCode, scanCode, b);
@@ -190,6 +197,7 @@ public class ScreenNetworkRemote extends AbstractContainerScreen<ContainerNetwor
     }
     //regardles of above branch, also check this
     if (minecraft.options.keyInventory.isActiveAndMatches(mouseKey)) {
+
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.
     }
@@ -205,18 +213,8 @@ public class ScreenNetworkRemote extends AbstractContainerScreen<ContainerNetwor
   }
 
   @Override
-  public void drawGradient(GuiGraphics ms, int x, int y, int x2, int y2, int u, int v) {
-    ms.fillGradient(x, y, x2, y2, u, v);
-  }
-
-  @Override
   public boolean isInRegion(int x, int y, int width, int height, double mouseX, double mouseY) {
     return super.isHovering(x, y, width, height, mouseX, mouseY);
-  }
-
-  @Override
-  public boolean getAutoFocus() {
-    return ItemStorageCraftingRemote.getAutoFocus(remote);
   }
 
   @Override
