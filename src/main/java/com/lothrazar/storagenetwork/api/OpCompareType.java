@@ -39,7 +39,7 @@ public enum OpCompareType {
         return "eq";
       case GREATER:
       default:
-        return "greater";
+        return "more";
     }
   }
 }

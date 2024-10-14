@@ -171,9 +171,10 @@
  
  
  
-	"gui.storagenetwork.operate.tooltip":"Operations disabled if the logic check fails",
+	"gui.storagenetwork.operate.tooltip":"If the logic check passes, the cable operates",
 	"gui.storagenetwork.operate.tooltip.more":"Item count must be more than value",
 	"gui.storagenetwork.operate.tooltip.less":"Item count must be less than value",
+	"gui.storagenetwork.operate.tooltip.eq":"Item count must be equal",
 
     "processing.buttons.toggle.true": "Always Active",
     "processing.buttons.toggle.false": "Only process the requested number",

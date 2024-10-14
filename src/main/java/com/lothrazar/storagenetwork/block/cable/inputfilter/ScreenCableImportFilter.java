@@ -16,7 +16,6 @@ import com.lothrazar.storagenetwork.registry.ClientEventRegistry;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.lothrazar.storagenetwork.util.SsnConsts;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -176,9 +175,7 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
 
   @Override
   protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
-    //    RenderSystem.setShader(GameRenderer::getPositionTexShader);
-    //    RenderSystem.setShaderTexture(0, texture);
-    //    this.txtHeight.ren
+
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
     ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
@@ -208,9 +205,7 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
     operationItemSlot = new ItemSlotNetwork(this, containerCableLink.cap.operationStack, x, y, size, leftPos, topPos, false);
     if (this.isOperationMode()) {
       operationItemSlot.drawSlot(ms, font, mouseX, mouseY);
-      //      RenderSystem.setShader(GameRenderer::getPositionTexShader);
-      RenderSystem.setShaderTexture(0, ClientEventRegistry.SLOT);
-      ms.blit(texture, x - 1, y - 1, 0, 0, size, size, size, size);
+      ms.blit(ClientEventRegistry.SLOT, x - 1, y - 1, 0, 0, size, size, size, size);
     }
   }
 
