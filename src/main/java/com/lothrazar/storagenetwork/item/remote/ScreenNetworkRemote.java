@@ -197,7 +197,6 @@ public class ScreenNetworkRemote extends AbstractContainerScreen<ContainerNetwor
     }
     //regardles of above branch, also check this
     if (minecraft.options.keyInventory.isActiveAndMatches(mouseKey)) {
-
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.
     }

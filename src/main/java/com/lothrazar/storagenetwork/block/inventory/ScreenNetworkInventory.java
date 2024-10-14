@@ -132,7 +132,6 @@ public class ScreenNetworkInventory extends AbstractContainerScreen<ContainerNet
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
     ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
-
     network.applySearchTextToSlots();
     network.renderItemSlots(ms, mouseX, mouseY, font);
   }

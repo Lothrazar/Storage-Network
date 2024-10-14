@@ -138,7 +138,6 @@ public class ScreenNetworkCraftingRemote extends AbstractContainerScreen<Contain
 
   @Override
   protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
-
     int xCenter = (this.width - this.imageWidth) / 2;
     int yCenter = (this.height - this.imageHeight) / 2;
     ms.blit(textureCraft, xCenter, yCenter, 0, 0, this.imageWidth, this.imageHeight);
@@ -209,7 +208,6 @@ public class ScreenNetworkCraftingRemote extends AbstractContainerScreen<Contain
       }
     }
     //Regardless of above branch, also check this
-
     if (minecraft.options.keyInventory.isActiveAndMatches(mouseKey)) {
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.

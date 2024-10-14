@@ -138,7 +138,6 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
 
   @Override
   protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
-
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
     ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
