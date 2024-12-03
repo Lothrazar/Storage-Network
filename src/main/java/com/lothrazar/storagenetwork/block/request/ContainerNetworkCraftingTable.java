@@ -26,10 +26,8 @@ public class ContainerNetworkCraftingTable extends ContainerNetwork {
     bindPlayerInvo(this.playerInv);
     bindHotbar();
     onCraftMatrixChanged(matrix);
-    this.removeListener(null);
   }
 
-  // in 1.18.2 this is just removed(player) 
   @Override
   public void onContainerClosed(@Nonnull PlayerEntity playerIn) {
     //the contents of the crafting matrix gets returned to the player when cleaning up
@@ -45,9 +43,7 @@ public class ContainerNetworkCraftingTable extends ContainerNetwork {
   }
 
   @Override
-  public void slotChanged() {
-    //parent is abstract
-  }
+  public void slotChanged() {}
 
   @Override
   public boolean canInteractWith(PlayerEntity playerIn) {
