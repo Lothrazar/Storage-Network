@@ -63,6 +63,10 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
 
   public abstract boolean isCrafting();
 
+  public ItemStack getRemote() { // semi-abstract
+    return ItemStack.EMPTY;
+  }
+
   public Slot getResultSlot() {
     return result;
   }
