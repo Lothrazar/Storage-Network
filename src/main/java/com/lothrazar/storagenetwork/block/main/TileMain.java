@@ -143,10 +143,10 @@ public class TileMain extends BlockEntity {
         }
         if (ioCap.ioDirection() == EnumStorageDirection.OUT) {
           requestBatch = ioCap.runExport(this);
+          executeRequestBatch(requestBatch);
         }
       }
     }
-    executeRequestBatch(requestBatch);
   }
 
   private void refresh() {
