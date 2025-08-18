@@ -1,6 +1,8 @@
 package com.lothrazar.storagenetwork.item;
 
 import java.util.List;
+
+import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.tuple.Triple;
 import com.lothrazar.library.item.ItemFlib;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
@@ -42,41 +44,55 @@ public class ItemCollector extends ItemFlib {
     return remote.getRight();
   }
 
-  // not subscribe, called from SsnEvents.java 
-  public void onEntityItemPickupEvent(EntityItemPickupEvent event) {
-    if (event.getEntity() instanceof Player &&
-        event.getItem() != null &&
-        event.getItem().getItem().isEmpty() == false) {
-      ItemStack item = event.getItem().getItem();
-      Player player = event.getEntity();
-      Level world = player.level();
-      DimPos dp = DimPos.getPosStored(this.findAmmo(player, this));
-      if (dp != null && !world.isClientSide) {
-        ServerLevel serverTargetWorld = DimPos.stringDimensionLookup(dp.getDimension(), world.getServer());
-        if (serverTargetWorld == null) {
-          StorageNetworkMod.LOGGER.error("Missing dimension key " + dp.getDimension());
-          return;
-        }
-        BlockEntity tile = serverTargetWorld.getBlockEntity(dp.getBlockPos());
-        if (tile instanceof TileMain) {
-          TileMain network = (TileMain) tile;
-          // Create a new reference to the stack, try to insert that into the
-          // network, then change the original stack size so the player picks up
-          // only what remains, if anything.
-          int countUnmoved = network.insertStack(item.copy(), false);
-          item.setCount(countUnmoved);
-          // We still want to play the pickup sound, even if Minecraft silently
-          // deletes the stack we just emptied.
-          if (countUnmoved == 0) {
-            UtilTileEntity.playSoundFromServer((ServerPlayer) player, SoundEvents.ITEM_PICKUP, 0.2F);
-          }
-        }
-        //        else {
-        //          StorageNetworkMod.LOGGER.error("item.remote.notfound");
-        //        }
-      }
+    public void toggleEnabled(ItemStack stack, Player player) {
+        boolean enabled = stack.getOrCreateTag().getBoolean(NBT_ENABLED);
+        stack.getOrCreateTag().putBoolean(NBT_ENABLED, !enabled);
+        player.displayClientMessage(
+                Component.literal("Collector " + (!enabled ? "enabled" : "disabled")),
+                true
+        );
     }
-  }
+
+    // not subscribe, called from SsnEvents.java
+    public void onEntityItemPickupEvent(EntityItemPickupEvent event) {
+        if (event.getEntity() instanceof Player &&
+                event.getItem() != null &&
+                !event.getItem().getItem().isEmpty()) {
+            Player player = event.getEntity();
+
+            // find the collector that the player has with them (main hand, offhand, curios...)
+            ItemStack collectorStack = this.findAmmo(player, this);
+            if (collectorStack.isEmpty()) {
+                return;
+            }
+
+            // check if it is turned on
+            CompoundTag tag = collectorStack.getOrCreateTag();
+            if (!tag.getBoolean("Enabled")) {
+                return;
+            }
+
+            ItemStack item = event.getItem().getItem();
+            Level world = player.level();
+            DimPos dp = DimPos.getPosStored(collectorStack);
+            if (dp != null && !world.isClientSide) {
+                ServerLevel serverTargetWorld = DimPos.stringDimensionLookup(dp.getDimension(), world.getServer());
+                if (serverTargetWorld == null) {
+                    StorageNetworkMod.LOGGER.error("Missing dimension key " + dp.getDimension());
+                    return;
+                }
+                BlockEntity tile = serverTargetWorld.getBlockEntity(dp.getBlockPos());
+                if (tile instanceof TileMain network) {
+                    int countUnmoved = network.insertStack(item.copy(), false);
+                    item.setCount(countUnmoved);
+                    if (countUnmoved == 0) {
+                        UtilTileEntity.playSoundFromServer((ServerPlayer) player, SoundEvents.ITEM_PICKUP, 0.2F);
+                    }
+                }
+                // else { StorageNetworkMod.LOGGER.error("item.remote.notfound"); }
+            }
+        }
+    }
 
   @Override
   public InteractionResult useOn(UseOnContext context) {
