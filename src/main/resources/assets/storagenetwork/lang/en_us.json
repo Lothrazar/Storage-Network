@@ -181,7 +181,7 @@
     "chat.main.connectables": "Connectables: ",
     
     "key.storagenetwork.remote":"Network Remote Curio",
- 
+    "key.storagenetwork.collector_toggle": "Network Collector Toggle",
  
  
 	"gui.storagenetwork.operate.tooltip":"If the logic check passes, the cable operates",
