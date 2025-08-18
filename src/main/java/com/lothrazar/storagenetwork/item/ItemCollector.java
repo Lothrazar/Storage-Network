@@ -33,8 +33,9 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 public class ItemCollector extends ItemFlib {
 
   public static final String NBT_BOUND = "bound";
+  private static final String NBT_ENABLED = "Enabled";
 
-  public ItemCollector(Properties properties) {
+    public ItemCollector(Properties properties) {
     super(properties.stacksTo(1));
   }
 
