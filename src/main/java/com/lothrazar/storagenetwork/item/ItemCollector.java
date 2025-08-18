@@ -1,6 +1,8 @@
 package com.lothrazar.storagenetwork.item;
 
 import java.util.List;
+
+import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.tuple.Triple;
 import com.lothrazar.library.item.ItemFlib;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
@@ -30,80 +32,95 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 
 public class ItemCollector extends ItemFlib {
 
-  public static final String NBT_BOUND = "bound";
+    public static final String NBT_BOUND = "bound";
+    private static final String NBT_ENABLED = "Enabled";
 
-  public ItemCollector(Properties properties) {
-    super(properties.stacksTo(1));
-  }
+    public ItemCollector(Properties properties) {
+        super(properties.stacksTo(1));
+    }
 
-  protected ItemStack findAmmo(Player player, Item item) {
-    //is curios installed? doesnt matter this is safe
-    Triple<String, Integer, ItemStack> remote = UtilInventory.getCurioRemote(player, item);
-    return remote.getRight();
-  }
+    protected ItemStack findAmmo(Player player, Item item) {
+        //is curios installed? doesnt matter this is safe
+        Triple<String, Integer, ItemStack> remote = UtilInventory.getCurioRemote(player, item);
+        return remote.getRight();
+    }
 
-  // not subscribe, called from SsnEvents.java 
-  public void onEntityItemPickupEvent(EntityItemPickupEvent event) {
-    if (event.getEntity() instanceof Player &&
-        event.getItem() != null &&
-        event.getItem().getItem().isEmpty() == false) {
-      ItemStack item = event.getItem().getItem();
-      Player player = event.getEntity();
-      Level world = player.level();
-      DimPos dp = DimPos.getPosStored(this.findAmmo(player, this));
-      if (dp != null && !world.isClientSide) {
-        ServerLevel serverTargetWorld = DimPos.stringDimensionLookup(dp.getDimension(), world.getServer());
-        if (serverTargetWorld == null) {
-          StorageNetworkMod.LOGGER.error("Missing dimension key " + dp.getDimension());
-          return;
+    public void toggleEnabled(ItemStack stack, Player player) {
+        boolean enabled = stack.getOrCreateTag().getBoolean(NBT_ENABLED);
+        stack.getOrCreateTag().putBoolean(NBT_ENABLED, !enabled);
+        player.displayClientMessage(
+                Component.literal("Collector " + (!enabled ? "enabled" : "disabled")),
+                true
+        );
+    }
+
+    // not subscribe, called from SsnEvents.java
+    public void onEntityItemPickupEvent(EntityItemPickupEvent event) {
+        if (event.getEntity() instanceof Player &&
+                event.getItem() != null &&
+                !event.getItem().getItem().isEmpty()) {
+            Player player = event.getEntity();
+
+            // find the collector that the player has with them (main hand, offhand, curios...)
+            ItemStack collectorStack = this.findAmmo(player, this);
+            if (collectorStack.isEmpty()) {
+                return; // player does not have a collector
+            }
+
+            // check if it is turned on
+            CompoundTag tag = collectorStack.getOrCreateTag();
+            if (!tag.getBoolean("Enabled")) {
+                return;
+            }
+
+            ItemStack item = event.getItem().getItem();
+            Level world = player.level();
+            DimPos dp = DimPos.getPosStored(collectorStack);
+            if (dp != null && !world.isClientSide) {
+                ServerLevel serverTargetWorld = DimPos.stringDimensionLookup(dp.getDimension(), world.getServer());
+                if (serverTargetWorld == null) {
+                    StorageNetworkMod.LOGGER.error("Missing dimension key " + dp.getDimension());
+                    return;
+                }
+                BlockEntity tile = serverTargetWorld.getBlockEntity(dp.getBlockPos());
+                if (tile instanceof TileMain network) {
+                    int countUnmoved = network.insertStack(item.copy(), false);
+                    item.setCount(countUnmoved);
+                    if (countUnmoved == 0) {
+                        UtilTileEntity.playSoundFromServer((ServerPlayer) player, SoundEvents.ITEM_PICKUP, 0.2F);
+                    }
+                }
+                // else { StorageNetworkMod.LOGGER.error("item.remote.notfound"); }
+            }
         }
-        BlockEntity tile = serverTargetWorld.getBlockEntity(dp.getBlockPos());
-        if (tile instanceof TileMain) {
-          TileMain network = (TileMain) tile;
-          // Create a new reference to the stack, try to insert that into the
-          // network, then change the original stack size so the player picks up
-          // only what remains, if anything.
-          int countUnmoved = network.insertStack(item.copy(), false);
-          item.setCount(countUnmoved);
-          // We still want to play the pickup sound, even if Minecraft silently
-          // deletes the stack we just emptied.
-          if (countUnmoved == 0) {
-            UtilTileEntity.playSoundFromServer((ServerPlayer) player, SoundEvents.ITEM_PICKUP, 0.2F);
-          }
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        InteractionHand hand = context.getHand();
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Player player = context.getPlayer();
+        if (world.getBlockEntity(pos) instanceof TileMain) {
+            ItemStack stack = player.getItemInHand(hand);
+            DimPos.putPos(stack, pos, world);
+            UtilTileEntity.statusMessage(player, "item.remote.connected");
+            return InteractionResult.SUCCESS;
         }
-        //        else {
-        //          StorageNetworkMod.LOGGER.error("item.remote.notfound");
-        //        }
-      }
+        return InteractionResult.PASS;
     }
-  }
 
-  @Override
-  public InteractionResult useOn(UseOnContext context) {
-    InteractionHand hand = context.getHand();
-    Level world = context.getLevel();
-    BlockPos pos = context.getClickedPos();
-    Player player = context.getPlayer();
-    if (world.getBlockEntity(pos) instanceof TileMain) {
-      ItemStack stack = player.getItemInHand(hand);
-      DimPos.putPos(stack, pos, world);
-      UtilTileEntity.statusMessage(player, "item.remote.connected");
-      return InteractionResult.SUCCESS;
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+        MutableComponent t = Component.translatable(getDescriptionId() + ".tooltip");
+        t.withStyle(ChatFormatting.GRAY);
+        tooltip.add(t);
+        if (stack.hasTag()) {
+            DimPos dp = DimPos.getPosStored(stack);
+            if (dp != null) {
+                tooltip.add(dp.makeTooltip());
+            }
+        }
     }
-    return InteractionResult.PASS;
-  }
-
-  @Override
-  @OnlyIn(Dist.CLIENT)
-  public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-    MutableComponent t = Component.translatable(getDescriptionId() + ".tooltip");
-    t.withStyle(ChatFormatting.GRAY);
-    tooltip.add(t);
-    if (stack.hasTag()) {
-      DimPos dp = DimPos.getPosStored(stack);
-      if (dp != null) {
-        tooltip.add(dp.makeTooltip());
-      }
-    }
-  }
 }
