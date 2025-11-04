@@ -26,7 +26,7 @@ public class TileCableExport extends TileCableWithFacing implements MenuProvider
   public TileCableExport(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.EXPORT_KABEL.get(), pos, state);
     this.ioStorage = new CapabilityConnectableAutoIO(this, EnumStorageDirection.OUT);
-    this.ioStorage.getFilter().isAllowList = true;
+    this.ioStorage.getFilter().isAllowList = true; // default only; let NBT override
   }
 
   @Override
@@ -50,7 +50,6 @@ public class TileCableExport extends TileCableWithFacing implements MenuProvider
     super.load(compound);
     this.ioStorage.deserializeNBT(compound.getCompound("ioStorage"));
     ioStorage.upgrades.deserializeNBT(compound.getCompound("upgrades"));
-    this.ioStorage.getFilter().isAllowList = true;
   }
 
   @Override

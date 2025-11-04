@@ -190,6 +190,9 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     if (direction == EnumStorageDirection.IN) {
       return stack;
     }
+    if (stack != null && !stack.isEmpty() && filters != null && filters.isStackFiltered(stack)) {
+      return stack;
+    }
     if (inventoryFace == null) {
       return stack;
     }
@@ -375,6 +378,39 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     if (this.ioDirection() != EnumStorageDirection.OUT) { // TODO: redundant?
       return null;
     }
+
+  // blacklist 
+  if (!filters.isAllowList) {
+    RequestBatch batch = new RequestBatch();
+
+    for (ItemStack s : main.getNetwork().getStacks(true)) {
+      if (s == null || s.isEmpty()) continue;
+      if (filters.isStackFiltered(s)) continue;
+
+      Request req = new Request(this);
+
+      if (isStockMode()) {
+        try {
+          if (inventoryFace == null) continue;
+          DimPos invPos = connectable.getPos().offset(inventoryFace);
+          IItemHandler target = invPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+          int stillNeeds = UtilInventory.containsAtLeastHowManyNeeded(target, s, s.getCount());
+          if (stillNeeds == 0) continue;
+          req.setCount(Math.min(stillNeeds, req.getCount()));
+        } catch (Throwable e) {
+          StorageNetworkMod.LOGGER.error("Error from connected block", e);
+          continue;
+        }
+      }
+
+      if (req.getCount() > 0) {
+        batch.put(s.getItem(), req);
+      }
+    }
+    return batch;
+  }
+
+  // whitelist
     RequestBatch requestBatch = new RequestBatch();
     for (IItemStackMatcher matcher : this.getAutoExportList()) {
       if (matcher.getStack().isEmpty()) {

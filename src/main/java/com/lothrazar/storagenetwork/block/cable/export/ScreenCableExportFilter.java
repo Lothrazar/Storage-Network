@@ -36,6 +36,7 @@ public class ScreenCableExportFilter extends AbstractContainerScreen<ContainerCa
   private ButtonRequest btnMinus;
   private ButtonRequest btnPlus;
   private ButtonRequest btnImport;
+  private ButtonRequest btnAllowIgn;
   private boolean isAllowlist;
   private List<ItemSlotNetwork> itemSlotsGhost;
   private ButtonRequest btnOperationToggle;
@@ -73,6 +74,10 @@ public class ScreenCableExportFilter extends AbstractContainerScreen<ContainerCa
       this.syncData(+1);
     }, DEFAULT_NARRATION));
     btnPlus.setTextureId(TextureEnum.PLUS);
+    btnAllowIgn = addRenderableWidget(new ButtonRequest(leftPos + 152, topPos + 24, "", (p) -> {
+      this.isAllowlist = !this.isAllowlist;
+      this.syncData(0);
+    }, DEFAULT_NARRATION));
     btnImport = addRenderableWidget(new ButtonRequest(leftPos + 80, topPos + 4, "", (p) -> {
       importFilterSlots();
     }, DEFAULT_NARRATION));
@@ -115,6 +120,7 @@ public class ScreenCableExportFilter extends AbstractContainerScreen<ContainerCa
     btnRedstone.setTextureId(containerCableLink.cap.needsRedstone() ? TextureEnum.REDSTONETRUE : TextureEnum.REDSTONEFALSE);
     btnOperationToggle.visible = this.isOperationMode();
     txtHeight.visible = btnOperationToggle.active = btnOperationToggle.visible;
+    btnAllowIgn.setTextureId(this.isAllowlist ? TextureEnum.ALLOWLIST : TextureEnum.IGNORELIST);
   }
 
   @Override
@@ -142,6 +148,11 @@ public class ScreenCableExportFilter extends AbstractContainerScreen<ContainerCa
       ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.import")), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
+   if (btnAllowIgn != null && btnAllowIgn.isMouseOver(mouseX, mouseY)) {
+     ms.renderTooltip(font,
+       Lists.newArrayList(Component.translatable(this.isAllowlist ? "gui.storagenetwork.allowlist" : "gui.storagenetwork.ignorelist")),
+       Optional.empty(), mouseX - leftPos, mouseY - topPos);
+   }
     if (btnMinus != null && btnMinus.isMouseOver(mouseX, mouseY)) {
       ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.down")), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
