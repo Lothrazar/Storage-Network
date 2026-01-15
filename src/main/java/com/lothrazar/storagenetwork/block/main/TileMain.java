@@ -1,5 +1,6 @@
 package com.lothrazar.storagenetwork.block.main;
 
+import java.util.List;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
@@ -9,11 +10,13 @@ import com.lothrazar.storagenetwork.api.IConnectableItemProcessing;
 import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
+import com.lothrazar.storagenetwork.util.Request;
 import com.lothrazar.storagenetwork.util.RequestBatch;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -119,7 +122,8 @@ public class TileMain extends BlockEntity {
       return;
     }
     refresh();
-    RequestBatch requestBatch = null;
+    RequestBatch requestBatch = new RequestBatch();
+    int exportCableCount = 0;
     for (IConnectable connectable : nw.getConnectables()) {
       if (connectable == null || connectable.getPos() == null) {
         continue;
@@ -142,9 +146,26 @@ public class TileMain extends BlockEntity {
           ioCap.runImport(this);
         }
         if (ioCap.ioDirection() == EnumStorageDirection.OUT) {
-          requestBatch = ioCap.runExport(this);
+          exportCableCount++;
+          RequestBatch cableBatch = ioCap.runExport(this);
+          StorageNetworkMod.log("Export cable #" + exportCableCount + " at " + connectable.getPos().getBlockPos() + " created batch with " + (cableBatch == null ? "0" : cableBatch.size()) + " item types");
+          if (cableBatch != null) {
+            // Merge this cable's requests into the accumulated batch
+            for (Item item : cableBatch.keySet()) {
+              List<Request> requests = cableBatch.get(item);
+              if (requests != null) {
+                for (Request request : requests) {
+                  requestBatch.put(item, request);
+                }
+              }
+            }
+          }
         }
       }
+    }
+    // Execute all accumulated export requests at once, properly sorted by priority
+    if (!requestBatch.isEmpty()) {
+      StorageNetworkMod.log("Executing accumulated batch with " + requestBatch.size() + " item types from " + exportCableCount + " cables");
     }
     executeRequestBatch(requestBatch);
   }
