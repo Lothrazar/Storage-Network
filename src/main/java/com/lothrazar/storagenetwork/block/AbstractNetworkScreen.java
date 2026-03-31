@@ -6,6 +6,7 @@ import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.TileableTexture;
 import com.lothrazar.storagenetwork.gui.components.TextboxInteger;
 import com.lothrazar.storagenetwork.jei.JeiHooks;
+import com.lothrazar.storagenetwork.network.RequestMessage;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -13,6 +14,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.gui.screens.Screen;
+import org.lwjgl.glfw.GLFW;
+import com.lothrazar.storagenetwork.registry.PacketRegistry;
 
 public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> implements IGuiNetwork {
 
@@ -39,33 +43,54 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
   }
 
   @Override
-  public boolean keyPressed(int keyCode, int scanCode, int b) {
-    InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
+  public boolean keyPressed(int keyCode, int scanCode, int mods) {
+    InputConstants.Key key = InputConstants.getKey(keyCode, scanCode);
+    
+    // 1) ESC always closes
     if (keyCode == TextboxInteger.KEY_ESC) {
       minecraft.player.closeContainer();
-      return true; // Forge MC-146650: Needs to return true when the key is handled.
-    }
-    if (getNetwork().searchBar.isFocused()) {
-      if (keyCode == TextboxInteger.KEY_BACKSPACE) { // BACKSPACE
-        getNetwork().syncTextToJei();
-      }
-      getNetwork().searchBar.keyPressed(keyCode, scanCode, b);
       return true;
     }
-    else if (!getNetwork().stackUnderMouse.isEmpty()) {
-      try {
-        JeiHooks.testJeiKeybind(mouseKey, getNetwork().stackUnderMouse);
+
+    // SEARCH BAR HANDLES FIRST
+    if (getNetwork().searchBar.isFocused()) {
+      // swallow inventory key
+      if (minecraft.options.keyInventory.isActiveAndMatches(key)) {
+        return true;
       }
-      catch (Throwable e) {
+
+      boolean handled = getNetwork().searchBar.keyPressed(keyCode, scanCode, mods);
+
+      // catch paste
+      if (Screen.hasControlDown() && keyCode == GLFW.GLFW_KEY_V) {
+        handled = true;
+      }
+
+      if (handled) {
+        PacketRegistry.INSTANCE.sendToServer(
+            new RequestMessage(0, ItemStack.EMPTY, false, false)
+                .withQuery(getNetwork().searchBar.getValue()));
+        getNetwork().syncTextToJei();
+      }
+      return true; 
+    }
+
+    // Not focused: inventory key closes
+    if (minecraft.options.keyInventory.isActiveAndMatches(key)) {
+      minecraft.player.closeContainer();
+      return true;
+    }
+
+    // JEI Keybinds
+    if (!getNetwork().stackUnderMouse.isEmpty()) {
+      try {
+        JeiHooks.testJeiKeybind(key, getNetwork().stackUnderMouse);
+      } catch (Throwable e) {
         StorageNetworkMod.LOGGER.error("Error thrown from JEI API ", e);
       }
     }
-    //Regardless of above branch, also check this
-    if (minecraft.options.keyInventory.isActiveAndMatches(mouseKey)) {
-      minecraft.player.closeContainer();
-      return true; // Forge MC-146650: Needs to return true when the key is handled.
-    }
-    return super.keyPressed(keyCode, scanCode, b);
+
+    return super.keyPressed(keyCode, scanCode, mods);
   }
 
   // used by ItemSlotNetwork and NetworkWidget
@@ -95,6 +120,17 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
   public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
     super.mouseClicked(mouseX, mouseY, mouseButton);
     getNetwork().mouseClicked(mouseX, mouseY, mouseButton);
+
+  // SHIFT quick-move from player inventory -> force refresh with current query
+  if (Screen.hasShiftDown()
+      && (mouseButton == 0 || mouseButton == 1)
+      && !getNetwork().inSearchBar(mouseX, mouseY)
+      && !isScrollable(mouseX, mouseY)) {
+    PacketRegistry.INSTANCE.sendToServer(
+        new RequestMessage(0, ItemStack.EMPTY, false, false)
+            .withQuery(getNetwork().searchBar.getValue())
+    );
+  }
     return true;
   }
 

@@ -139,6 +139,41 @@ public class NetworkModule {
     return stacks;
   }
 
+  public List<ItemStack> getSortedStacksFiltered(String query, int limit) {
+    final String q = query == null ? "" : query.toLowerCase();
+    final boolean use = !q.isEmpty();
+    List<ItemStack> out = new ArrayList<>();
+    try {
+      for (IConnectableLink storage : getSortedConnectableStorage()) {
+        for (ItemStack st : storage.getStoredStacks(true)) {
+          if (st == null || st.isEmpty()) continue;
+          if (use && !st.getHoverName().getString().toLowerCase().contains(q)) continue;
+          UtilTileEntity.addOrMergeIntoList(out, st);
+          if (limit > 0 && out.size() >= limit) return out;
+        }
+      }
+    } catch (Exception e) {
+      StorageNetworkMod.LOGGER.info("3rd party storage mod has an error", e);
+    }
+    return out;
+  }
+
+  public List<ItemStack> getSortedStacksUpTo(int limit) {
+    final boolean isFiltered = true;
+    List<ItemStack> out = new ArrayList<>();
+    try {
+      for (IConnectableLink storage : getSortedConnectableStorage()) {
+        for (ItemStack st : storage.getStoredStacks(isFiltered)) {
+          if (st == null || st.isEmpty()) continue;
+          UtilTileEntity.addOrMergeIntoList(out, st);
+          if (limit > 0 && out.size() >= limit) return out; // EARLY EXIT
+        }
+      }
+    } catch (Exception e) {
+      StorageNetworkMod.LOGGER.info("3rd party storage mod has an error", e);
+    }
+    return out;
+  }
   /**
    * 
    * @param filter

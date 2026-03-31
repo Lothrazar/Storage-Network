@@ -3,6 +3,7 @@ package com.lothrazar.storagenetwork.capability;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
@@ -30,18 +31,14 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag>, IConnectableItemAutoIO {
-
   public static final int DEFAULT_ITEMS_PER = 4;
   public static final int IO_DEFAULT_SPEED = 30; // TODO CONFIG
-
   public static class Factory implements Callable<IConnectableItemAutoIO> {
-
     @Override
     public IConnectableItemAutoIO call() throws Exception {
       return new CapabilityConnectableAutoIO(EnumStorageDirection.IN);
     }
   }
-
   public final IConnectable connectable;
   public EnumStorageDirection direction;
   public final UpgradesItemStackHandler upgrades = new UpgradesItemStackHandler();
@@ -52,36 +49,30 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   public ItemStack operationStack = ItemStack.EMPTY;
   public int operationLimit = 0;
   public int operationType = OpCompareType.LESS.ordinal();
-
   CapabilityConnectableAutoIO(EnumStorageDirection direction) {
     connectable = new CapabilityConnectable();
     this.direction = direction;
   }
-
   @Override
   public void toggleNeedsRedstone() {
     needsRedstone = !needsRedstone;
   }
-
   @Override
   public boolean needsRedstone() {
     return this.needsRedstone;
   }
-
   @Override
   public void needsRedstone(boolean in) {
     this.needsRedstone = in;
   }
-
   public FilterItemStackHandler getFilter() {
     return filters;
   }
-
-  //TODO: share with ConnectableLink  @Override
-  public List<ItemStack> getStoredStacks(boolean isFiltered) {
-    if (inventoryFace == null) {
-      return Collections.emptyList();
-    }
+  //TODO: share with ConnectableLink
+   public List<ItemStack> getStoredStacks(boolean isFiltered) {
+     if (inventoryFace == null) {
+       return Collections.emptyList();
+     }
     DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
     // Test whether the connected block has the IItemHandler capability
     IItemHandler itemHandler = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
@@ -102,17 +93,14 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     }
     return result;
   }
-
   //TODO: share with ConnectableLink
   public void setPriority(int value) {
     this.priority = value;
   }
-
   public void setFilter(int value, ItemStack stack) {
     filters.setStackInSlot(value, stack);
     filters.getStacks().set(value, stack);
   }
-
   public CapabilityConnectableAutoIO(BlockEntity tile, EnumStorageDirection direction) {
     connectable = tile.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY, null).orElse(null);
     this.direction = direction;
@@ -124,11 +112,9 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
       filters.setIsAllowlist(false);
     }
   }
-
   public void setInventoryFace(Direction inventoryFace) {
     this.inventoryFace = inventoryFace;
   }
-
   @Override
   public CompoundTag serializeNBT() {
     CompoundTag result = new CompoundTag();
@@ -146,7 +132,6 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     result.put("operation", operation);
     return result;
   }
-
   @Override
   public void deserializeNBT(CompoundTag nbt) {
     CompoundTag upgrades = nbt.getCompound("upgrades");
@@ -172,22 +157,22 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
       this.operationStack = ItemStack.EMPTY;
     }
   }
-
   @Override
   public EnumStorageDirection ioDirection() {
     return direction;
   }
-
   @Override
   public int getPriority() {
     return priority;
   }
-
   @Override
   public ItemStack insertStack(ItemStack stack, boolean simulate) {
     // If this storage is configured to only import into the network, do not
     // insert into the storage, but abort immediately.
     if (direction == EnumStorageDirection.IN) {
+      return stack;
+    }
+    if (stack != null && !stack.isEmpty() && filters != null && filters.isStackFiltered(stack)) {
       return stack;
     }
     if (inventoryFace == null) {
@@ -201,7 +186,6 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     }
     return ItemHandlerHelper.insertItemStacked(itemHandler, stack, simulate);
   }
-
   public List<ItemStack> getStacksForFilter() {
     if (inventoryFace == null) {
       return Collections.emptyList();
@@ -230,12 +214,10 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     }
     return result;
   }
-
   @Override
   public FilterItemStackHandler getFilters() {
     return filters;
   }
-
   @Override
   public IItemHandler getItemHandler() {
     if (inventoryFace == null || direction == EnumStorageDirection.OUT) {
@@ -244,59 +226,14 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
     return inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
   }
-  //  @Deprecated
-  //  @Override
-  //  public ItemStack extractNextStack(final int amtToRequestIn, boolean simulate) {
-  //    //op mode override
-  //    int amtToRequest = amtToRequestIn;
-  //    boolean operationMode = isOperationMode();
-  //    // If this storage is configured to only export from the network, do not
-  //    // extract from the storage, but abort immediately.
-  //    if (direction == EnumStorageDirection.OUT) {
-  //      return ItemStack.EMPTY;
-  //    }
-  //    if (inventoryFace == null) {
-  //      return ItemStack.EMPTY;
-  //    }
-  //    DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
-  //    // Test whether the connected block has the IItemHandler capability
-  //    IItemHandler itemHandler = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
-  //    if (itemHandler == null) {
-  //      return ItemStack.EMPTY;
-  //    }
-  //    for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
-  //      ItemStack stack = itemHandler.getStackInSlot(slot);
-  //      if (stack == null || stack.isEmpty()) {
-  //        continue;
-  //      }
-  //      // Ignore stacks that are filtered
-  //      if (filters.isStackFiltered(stack)) {
-  //        continue;
-  //      }
-  //      if (operationMode && filters.isAllowList) {
-  //        IItemStackMatcher matcher = filters.getFirstMatcher(stack);
-  //        //if filters are also in allow list mode
-  //        //then get the filter matching stack, and get the count of that filter
-  //        if (matcher != null && matcher.getStack().getCount() > 0) {
-  //          amtToRequest = matcher.getStack().getCount(); // the 63 haha
-  //        }
-  //      }
-  //      int extractSize = Math.min(amtToRequest, stack.getCount());
-  //      return itemHandler.extractItem(slot, extractSize, simulate);
-  //    }
-  //    return ItemStack.EMPTY;
-  //  }
-
   @Override
   public boolean isStockMode() {
     return getUpgrades().hasUpgradesOfType(SsnRegistry.Items.STOCK_UPGRADE.get());
   }
-
   @Override
   public boolean isOperationMode() {
     return getUpgrades().hasUpgradesOfType(SsnRegistry.Items.OP_U.get());
   }
-
   @Override
   public int getTransferRate() {
     if (upgrades.hasUpgradesOfType(SsnRegistry.Items.SINGLE_UPGRADE.get())) {
@@ -304,7 +241,6 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     }
     return upgrades.hasUpgradesOfType(SsnRegistry.Items.STACK_UPGRADE.get()) ? 64 : DEFAULT_ITEMS_PER;
   }
-
   private boolean doesPassOperationFilterLimit(TileMain master) {
     if (upgrades.getUpgradesOfType(SsnRegistry.Items.OP_U.get()) < 1) {
       return true;
@@ -326,61 +262,138 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     }
     return false;
   }
-
   @Override
   public boolean canRunNow(DimPos connectablePos, TileMain main) {
+    if (this.ioDirection() == EnumStorageDirection.OUT) {
+      if (inventoryFace == null) return false;
+      try {
+        DimPos invPos = connectable.getPos().offset(inventoryFace);
+        IItemHandler target = invPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+        if (target == null) {
+          return false;
+        }
+        boolean needsSomething = false;
+        if (filters.isAllowList) {
+          for (IItemStackMatcher m : this.getAutoExportList()) {
+            ItemStack st = m.getStack();
+            if (st.isEmpty()) continue;
+            int need = UtilInventory.containsAtLeastHowManyNeeded(target, st, st.getCount());
+            if (need > 0) {
+              needsSomething = true;
+              break;
+            }
+          }
+        }
+        else {
+          for (ItemStack s : main.getNetwork().getStacks(true)) {
+            if (s == null || s.isEmpty()) continue;
+            if (filters.isStackFiltered(s)) continue;
+            int need = UtilInventory.containsAtLeastHowManyNeeded(target, s, s.getCount());
+            if (need > 0) {
+              needsSomething = true;
+              break;
+            }
+          }
+        }
+        if (!needsSomething) {
+          return false;
+        }
+      } catch (Exception e) {
+        return false;
+      }
+    }
     int speedUpgrades = upgrades.getUpgradesOfType(SsnRegistry.Items.SPEED_UPGRADE.get());
     int slowUpgrades = upgrades.getUpgradesOfType(SsnRegistry.Items.SLOW_UPGRADE.get());
-    int speedRatio = IO_DEFAULT_SPEED; // no upgrades
+    int speedRatio = IO_DEFAULT_SPEED;
     if (speedUpgrades > 0) {
-      //so 1 speed upgrade is run every 30/2=15t, two is 30/3 ticks etc
       speedRatio = IO_DEFAULT_SPEED / (speedUpgrades + 1);
     }
     else if (slowUpgrades > 0) {
-      //meaning IF one or more speed upgrades are present, then all slowness upgrades are IGNORED
-      //so 1 Slow upgrade is run every 30*2=60t, two is 30*3=90 ticks 
       speedRatio = IO_DEFAULT_SPEED * (slowUpgrades + 1);
     }
     if (speedRatio < 1) {
-      speedRatio = 1; // 0 wont happen but idk maybe
+      speedRatio = 1;
     }
     boolean cooldownOk = (connectablePos.getWorld().getGameTime() % speedRatio == 0);
     if (!cooldownOk) {
       return false;
     }
-    //opt: dont check operation count if the cooldown is bad anyway
     boolean operationLimitOk = doesPassOperationFilterLimit(main);
-    //    StorageNetwork.log("OP allowed to runNow = " + operationLimitOk);
     return operationLimitOk;
   }
-
   @Override
   public List<IItemStackMatcher> getAutoExportList() {
     return filters.getStackMatchers();
   }
-
   @Override
   public Direction facingInventory() {
     return inventoryFace;
   }
-
   public UpgradesItemStackHandler getUpgrades() {
     return upgrades;
   }
-
   public void extractFromSlot(int slot) {}
+
+  /** Stable key per target inventory  face; fallback to identity. */
+  private int computeTargetKey() {
+    try {
+      if (inventoryFace == null) return System.identityHashCode(this);
+      DimPos invPos = connectable.getPos().offset(inventoryFace);
+      Object dimIdObj = invPos.getWorld().dimension().location(); // ResourceLocation
+      long posLong;
+      try {
+        posLong = invPos.getBlockPos().asLong(); // if available
+      } catch (Throwable t2) {
+        posLong = invPos.hashCode();
+      }
+      int face = inventoryFace.ordinal();
+      return Objects.hash(dimIdObj, posLong, face);
+    } catch (Throwable t) {
+      return System.identityHashCode(this);
+    }
+  }
 
   @Override
   public RequestBatch runExport(TileMain main) {
-    if (this.ioDirection() != EnumStorageDirection.OUT) { // TODO: redundant?
+    if (this.ioDirection() != EnumStorageDirection.OUT) {
+      // TODO: redundant?
       return null;
     }
+    // blacklist
+    if (!filters.isAllowList) {
+      RequestBatch batch = new RequestBatch();
+      final int targetKey = computeTargetKey();
+      for (ItemStack s : main.getNetwork().getStacks(true)) {
+        if (s == null || s.isEmpty()) continue;
+        if (filters.isStackFiltered(s)) continue;
+        Request req = new Request(this, targetKey);
+        if (isStockMode()) {
+          try {
+            if (inventoryFace == null) continue;
+            DimPos invPos = connectable.getPos().offset(inventoryFace);
+            IItemHandler target = invPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+            int stillNeeds = UtilInventory.containsAtLeastHowManyNeeded(target, s, s.getCount());
+            if (stillNeeds == 0) continue;
+            req.setCount(Math.min(stillNeeds, req.getCount()));
+          } catch (Throwable e) {
+            StorageNetworkMod.LOGGER.error("Error from connected block", e);
+            continue;
+          }
+        }
+        if (req.getCount() > 0) {
+          batch.put(s.getItem(), req);
+        }
+      }
+      return batch;
+    }
+    // whitelist
     RequestBatch requestBatch = new RequestBatch();
+    final int targetKey = computeTargetKey();
     for (IItemStackMatcher matcher : this.getAutoExportList()) {
       if (matcher.getStack().isEmpty()) {
         continue;
       }
-      Request request = new Request(this);
+      Request request = new Request(this, targetKey);
       // default amt to request. can be overriden by other upgrades
       // check operations upgrade for export
       boolean stockMode = this.isStockMode();
@@ -391,8 +404,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
           DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
           IItemHandler targetInventory = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
           // request with false to see how many even exist in there.
-          int stillNeeds = UtilInventory.containsAtLeastHowManyNeeded(targetInventory, matcher.getStack(),
-              matcher.getStack().getCount());
+          int stillNeeds = UtilInventory.containsAtLeastHowManyNeeded(targetInventory, matcher.getStack(), matcher.getStack().getCount());
           if (stillNeeds == 0) {
             // they dont need any more, they have the stock they need
             StorageNetworkMod.log("stockMode upgrade finishing transaction");
@@ -400,9 +412,8 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
           }
           request.setCount(Math.min(stillNeeds, request.getCount()));
           StorageNetworkMod.log("updateExports stock mode edited value: amtToRequest = " + request.getCount());
-        }
-        catch (Throwable e) {
-          StorageNetworkMod.LOGGER.error("Error thrown from a connected block" + e);
+        } catch (Throwable e) {
+          StorageNetworkMod.LOGGER.error("Error thrown from a connected block", e);
         }
       }
       if (matcher.getStack().isEmpty() || request.getCount() == 0) {
@@ -411,13 +422,12 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
       }
       requestBatch.put(matcher.getStack().getItem(), request);
     }
-    //
     return requestBatch;
   }
-
   @Override
   public void runImport(TileMain main) {
-    if (this.ioDirection() != EnumStorageDirection.IN) { // TODO: redundant?
+    if (this.ioDirection() != EnumStorageDirection.IN) {
+      // TODO: redundant?
       return;
     }
     IItemHandler itemHandler = this.getItemHandler();
@@ -443,7 +453,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
           //as we want the STOCK of the chest to not go less than the filter number , just down to it
           if (chestHowMany > filterSize) {
             int realSize = Math.min(chestHowMany - filterSize, 64);
-            StorageNetworkMod.log(" : stock mode import  realSize = " + realSize);
+            StorageNetworkMod.log(" : stock mode import realSize = " + realSize);
             stackCurrent.setCount(realSize);
           }
           else {

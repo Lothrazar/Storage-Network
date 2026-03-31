@@ -3,6 +3,7 @@ package com.lothrazar.storagenetwork.network;
 import java.util.function.Supplier;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.ITileNetworkSync;
+import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkCraftingRemote;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkRemote;
 import com.lothrazar.storagenetwork.item.remote.ItemRemote;
@@ -35,29 +36,20 @@ public class SettingsSyncMessage {
   public static void handle(SettingsSyncMessage message, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
       ServerPlayer player = ctx.get().getSender();
-      //TODO: how to refactor this
+      /// is it a block?
       if (message.targetTileEntity) {
         BlockEntity tileEntity = player.level().getBlockEntity(message.pos);
-        if (tileEntity instanceof ITileNetworkSync) {
-          ITileNetworkSync tile = (ITileNetworkSync) tileEntity;
+        if (tileEntity instanceof ITileNetworkSync tile) {
           tile.setSort(message.sort);
           tile.setDownwards(message.direction);
           tile.setJeiSearchSynced(message.jeiSync);
           tile.setAutoFocus(message.autoFocus);
           tileEntity.setChanged();
         }
-      }
-      else if (player.containerMenu instanceof ContainerNetworkCraftingRemote remoteContainer) {
+      } // else is it an item?
+      else if (player.containerMenu instanceof ContainerNetwork remoteContainer) {
         ItemStack stackPlayerHeld = remoteContainer.getRemote();
-        if (stackPlayerHeld.getItem() instanceof ItemRemote) {
-          ItemRemote.setSort(stackPlayerHeld, message.sort);
-          ItemRemote.setDownwards(stackPlayerHeld, message.direction);
-          ItemRemote.setJeiSearchSynced(stackPlayerHeld, message.jeiSync);
-          ItemRemote.setAutoFocus(stackPlayerHeld, message.autoFocus);
-        }
-      }
-      else if (player.containerMenu instanceof ContainerNetworkRemote rcc) {
-        ItemStack stackPlayerHeld = rcc.getRemote();
+        //if it passes the instanceof check, we also know it is not-Empty
         if (stackPlayerHeld.getItem() instanceof ItemRemote) {
           ItemRemote.setSort(stackPlayerHeld, message.sort);
           ItemRemote.setDownwards(stackPlayerHeld, message.direction);

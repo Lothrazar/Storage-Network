@@ -1,62 +1,91 @@
 package com.lothrazar.storagenetwork.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import com.lothrazar.storagenetwork.api.IConnectableLink;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 
-public class RequestBatch extends Batch<Request> {
+public class RequestBatch {
 
-  private static final long serialVersionUID = 9136459257621033386L;
+  private final Map<Item, LinkedHashMap<Integer, Request>> map = new HashMap<>();
 
-  public void extractStacks(IConnectableLink providerStorage, Integer slot, Item item) {
-    List<Request> requests = get(item);
-    List<Request> remainingRequests = new ArrayList<Request>();
-    for (Request request : requests) {
-      if (!request.insertStack(providerStorage, slot)) {
-        remainingRequests.add(request);
+  public void put(Item item, Request req) {
+    if (item == null || req == null) return;
+    LinkedHashMap<Integer, Request> byDest = map.computeIfAbsent(item, k -> new LinkedHashMap<>());
+    int key = req.getTargetKey();
+    Request existing = byDest.get(key);
+    if (existing == null) {
+      byDest.put(key, req);
+    } else {
+      existing.setCount(existing.getCount() + req.getCount());
+    }
+  }
+
+  public boolean isEmpty() {
+    if (map.isEmpty()) return true;
+    for (Map<Integer, Request> m : map.values()) {
+      if (!m.isEmpty()) return false;
+    }
+    return true;
+  }
+
+  public void forEach(BiConsumer<Item, Request> consumer) {
+    for (Map.Entry<Item, LinkedHashMap<Integer, Request>> e : map.entrySet()) {
+      Item item = e.getKey();
+      for (Request r : e.getValue().values()) {
+        consumer.accept(item, r);
       }
-      ItemStack stack = providerStorage.extractFromSlot(slot, 1, true);
-      if (stack.isEmpty()) {
+    }
+  }
+
+  // Backward-compatibility
+  // remove once all call sites use batch.forEach(...).
+  // mirrors old API: try to satisfy requests for this item from a provider slot
+  public void extractStacks(com.lothrazar.storagenetwork.api.IConnectableLink providerStorage,
+                            Integer slot,
+                            net.minecraft.world.item.Item item) {
+    java.util.LinkedHashMap<Integer, Request> byDest = map.get(item);
+    if (byDest == null || byDest.isEmpty()) return;
+    java.util.Iterator<Request> it = byDest.values().iterator();
+    while (it.hasNext()) {
+      Request r = it.next();
+      if (!r.insertStack(providerStorage, slot)) {
+        // keep for next pass
+      }
+      net.minecraft.world.item.ItemStack peek = providerStorage.extractFromSlot(slot, 1, true);
+      if (peek.isEmpty()) {
         return;
       }
     }
-    put(item, remainingRequests);
   }
 
   public void sort() {
-    Collection<List<Request>> requests = this.values();
-    for (List<Request> requestList : requests) {
-      quickSort(requestList, 0, requestList.size() - 1);
-    }
-  }
-
-  private void quickSort(List<Request> requestList, int start, int end) {
-    if (start < end) {
-      int partitionInd = partition(requestList, start, end);
-      quickSort(requestList, start, partitionInd - 1);
-      quickSort(requestList, partitionInd + 1, end);
-    }
-  }
-
-  private int partition(List<Request> requestList, int start, int end) {
-    int pivot = requestList.get(end).getPriority();
-    int i = (start - 1);
-    for (int j = start; j < end; j++) {
-      if (requestList.get(j).getPriority() <= pivot) {
-        i++;
-        Request highTemp = requestList.get(i);
-        Request lowTemp = requestList.get(j);
-        requestList.set(i, lowTemp);
-        requestList.set(j, highTemp);
+    for (Map.Entry<Item, LinkedHashMap<Integer, Request>> e : map.entrySet()) {
+      LinkedHashMap<Integer, Request> byDest = e.getValue();
+      java.util.List<Map.Entry<Integer, Request>> entries =
+          new java.util.ArrayList<>(byDest.entrySet());
+      entries.sort(java.util.Comparator.comparingInt(a -> a.getValue().getPriority()));
+      LinkedHashMap<Integer, Request> reordered = new LinkedHashMap<>();
+      for (Map.Entry<Integer, Request> en : entries) {
+        reordered.put(en.getKey(), en.getValue());
       }
+      e.setValue(reordered);
     }
-    Request swapTemp = requestList.get(i + 1);
-    Request temp = requestList.get(end);
-    requestList.set(i + 1, temp);
-    requestList.set(end, swapTemp);
-    return i + 1;
   }
+  /** Old: batch.get(item) returned a List<Request>. */
+  public java.util.List<Request> get(Item item) {
+    LinkedHashMap<Integer, Request> byDest = map.get(item);
+    if (byDest == null || byDest.isEmpty()) return java.util.Collections.emptyList();
+    return new java.util.ArrayList<>(byDest.values());
+  }
+
+  /** Old: batch.put(item, List<Request>). */
+  public void put(Item item, java.util.List<Request> requests) {
+    if (requests == null) return;
+    for (Request r : requests) {
+      put(item, r);
+    }
+  }
+  public java.util.Set<Item> keySet() { return map.keySet(); }
 }

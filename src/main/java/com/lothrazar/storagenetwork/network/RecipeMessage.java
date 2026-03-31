@@ -117,7 +117,8 @@ public class RecipeMessage {
         //        }
         //now make sure client sync happens.
         ctr.slotChanged();
-        List<ItemStack> list = main.getNetwork().getStacks();
+        final int THRESH = 256;
+        List<ItemStack> list = main.getNetwork().getSortedStacksUpTo(THRESH);
         PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()),
             player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
       } //end run

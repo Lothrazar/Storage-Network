@@ -30,7 +30,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ItemRemote extends ItemFlib implements MenuProvider {
 
   public static final String NBT_JEI = TileRequest.NBT_JEI;
-  public static final String NBT_BOUND = "bound";
   public static final String NBT_SORT = "sort";
   public static final String NBT_DOWN = "down";
 

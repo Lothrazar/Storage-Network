@@ -22,6 +22,7 @@ public class RequestMessage {
   private ItemStack stack = ItemStack.EMPTY;
   private boolean shift;
   private boolean ctrl;
+  private String query = "";
 
   @Override
   public String toString() {
@@ -55,6 +56,21 @@ public class RequestMessage {
       if (root == null) {
         //maybe the table broke after doing this, rare case
         StorageNetworkMod.log("Request message cancelled, null tile");
+        return;
+      }
+      final int THRESH = 256;
+      final boolean isRefresh = message.stack.isEmpty()
+                                && message.mouseButton == 0
+                                && !message.shift && !message.ctrl;
+
+      if (isRefresh) {
+        final String q = message.query == null ? "" : message.query.trim();
+        final List<ItemStack> send = q.isEmpty()
+            ? root.getNetwork().getSortedStacksUpTo(THRESH)
+            : root.getNetwork().getSortedStacksFiltered(q, 4096);
+        PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(send, new ArrayList<>()),
+            player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        player.containerMenu.broadcastChanges();
         return;
       }
       int in = root.getNetwork().getAmount(new ItemStackMatcher(message.stack, false, true));
@@ -96,10 +112,17 @@ public class RequestMessage {
               player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         }
       }
-      List<ItemStack> list = root.getNetwork().getSortedStacks();
-      PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()),
-          player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-      player.containerMenu.broadcastChanges();
+      // refresh using the SAME query (keeps filtered view stable)
+      {
+        final String q = message.query == null ? "" : message.query.trim();
+        final List<ItemStack> list = q.isEmpty()
+            ? root.getNetwork().getSortedStacksUpTo(THRESH)
+            : root.getNetwork().getSortedStacksFiltered(q, 4096);
+        PacketRegistry.INSTANCE.sendTo(
+            new StackRefreshClientMessage(list, new ArrayList<>()),
+            player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        player.containerMenu.broadcastChanges();
+      }
     });
     ctx.get().setPacketHandled(true);
   }
@@ -110,6 +133,7 @@ public class RequestMessage {
     msg.stack = ItemStack.of(buf.readNbt());
     msg.shift = buf.readBoolean();
     msg.ctrl = buf.readBoolean();
+    msg.query = buf.readUtf(32767);
     return msg;
   }
 
@@ -118,5 +142,11 @@ public class RequestMessage {
     buf.writeNbt(msg.stack.serializeNBT());
     buf.writeBoolean(msg.shift);
     buf.writeBoolean(msg.ctrl);
+    buf.writeUtf(msg.query == null ? "" : msg.query);
+  }
+ 
+  public RequestMessage withQuery(String q) {
+    this.query = (q == null) ? "" : q;
+    return this;
   }
 }
