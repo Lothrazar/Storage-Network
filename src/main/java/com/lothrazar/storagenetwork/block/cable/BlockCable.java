@@ -3,7 +3,8 @@ package com.lothrazar.storagenetwork.block.cable;
 import java.util.Map;
 import com.google.common.collect.Maps;
 import com.lothrazar.library.block.EntityBlockFlib;
-import com.lothrazar.library.data.ShapeCache;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumConnectType;
 import com.lothrazar.storagenetwork.api.IConnectable;
@@ -41,7 +42,8 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 
 public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBlock {
-
+  
+  private static final ConcurrentMap<BlockState, VoxelShape> SHAPE_CACHE = new ConcurrentHashMap<>();
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
   public BlockCable() {
@@ -131,7 +133,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
         return tile.getFacadeState().getShape(worldIn, pos, context);
       }
     }
-    return ShapeCache.getOrCreate(state, ShapeBuilder::createShape);
+    return SHAPE_CACHE.computeIfAbsent(state, ShapeBuilder::createShape);
   }
 
   @Override

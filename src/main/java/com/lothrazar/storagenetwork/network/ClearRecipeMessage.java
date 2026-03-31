@@ -67,7 +67,8 @@ public class ClearRecipeMessage {
           }
         }
         if (doRefresh) {
-          List<ItemStack> list = root.getNetwork().getStacks();
+          final int THRESH = 256;
+          List<ItemStack> list = root.getNetwork().getSortedStacksUpTo(THRESH);
           PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()),
               player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
           container.broadcastChanges();

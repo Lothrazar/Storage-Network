@@ -178,7 +178,8 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
         ItemStack stack = rest == 0 ? ItemStack.EMPTY : ItemHandlerHelper.copyStackWithSize(itemstack1, rest);
         slot.set(stack);
         broadcastChanges();
-        List<ItemStack> list = tileMain.getNetwork().getSortedStacks();
+        final int THRESH = 256;
+        List<ItemStack> list = tileMain.getNetwork().getSortedStacksUpTo(THRESH);
         if (playerIn instanceof ServerPlayer) {
           ServerPlayer sp = (ServerPlayer) playerIn;
           PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()),

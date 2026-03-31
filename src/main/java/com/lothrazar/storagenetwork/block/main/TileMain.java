@@ -119,7 +119,6 @@ public class TileMain extends BlockEntity {
       return;
     }
     refresh();
-    RequestBatch requestBatch = null;
     for (IConnectable connectable : nw.getConnectables()) {
       if (connectable == null || connectable.getPos() == null) {
         continue;
@@ -140,13 +139,12 @@ public class TileMain extends BlockEntity {
         //it has IO, so run imports and then exports
         if (ioCap.ioDirection() == EnumStorageDirection.IN) {
           ioCap.runImport(this);
-        }
-        if (ioCap.ioDirection() == EnumStorageDirection.OUT) {
-          requestBatch = ioCap.runExport(this);
+        } else if (ioCap.ioDirection() == EnumStorageDirection.OUT) {
+          RequestBatch b = ioCap.runExport(this);
+          if (b != null) executeRequestBatch(b);
         }
       }
     }
-    executeRequestBatch(requestBatch);
   }
 
   private void refresh() {

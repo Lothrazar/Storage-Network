@@ -7,11 +7,20 @@ import net.minecraft.world.item.ItemStack;
 public class Request {
 
   private Integer count = 0;
-  private IConnectableItemAutoIO storage;
+  private final IConnectableItemAutoIO storage;
+  /** Stable id per concrete export destination within a batch/tick. */
+  private final int targetKey;
 
+  /** Backwards-compatible: falls back to identity hash as destination key. */
   public Request(IConnectableItemAutoIO storage) {
+    this(storage, System.identityHashCode(storage));
+  }
+
+  /** Preferred: caller provides stable destination key. */
+  public Request(IConnectableItemAutoIO storage, int targetKey) {
     this.count = storage.getTransferRate();
     this.storage = storage;
+    this.targetKey = targetKey;
   }
 
   public void setCount(Integer count) {
@@ -26,28 +35,30 @@ public class Request {
     return storage.getPriority();
   }
 
+  public int getTargetKey() {
+    return targetKey;
+  }
+
   public Boolean insertStack(IConnectableLink providerStorage, int slot) {
-    ItemStack simulatedExtractedStack = providerStorage.extractFromSlot(slot, getCount(), true);
+    final int requested = getCount();
+    ItemStack simulatedExtractedStack = providerStorage.extractFromSlot(slot, requested, true);
+
     if (simulatedExtractedStack.isEmpty()) {
       return false;
     }
     int movedItems = 0;
     ItemStack simulatedInsertedStack = storage.insertStack(simulatedExtractedStack, true);
     if (simulatedInsertedStack.isEmpty()) {
-      movedItems = getCount();
-      setCount(0);
+      movedItems = simulatedExtractedStack.getCount();
+      setCount(Math.max(0, requested - movedItems));
     }
     else {
       movedItems = simulatedExtractedStack.getCount() - simulatedInsertedStack.getCount();
-      setCount(movedItems);
+      setCount(Math.max(0, requested - movedItems));
     }
     // real extraction
     ItemStack realExtractedStack = providerStorage.extractFromSlot(slot, movedItems, false);
     storage.insertStack(realExtractedStack, false);
-    // Determine the amount of items moved in the stack
-    if (getCount() == 0) {
-      return true;
-    }
-    return false;
+    return getCount() == 0;
   }
 }

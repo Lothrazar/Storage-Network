@@ -164,7 +164,7 @@ public class NetworkWidget {
       clearGridBtn = new ButtonRequest(
           x, y, "", (p) -> {
             PacketRegistry.INSTANCE.sendToServer(new ClearRecipeMessage());
-            PacketRegistry.INSTANCE.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
+            PacketRegistry.INSTANCE.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false).withQuery(searchBar.getValue()));
           }, DEFAULT_NARRATION);
       clearGridBtn.setHeight(7);
       clearGridBtn.setWidth(7);
@@ -386,10 +386,9 @@ public class NetworkWidget {
       stackUnderMouse = ItemStack.EMPTY;
     }
   }
-
   public boolean charTyped(char typedChar, int keyCode) {
     if (searchBar.isFocused() && searchBar.charTyped(typedChar, keyCode)) {
-      PacketRegistry.INSTANCE.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
+      PacketRegistry.INSTANCE.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false).withQuery(searchBar.getValue()));
       syncTextToJei();
       return true;
     }
@@ -413,14 +412,19 @@ public class NetworkWidget {
     if (!stackUnderMouse.isEmpty()
         && (mouseButton == UtilTileEntity.MOUSE_BTN_LEFT || mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT)
         && stackCarriedByMouse.isEmpty()) {
-      // Request an item (from the network) if we are in the upper section of the GUI 
-      PacketRegistry.INSTANCE.sendToServer(new RequestMessage(mouseButton, this.stackUnderMouse.copy(), Screen.hasShiftDown(),
-          Screen.hasAltDown() || Screen.hasControlDown()));
+      PacketRegistry.INSTANCE.sendToServer(
+        new RequestMessage(mouseButton, this.stackUnderMouse.copy(),
+          Screen.hasShiftDown(), Screen.hasAltDown() || Screen.hasControlDown()
+        ).withQuery(searchBar.getValue())
+      );
       this.lastClick = System.currentTimeMillis();
     }
     else if (!stackCarriedByMouse.isEmpty() && inField((int) mouseX, (int) mouseY)) {
-      // Insert the item held by the mouse into the network
-      PacketRegistry.INSTANCE.sendToServer(new InsertMessage(0, mouseButton));
+      PacketRegistry.INSTANCE.sendToServer(
+          new InsertMessage(0, mouseButton).withQuery(searchBar.getValue()));
+      PacketRegistry.INSTANCE.sendToServer(
+          new RequestMessage(0, ItemStack.EMPTY, false, false)
+              .withQuery(searchBar.getValue()));
       this.lastClick = System.currentTimeMillis();
     }
   }
