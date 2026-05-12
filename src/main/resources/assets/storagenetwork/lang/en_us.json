@@ -67,7 +67,7 @@
     "block.storagenetwork.collector": "Network Collection Interface",
     "block.storagenetwork.collector.guide":  "This exposes the network and acts as an insert-only controller for other automation systems or storage solutions.  For example, a normal Hopper will insert items similar to the  $(l:import_kabel)Import Cable$(/l).  Does not allow any item extraction.  Try this with other storage mods!  ",
     "block.storagenetwork.collector.tooltip": "Items inserted enter the network",
-    
+
     "item.storagenetwork.speed_upgrade": "Speed Upgrade",
     "item.storagenetwork.speed_upgrade.guide": "This upgrade can be placed in cables.  Increases the speed of imports, which normally do not happen every tick. by decreasing the tick delay between operations.  Will cause any Slowness upgrades to be ignored if both are present.  ",
     "item.storagenetwork.speed_upgrade.tooltip": "Increases the speed of importing/exporting",
@@ -111,6 +111,9 @@
     "item.storagenetwork.collector_remote": "Network Collector Remote",
     "item.storagenetwork.collector_remote.tooltip": "Items picked up are moved into the network",
     "item.storagenetwork.collector_remote.guide": "Bind this to the network as normal.  This remote works anywhere in your inventory (including curios but not ender chest), no need to hold it in hand or hotbar.  When you pickup any item, this will insert that item into the network if possible",
+
+    "item.storagenetwork.collector_remote.enabled": "Collector enabled",
+    "item.storagenetwork.collector_remote.disabled": "Collector disabled",
 
     "block.storagenetwork.recipe.invalid": "Transaction invalid:",
     "block.storagenetwork.recipe.invalidleft": "Set Input on left",

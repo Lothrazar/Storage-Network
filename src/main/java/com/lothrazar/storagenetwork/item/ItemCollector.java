@@ -31,8 +31,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 
 public class ItemCollector extends ItemFlib {
-
-  public static final String NBT_BOUND = "bound";
   private static final String NBT_ENABLED = "Enabled";
 
   public ItemCollector(Properties properties) {
@@ -46,12 +44,9 @@ public class ItemCollector extends ItemFlib {
   }
 
   public void toggleEnabled(ItemStack stack, Player player) {
-    boolean enabled = stack.getOrCreateTag().getBoolean(NBT_ENABLED);
-    stack.getOrCreateTag().putBoolean(NBT_ENABLED, !enabled);
-    player.displayClientMessage(
-        Component.literal("Collector " + (!enabled ? "enabled" : "disabled")),
-        true
-    );
+    boolean newEnabled = !isEnabled(stack);
+    stack.getOrCreateTag().putBoolean(NBT_ENABLED, newEnabled);
+    player.displayClientMessage(makeDisabledTooltip(newEnabled), true);
   }
 
   // not subscribe, called from SsnEvents.java
@@ -68,8 +63,7 @@ public class ItemCollector extends ItemFlib {
       }
 
       // check if it is turned on
-      CompoundTag tag = collectorStack.getOrCreateTag();
-      if (!tag.getBoolean("Enabled")) {
+      if (!isEnabled(collectorStack)) {
         return;
       }
 
@@ -93,6 +87,10 @@ public class ItemCollector extends ItemFlib {
         // else { StorageNetworkMod.LOGGER.error("item.remote.notfound"); }
       }
     }
+  }
+
+  private static boolean isEnabled(ItemStack collectorStack) {
+    return collectorStack.getOrCreateTag().getBoolean(NBT_ENABLED);
   }
 
   @Override
@@ -121,6 +119,12 @@ public class ItemCollector extends ItemFlib {
       if (dp != null) {
         tooltip.add(dp.makeTooltip());
       }
+      tooltip.add(makeDisabledTooltip(isEnabled(stack)).withStyle(ChatFormatting.DARK_GRAY));
     }
+  }
+
+  // used for title on keybind as well as item tooltip
+  private MutableComponent makeDisabledTooltip(boolean enabled) {
+    return Component.translatable(getDescriptionId() + "." + (enabled ? "enabled" : "disabled"));
   }
 }

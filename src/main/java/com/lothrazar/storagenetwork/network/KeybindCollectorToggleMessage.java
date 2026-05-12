@@ -1,6 +1,8 @@
 package com.lothrazar.storagenetwork.network;
 
 import com.lothrazar.storagenetwork.item.ItemCollector;
+import com.lothrazar.storagenetwork.registry.SsnRegistry;
+import com.lothrazar.storagenetwork.util.UtilInventory;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,33 +20,17 @@ public class KeybindCollectorToggleMessage {
     ctx.get().enqueueWork(() -> {
       ServerPlayer player = ctx.get().getSender();
       if (player != null) {
-        Inventory inv = player.getInventory();
 
-        for (ItemStack stack : inv.items) {
-          if (stack.getItem() instanceof ItemCollector collector) {
-            collector.toggleEnabled(stack, player);
-            return;
-          }
-        }
-
-        for (ItemStack stack : inv.armor) {
-          if (stack.getItem() instanceof ItemCollector collector) {
-            collector.toggleEnabled(stack, player);
-            return;
-          }
-        }
-
-        for (ItemStack stack : inv.offhand) {
-          if (stack.getItem() instanceof ItemCollector collector) {
-            collector.toggleEnabled(stack, player);
-            return;
-          }
+        // added curios compatibility to toggle feature
+        var searchResult = UtilInventory.getCurioRemote(player, SsnRegistry.Items.COLLECTOR_REMOTE.get());
+        ItemStack remoteFound = searchResult.getRight();
+        if (!remoteFound.isEmpty()) {
+          SsnRegistry.Items.COLLECTOR_REMOTE.get().toggleEnabled(remoteFound, player);
         }
       }
     });
     ctx.get().setPacketHandled(true);
   }
-
 
   public void encode(FriendlyByteBuf friendlyByteBuf) {
   }
