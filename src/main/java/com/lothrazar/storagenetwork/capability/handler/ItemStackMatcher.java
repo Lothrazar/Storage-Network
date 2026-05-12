@@ -31,7 +31,9 @@ public class ItemStackMatcher implements IItemStackMatcher {
   }
 
   public CompoundTag writeToNBT(HolderLookup.Provider registries, CompoundTag compound) {
-    compound.put("stack", stack.save(registries));
+    if (!stack.isEmpty()) {
+      compound.put("stack", stack.save(registries));
+    }
     compound.putBoolean("ore", ore);
     compound.putBoolean("nbt", nbt);
     return compound;

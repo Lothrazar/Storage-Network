@@ -141,7 +141,9 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     }
     result.putBoolean("needsRedstone", this.needsRedstone());
     CompoundTag operation = new CompoundTag();
-    operation.put("stack", (CompoundTag) operationStack.save(registries));
+    if (!operationStack.isEmpty()) {
+      operation.put("stack", (CompoundTag) operationStack.save(registries));
+    }
     operation.putInt("operationType", operationType);
     operation.putInt("limit", operationLimit);
     result.put("operation", operation);

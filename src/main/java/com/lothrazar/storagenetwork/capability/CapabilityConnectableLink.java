@@ -235,7 +235,9 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
     }
     result.putString("way", filterDirection.toString());
     CompoundTag operation = new CompoundTag();
-    operation.put("stack", (CompoundTag) operationStack.save(registries));
+    if (!operationStack.isEmpty()) {
+      operation.put("stack", (CompoundTag) operationStack.save(registries));
+    }
     operation.putBoolean("mustBeSmaller", operationMustBeSmaller);
     operation.putInt("limit", operationLimit);
     result.put("operation", operation);
