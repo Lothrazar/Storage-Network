@@ -4,6 +4,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -49,10 +50,12 @@ public class UtilConnections {
       return false;
     }
     BlockEntity neighbor = world.getBlockEntity(facingPos);
-    if (neighbor != null
-        && world.getCapability(Capabilities.ItemHandler.BLOCK, facingPos, facing.getOpposite()) != null) {
-      return true;
+    if (neighbor == null) {
+      return false;
     }
-    return false;
+    if (world instanceof Level level) {
+      return level.getCapability(Capabilities.ItemHandler.BLOCK, facingPos, facing.getOpposite()) != null;
+    }
+    return true;
   }
 }

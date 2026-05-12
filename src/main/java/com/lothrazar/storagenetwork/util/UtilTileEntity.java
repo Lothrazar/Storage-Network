@@ -42,7 +42,7 @@ public class UtilTileEntity {
     if (soundIn == null || entityIn == null) {
       return;
     }
-    entityIn.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.getHolder(soundIn).get(), SoundSource.PLAYERS, entityIn.xOld, entityIn.yOld, entityIn.zOld, volume, 1.0F, 0)); // pitch=1; seed=0
+    entityIn.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundIn), SoundSource.PLAYERS, entityIn.xOld, entityIn.yOld, entityIn.zOld, volume, 1.0F, 0)); // pitch=1; seed=0
   }
 
   public static void chatMessage(Player player, String message) {

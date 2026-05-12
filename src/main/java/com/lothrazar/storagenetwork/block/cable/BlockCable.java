@@ -121,7 +121,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
 
   @Override
   public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-    if (ConfigRegistry.enableFacades.get()) {
+    if (ConfigRegistry.COMMON_CONFIG.isLoaded() && ConfigRegistry.enableFacades.get()) {
       TileCable tile = TileCable.getTileCable(worldIn, pos);
       if (tile != null && tile.getFacadeState() != null) {
         return tile.getFacadeState().getShape(worldIn, pos, context);

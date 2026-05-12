@@ -1,5 +1,7 @@
 package com.lothrazar.storagenetwork;
 
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.lothrazar.storagenetwork.block.cable.export.ScreenCableExportFilter;
@@ -17,15 +19,14 @@ import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.lothrazar.storagenetwork.registry.SsnEvents;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(StorageNetworkMod.MODID)
@@ -35,35 +36,44 @@ public class StorageNetworkMod {
   public static final Logger LOGGER = LogManager.getLogger();
   public static ConfigRegistry CONFIG;
 
-  public StorageNetworkMod(IEventBus modEventBus) {
+  public StorageNetworkMod(IEventBus modEventBus, ModContainer modContainer) {
+    modContainer.registerConfig(ModConfig.Type.COMMON, ConfigRegistry.COMMON_CONFIG);
     modEventBus.addListener(StorageNetworkMod::setup);
     modEventBus.addListener(PacketRegistry::registerPayloads);
     NeoForge.EVENT_BUS.register(new SsnEvents());
+    SsnRegistry.Blocks.init();
     SsnRegistry.BLOCKS.register(modEventBus);
+    SsnRegistry.Items.init();
     SsnRegistry.ITEMS.register(modEventBus);
+    SsnRegistry.Tiles.init();
     SsnRegistry.TILES.register(modEventBus);
+    SsnRegistry.Menus.init();
     SsnRegistry.CONTAINERS.register(modEventBus);
     if (FMLEnvironment.dist == Dist.CLIENT) {
       modEventBus.addListener(this::setupClient);
+      modEventBus.addListener(this::registerScreens);
       modEventBus.addListener(this::registerMapping);
     }
   }
 
   private static void setup(FMLCommonSetupEvent event) {
-    CONFIG = new ConfigRegistry(FMLPaths.CONFIGDIR.get().resolve(MODID + ".toml"));
+    CONFIG = new ConfigRegistry();
   }
 
   private void setupClient(final FMLClientSetupEvent event) {
-    MenuScreens.register(SsnRegistry.Menus.REQUEST.get(), ScreenNetworkTable::new);
-    MenuScreens.register(SsnRegistry.Menus.FILTER_KABEL.get(), ScreenCableFilter::new);
-    MenuScreens.register(SsnRegistry.Menus.IMPORT_FILTER_KABEL.get(), ScreenCableImportFilter::new);
-    MenuScreens.register(SsnRegistry.Menus.EXPORT_KABEL.get(), ScreenCableExportFilter::new);
-    MenuScreens.register(SsnRegistry.Menus.INVENTORY_REMOTE.get(), ScreenNetworkRemote::new);
-    MenuScreens.register(SsnRegistry.Menus.CRAFTING_REMOTE.get(), ScreenNetworkCraftingRemote::new);
-    MenuScreens.register(SsnRegistry.Menus.INVENTORY.get(), ScreenNetworkInventory::new);
-    MenuScreens.register(SsnRegistry.Menus.COLLECTOR.get(), ScreenCollectionFilter::new);
-    MenuScreens.register(SsnRegistry.Menus.REQUEST_EXPANDED.get(), ScreenNetworkInventoryExpanded::new);
-    MenuScreens.register(SsnRegistry.Menus.EXPANDED_REMOTE.get(), ScreenNetworkExpandedRemote::new);
+  }
+
+  private void registerScreens(final RegisterMenuScreensEvent event) {
+    event.register(SsnRegistry.Menus.REQUEST.get(), ScreenNetworkTable::new);
+    event.register(SsnRegistry.Menus.FILTER_KABEL.get(), ScreenCableFilter::new);
+    event.register(SsnRegistry.Menus.IMPORT_FILTER_KABEL.get(), ScreenCableImportFilter::new);
+    event.register(SsnRegistry.Menus.EXPORT_KABEL.get(), ScreenCableExportFilter::new);
+    event.register(SsnRegistry.Menus.INVENTORY_REMOTE.get(), ScreenNetworkRemote::new);
+    event.register(SsnRegistry.Menus.CRAFTING_REMOTE.get(), ScreenNetworkCraftingRemote::new);
+    event.register(SsnRegistry.Menus.INVENTORY.get(), ScreenNetworkInventory::new);
+    event.register(SsnRegistry.Menus.COLLECTOR.get(), ScreenCollectionFilter::new);
+    event.register(SsnRegistry.Menus.REQUEST_EXPANDED.get(), ScreenNetworkInventoryExpanded::new);
+    event.register(SsnRegistry.Menus.EXPANDED_REMOTE.get(), ScreenNetworkExpandedRemote::new);
   }
 
   private void registerMapping(final RegisterKeyMappingsEvent event) {

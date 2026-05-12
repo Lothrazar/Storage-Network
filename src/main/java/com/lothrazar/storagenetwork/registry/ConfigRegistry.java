@@ -1,11 +1,8 @@
 package com.lothrazar.storagenetwork.registry;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.WritingMode;
 import com.lothrazar.library.util.StringParseUtil;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,7 +16,7 @@ import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 public class ConfigRegistry {
 
   private static final ModConfigSpec.Builder COMMON_BUILDER = new ModConfigSpec.Builder();
-  private static ModConfigSpec COMMON_CONFIG;
+  public static ModConfigSpec COMMON_CONFIG;
   private static BooleanValue LOGSPAM;
   private static IntValue REFRESHTICKS;
   public static IntValue EXCHANGEBUFFER;
@@ -85,14 +82,7 @@ public class ConfigRegistry {
     COMMON_CONFIG = COMMON_BUILDER.build();
   }
 
-  public ConfigRegistry(Path path) {
-    final CommentedFileConfig configData = CommentedFileConfig.builder(path)
-        .sync()
-        .autosave()
-        .writingMode(WritingMode.REPLACE)
-        .build();
-    configData.load();
-    COMMON_CONFIG.setConfig(configData);
+  public ConfigRegistry() {
   }
 
   public boolean logspam() {
