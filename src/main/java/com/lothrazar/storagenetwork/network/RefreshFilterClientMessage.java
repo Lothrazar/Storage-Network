@@ -2,37 +2,61 @@ package com.lothrazar.storagenetwork.network;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
+import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.cable.export.ScreenCableExportFilter;
 import com.lothrazar.storagenetwork.block.cable.inputfilter.ScreenCableImportFilter;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.ScreenCableFilter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/**
- * Refresh the current screen with large data set of stacks.
- * <p>
- * Used by Containers displaying network inventory as well as most other packets that perform small actions
- */
 @SuppressWarnings("resource")
-public class RefreshFilterClientMessage {
+public class RefreshFilterClientMessage implements CustomPacketPayload {
 
-  private int size;
-  private List<ItemStack> stacks;
+  public static final CustomPacketPayload.Type<RefreshFilterClientMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "refresh_filter_client"));
 
-  private RefreshFilterClientMessage() {}
+  public static final StreamCodec<RegistryFriendlyByteBuf, RefreshFilterClientMessage> STREAM_CODEC = StreamCodec.of(
+      RefreshFilterClientMessage::write,
+      RefreshFilterClientMessage::read
+  );
+
+  private final List<ItemStack> stacks;
 
   public RefreshFilterClientMessage(List<ItemStack> stacks) {
-    super();
     this.stacks = stacks;
-    size = stacks.size();
   }
 
-  public static void handle(RefreshFilterClientMessage message, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      //TODO: optimize with base class or interface
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
+
+  private static void write(RegistryFriendlyByteBuf buf, RefreshFilterClientMessage msg) {
+    buf.writeInt(msg.stacks.size());
+    for (ItemStack stack : msg.stacks) {
+      ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, stack);
+      buf.writeInt(stack.getCount());
+    }
+  }
+
+  private static RefreshFilterClientMessage read(RegistryFriendlyByteBuf buf) {
+    int size = buf.readInt();
+    List<ItemStack> stacks = new ArrayList<>();
+    for (int i = 0; i < size; i++) {
+      ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+      stack.setCount(buf.readInt());
+      stacks.add(stack);
+    }
+    return new RefreshFilterClientMessage(stacks);
+  }
+
+  public static void handle(RefreshFilterClientMessage message, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
       if (Minecraft.getInstance().screen instanceof ScreenCableFilter) {
         ScreenCableFilter gui = (ScreenCableFilter) Minecraft.getInstance().screen;
         gui.setFilterItems(message.stacks);
@@ -46,26 +70,5 @@ public class RefreshFilterClientMessage {
         gui.setFilterItems(message.stacks);
       }
     });
-    ctx.get().setPacketHandled(true);
-  }
-
-  public static RefreshFilterClientMessage decode(FriendlyByteBuf buf) {
-    RefreshFilterClientMessage message = new RefreshFilterClientMessage();
-    message.size = buf.readInt();
-    message.stacks = new ArrayList<>();
-    for (int i = 0; i < message.size; i++) {
-      ItemStack stack = ItemStack.of(buf.readNbt());
-      stack.setCount(buf.readInt());
-      message.stacks.add(stack);
-    }
-    return message;
-  }
-
-  public static void encode(RefreshFilterClientMessage msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.size);
-    for (ItemStack stack : msg.stacks) {
-      buf.writeNbt(stack.serializeNBT());
-      buf.writeInt(stack.getCount());
-    }
   }
 }

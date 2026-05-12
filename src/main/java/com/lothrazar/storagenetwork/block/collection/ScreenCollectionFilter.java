@@ -7,7 +7,7 @@ import com.lothrazar.storagenetwork.api.IGuiPrivate;
 import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.CableIOMessage;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class ScreenCollectionFilter extends AbstractContainerScreen<ContainerCollectionFilter> implements IGuiPrivate {
 
-  private final ResourceLocation texture = new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/plain_filter.png");
+  private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/plain_filter.png");
   ContainerCollectionFilter containerCableLink;
   private List<ItemSlotNetwork> itemSlotsGhost;
 
@@ -44,12 +44,12 @@ public class ScreenCollectionFilter extends AbstractContainerScreen<ContainerCol
   }
 
   private void sendStackSlot(int value, ItemStack stack) {
-    PacketRegistry.INSTANCE.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SAVE_FITLER.ordinal(), value, stack));
+    PacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SAVE_FITLER.ordinal(), value, stack));
   }
 
   @Override
   public void render(GuiGraphics ms, int mouseX, int mouseY, float partialTicks) {
-    renderBackground(ms);
+    renderBackground(ms, mouseX, mouseY, partialTicks);
     super.render(ms, mouseX, mouseY, partialTicks);
     this.renderTooltip(ms, mouseX, mouseY);
   }

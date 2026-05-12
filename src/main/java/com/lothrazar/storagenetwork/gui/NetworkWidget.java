@@ -17,7 +17,7 @@ import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.ClearRecipeMessage;
 import com.lothrazar.storagenetwork.network.InsertMessage;
 import com.lothrazar.storagenetwork.network.RequestMessage;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.client.Minecraft;
@@ -32,7 +32,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 
 public class NetworkWidget {
 
@@ -69,7 +69,7 @@ public class NetworkWidget {
     slots = Lists.newArrayList();
     this.size = size;
     setScreenSize();
-    PacketRegistry.INSTANCE.sendToServer(new RequestMessage());
+    PacketDistributor.sendToServer(new RequestMessage());
     lastClick = System.currentTimeMillis();
   }
 
@@ -163,8 +163,8 @@ public class NetworkWidget {
       }
       clearGridBtn = new ButtonRequest(
           x, y, "", (p) -> {
-            PacketRegistry.INSTANCE.sendToServer(new ClearRecipeMessage());
-            PacketRegistry.INSTANCE.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
+            PacketDistributor.sendToServer(new ClearRecipeMessage());
+            PacketDistributor.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
           }, DEFAULT_NARRATION);
       clearGridBtn.setHeight(7);
       clearGridBtn.setWidth(7);
@@ -218,7 +218,7 @@ public class NetworkWidget {
     else if (searchText.startsWith(EnumSearchPrefix.TOOLTIP.getPrefix())) { // search tooltips
       String tooltipString;
       Minecraft mc = Minecraft.getInstance();
-      List<Component> tooltip = stack.getTooltipLines(mc.player, TooltipFlag.Default.NORMAL);
+      List<Component> tooltip = stack.getTooltipLines(net.minecraft.world.item.Item.TooltipContext.of(mc.level), mc.player, TooltipFlag.Default.NORMAL);
       List<String> unformattedTooltip = tooltip.stream().map(Component::getString).collect(Collectors.toList());
       tooltipString = Joiner.on(' ').join(unformattedTooltip).toLowerCase().trim();
       return tooltipString.contains(searchText.toLowerCase().substring(1));
@@ -389,7 +389,7 @@ public class NetworkWidget {
 
   public boolean charTyped(char typedChar, int keyCode) {
     if (searchBar.isFocused() && searchBar.charTyped(typedChar, keyCode)) {
-      PacketRegistry.INSTANCE.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
+      PacketDistributor.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
       syncTextToJei();
       return true;
     }
@@ -414,13 +414,13 @@ public class NetworkWidget {
         && (mouseButton == UtilTileEntity.MOUSE_BTN_LEFT || mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT)
         && stackCarriedByMouse.isEmpty()) {
       // Request an item (from the network) if we are in the upper section of the GUI 
-      PacketRegistry.INSTANCE.sendToServer(new RequestMessage(mouseButton, this.stackUnderMouse.copy(), Screen.hasShiftDown(),
+      PacketDistributor.sendToServer(new RequestMessage(mouseButton, this.stackUnderMouse.copy(), Screen.hasShiftDown(),
           Screen.hasAltDown() || Screen.hasControlDown()));
       this.lastClick = System.currentTimeMillis();
     }
     else if (!stackCarriedByMouse.isEmpty() && inField((int) mouseX, (int) mouseY)) {
       // Insert the item held by the mouse into the network
-      PacketRegistry.INSTANCE.sendToServer(new InsertMessage(0, mouseButton));
+      PacketDistributor.sendToServer(new InsertMessage(0, mouseButton));
       this.lastClick = System.currentTimeMillis();
     }
   }
@@ -485,13 +485,13 @@ public class NetworkWidget {
 
   protected static final int W = 256;
   //i know they could all be in the same png file and i pull out sprites from it, but split images is easier to work with
-  public static final TileableTexture head = new TileableTexture(new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/expandable_head.png"), W, 10);
-  public static final TileableTexture head_right = new TileableTexture(new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/expandable_head_right.png"), W, 10);
-  public static final TileableTexture row = new TileableTexture(new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/expandable_row.png"), W, SsnConsts.SQ);
-  public static final TileableTexture row_right = new TileableTexture(new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/expandable_row_right.png"), W, SsnConsts.SQ);
-  public static final TileableTexture crafting = new TileableTexture(new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/expandable_crafting.png"), W, 66);
-  public static final TileableTexture crafting_right = new TileableTexture(new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/expandable_crafting_right.png"), W, 66);
-  public static final TileableTexture player = new TileableTexture(new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/expandable_player.png"), 176, 84);
+  public static final TileableTexture head = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head.png"), W, 10);
+  public static final TileableTexture head_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head_right.png"), W, 10);
+  public static final TileableTexture row = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row.png"), W, SsnConsts.SQ);
+  public static final TileableTexture row_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row_right.png"), W, SsnConsts.SQ);
+  public static final TileableTexture crafting = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting.png"), W, 66);
+  public static final TileableTexture crafting_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting_right.png"), W, 66);
+  public static final TileableTexture player = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_player.png"), 176, 84);
 
   protected void blitSegment(GuiGraphics ms, TileableTexture tt, int xpos, int ypos) {
     ms.blit(tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height());

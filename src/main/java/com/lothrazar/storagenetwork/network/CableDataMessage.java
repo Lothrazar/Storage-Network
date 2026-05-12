@@ -1,59 +1,85 @@
 package com.lothrazar.storagenetwork.network;
 
-import java.util.function.Supplier;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.ContainerCableFilter;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.capability.CapabilityConnectableLink;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class CableDataMessage {
+public class CableDataMessage implements CustomPacketPayload {
+
+  public static final CustomPacketPayload.Type<CableDataMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "cable_data"));
+
+  public static final StreamCodec<RegistryFriendlyByteBuf, CableDataMessage> STREAM_CODEC = StreamCodec.of(
+      CableDataMessage::write,
+      CableDataMessage::read
+  );
 
   public enum CableMessageType {
     SYNC_DATA, IMPORT_FILTER, SAVE_FITLER;
   }
 
-  private boolean isAllowlist;
+  private final boolean isAllowlist;
   private final int id;
-  private int value = 0;
-  private ItemStack stack = ItemStack.EMPTY;
+  private final int value;
+  private ItemStack stack;
 
   public CableDataMessage(int id) {
     this.id = id;
+    this.value = 0;
+    this.isAllowlist = false;
+    this.stack = ItemStack.EMPTY;
   }
 
   public CableDataMessage(int id, int value, boolean is) {
-    this(id);
+    this.id = id;
     this.value = value;
     this.isAllowlist = is;
+    this.stack = ItemStack.EMPTY;
   }
 
   public CableDataMessage(int id, int value, ItemStack mystack) {
-    this(id);
+    this.id = id;
     this.value = value;
-    stack = mystack;
+    this.isAllowlist = false;
+    this.stack = mystack;
   }
 
   @Override
   public String toString() {
-    return "CableDataMessage{" +
-        "isAllowlist=" + isAllowlist +
-        ", id=" + id +
-        ", value=" + value +
-        ", stack=" + stack +
-        '}';
+    return "CableDataMessage{isAllowlist=" + isAllowlist + ", id=" + id + ", value=" + value + ", stack=" + stack + '}';
   }
 
-  public static void handle(CableDataMessage message, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer player = ctx.get().getSender();
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
+
+  private static void write(RegistryFriendlyByteBuf buf, CableDataMessage msg) {
+    buf.writeInt(msg.id);
+    buf.writeInt(msg.value);
+    buf.writeBoolean(msg.isAllowlist);
+    ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, msg.stack);
+  }
+
+  private static CableDataMessage read(RegistryFriendlyByteBuf buf) {
+    CableDataMessage c = new CableDataMessage(buf.readInt(), buf.readInt(), buf.readBoolean());
+    c.stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+    return c;
+  }
+
+  public static void handle(CableDataMessage message, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer player = (ServerPlayer) ctx.player();
       CapabilityConnectableLink link = null;
       ContainerCableFilter container = (ContainerCableFilter) player.containerMenu;
       if (container == null || container.cap == null) {
@@ -67,11 +93,9 @@ public class CableDataMessage {
           link.getFilter().clear();
           int targetSlot = 0;
           for (ItemStack filterSuggestion : link.getStoredStacks(false)) {
-            // Ignore stacks that are already filtered
             if (link.getFilter().exactStackAlreadyInList(filterSuggestion)) {
               continue;
             }
-            //int over max
             try {
               link.getFilter().setStackInSlot(targetSlot, filterSuggestion.copy());
               targetSlot++;
@@ -83,8 +107,7 @@ public class CableDataMessage {
               StorageNetworkMod.LOGGER.error("Exception saving filter slot ", message);
             }
           }
-          PacketRegistry.INSTANCE.sendTo(new RefreshFilterClientMessage(link.getFilter().getStacks()),
-              player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+          PacketDistributor.sendToPlayer(player, new RefreshFilterClientMessage(link.getFilter().getStacks()));
         break;
         case SYNC_DATA:
           link.setPriority(link.getPriority() + message.value);
@@ -100,19 +123,5 @@ public class CableDataMessage {
       container.tile.setChanged();
       player.connection.send(container.tile.getUpdatePacket());
     });
-    ctx.get().setPacketHandled(true);
-  }
-
-  public static void encode(CableDataMessage msg, FriendlyByteBuf buffer) {
-    buffer.writeInt(msg.id);
-    buffer.writeInt(msg.value);
-    buffer.writeBoolean(msg.isAllowlist);
-    buffer.writeNbt(msg.stack.save(new CompoundTag()));
-  }
-
-  public static CableDataMessage decode(FriendlyByteBuf buffer) {
-    CableDataMessage c = new CableDataMessage(buffer.readInt(), buffer.readInt(), buffer.readBoolean());
-    c.stack = ItemStack.of(buffer.readNbt());
-    return c;
   }
 }

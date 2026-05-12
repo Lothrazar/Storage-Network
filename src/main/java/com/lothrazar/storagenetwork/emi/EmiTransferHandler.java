@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
 import com.lothrazar.storagenetwork.network.RecipeMessage;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -66,7 +66,7 @@ public class EmiTransferHandler<T extends ContainerNetwork> implements StandardR
   public boolean craft(EmiRecipe recipe, EmiCraftContext<T> context) {
     AbstractContainerScreen<T> screen = context.getScreen();
     CompoundTag nbt = buildRecipe(recipe, screen);
-    PacketRegistry.INSTANCE.sendToServer(new RecipeMessage(nbt));
+    PacketDistributor.sendToServer(new RecipeMessage(nbt));
     Minecraft.getInstance().setScreen(screen);
     return true;
   }

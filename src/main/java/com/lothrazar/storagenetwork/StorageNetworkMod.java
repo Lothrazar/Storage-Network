@@ -18,16 +18,15 @@ import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.lothrazar.storagenetwork.registry.SsnEvents;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(StorageNetworkMod.MODID)
 public class StorageNetworkMod {
@@ -36,23 +35,21 @@ public class StorageNetworkMod {
   public static final Logger LOGGER = LogManager.getLogger();
   public static ConfigRegistry CONFIG;
 
-  public StorageNetworkMod() {
-    FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageNetworkMod::setup);
-    MinecraftForge.EVENT_BUS.register(new SsnRegistry.Tiles());
-    MinecraftForge.EVENT_BUS.register(new SsnEvents());
-    IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-    SsnRegistry.BLOCKS.register(bus);
-    SsnRegistry.ITEMS.register(bus);
-    SsnRegistry.TILES.register(bus);
-    SsnRegistry.CONTAINERS.register(bus);
-    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-      FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
-      FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerMapping);
-    });
+  public StorageNetworkMod(IEventBus modEventBus) {
+    modEventBus.addListener(StorageNetworkMod::setup);
+    modEventBus.addListener(PacketRegistry::registerPayloads);
+    NeoForge.EVENT_BUS.register(new SsnEvents());
+    SsnRegistry.BLOCKS.register(modEventBus);
+    SsnRegistry.ITEMS.register(modEventBus);
+    SsnRegistry.TILES.register(modEventBus);
+    SsnRegistry.CONTAINERS.register(modEventBus);
+    if (FMLEnvironment.dist == Dist.CLIENT) {
+      modEventBus.addListener(this::setupClient);
+      modEventBus.addListener(this::registerMapping);
+    }
   }
 
   private static void setup(FMLCommonSetupEvent event) {
-    PacketRegistry.init();
     CONFIG = new ConfigRegistry(FMLPaths.CONFIGDIR.get().resolve(MODID + ".toml"));
   }
 

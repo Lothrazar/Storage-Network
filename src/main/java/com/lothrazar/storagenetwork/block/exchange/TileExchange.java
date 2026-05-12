@@ -2,21 +2,15 @@ package com.lothrazar.storagenetwork.block.exchange;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
-import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullSupplier;
 
 public class TileExchange extends TileConnectable {
 
@@ -27,43 +21,31 @@ public class TileExchange extends TileConnectable {
     itemHandler = new ExchangeItemStackHandler();
   }
 
-  @Override
-  public void load(CompoundTag compound) {
-    super.load(compound);
-  }
-
-  @Override
-  public void saveAdditional(CompoundTag compound) {
-    super.saveAdditional(compound);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-    if (cap == ForgeCapabilities.ITEM_HANDLER) {
-      try {
-        IConnectable capabilityConnectable = super.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY, side).orElse(null);
-        DimPos m = getMain();
-        if (capabilityConnectable != null && m != null
-            && itemHandler != null &&
-            itemHandler.tileMain == null) {
-          TileMain tileMain = m.getTileEntity(TileMain.class);
-          if (tileMain != null) {
-            itemHandler.setMain(tileMain);
-          }
+  public ExchangeItemStackHandler getItemHandler() {
+    try {
+      DimPos m = getMain();
+      if (m != null && itemHandler != null && itemHandler.tileMain == null) {
+        TileMain tileMain = m.getTileEntity(TileMain.class);
+        if (tileMain != null) {
+          itemHandler.setMain(tileMain);
         }
-        return LazyOptional.of(new NonNullSupplier<T>() {
-
-          public @Override T get() {
-            return (T) itemHandler;
-          }
-        });
       }
-      catch (Exception e) {
-        StorageNetworkMod.LOGGER.error("Exchange caught error from a mod", e);
-      }
+      return itemHandler;
     }
-    return super.getCapability(cap, side);
+    catch (Exception e) {
+      StorageNetworkMod.LOGGER.error("Exchange caught error from a mod", e);
+      return null;
+    }
+  }
+
+  @Override
+  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.loadAdditional(compound, registries);
+  }
+
+  @Override
+  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.saveAdditional(compound, registries);
   }
 
   private void tick() {

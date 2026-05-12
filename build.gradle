@@ -40,7 +40,10 @@ sourceSets.main.resources {
 repositories {
 //    mavenLocal()
   flatDir { dir 'libs' }
-
+  maven {
+    name = "EMI"
+    url = "https://maven.terraformersmc.com/"
+  }
   maven {
       name = "curios"
       url = 'https://maven.theillusivec4.top/'
@@ -165,6 +168,9 @@ dependencies {
 
   compileOnly "com.blamejared.crafttweaker:CraftTweaker-neoforge-${minecraft_version}:${crafttweaker_version}"
 
+
+  compileOnly "dev.emi:emi-forge:${emi_version}:api"
+  runtimeOnly "dev.emi:emi-forge:${emi_version}"
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${minecraft_version}-${coolmod_version}.jar

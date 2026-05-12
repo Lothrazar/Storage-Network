@@ -1,22 +1,30 @@
 package com.lothrazar.storagenetwork.network;
 
-import java.util.function.Supplier;
+import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.cable.TileCable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class CableFacadeMessage {
+public class CableFacadeMessage implements CustomPacketPayload {
 
-  //sync sort data TO client gui FROM server
-  private BlockPos pos;
-  private boolean erase = false;
-  private CompoundTag blockStateTag = new CompoundTag();
+  public static final CustomPacketPayload.Type<CableFacadeMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "cable_facade"));
 
-  private CableFacadeMessage() {}
+  public static final StreamCodec<RegistryFriendlyByteBuf, CableFacadeMessage> STREAM_CODEC = StreamCodec.of(
+      CableFacadeMessage::write,
+      CableFacadeMessage::read
+  );
+
+  private final BlockPos pos;
+  private final boolean erase;
+  private final CompoundTag blockStateTag;
 
   public CableFacadeMessage(BlockPos pos, CompoundTag state) {
     this.pos = pos;
@@ -27,41 +35,45 @@ public class CableFacadeMessage {
   public CableFacadeMessage(BlockPos pos, boolean eraseIn) {
     this.pos = pos;
     this.erase = eraseIn;
-    blockStateTag = new CompoundTag();
+    this.blockStateTag = new CompoundTag();
   }
 
-  public static void handle(CableFacadeMessage message, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer player = ctx.get().getSender();
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
+
+  private static void write(RegistryFriendlyByteBuf buf, CableFacadeMessage msg) {
+    buf.writeBoolean(msg.erase);
+    buf.writeBlockPos(msg.pos);
+    buf.writeNbt(msg.blockStateTag);
+  }
+
+  private static CableFacadeMessage read(RegistryFriendlyByteBuf buf) {
+    boolean erase = buf.readBoolean();
+    BlockPos pos = buf.readBlockPos();
+    CompoundTag tag = buf.readNbt();
+    if (erase) {
+      return new CableFacadeMessage(pos, true);
+    }
+    return new CableFacadeMessage(pos, tag != null ? tag : new CompoundTag());
+  }
+
+  public static void handle(CableFacadeMessage message, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer player = (ServerPlayer) ctx.player();
       ServerLevel serverWorld = (ServerLevel) player.level();
       TileCable tile = TileCable.getTileCable(serverWorld, message.pos);
       if (tile != null) {
         if (message.erase) {
-          //   StorageNetworkMod.log("Network Packet facade  SAVE NULL EMPTY ERASE " + message.blockStateTag);
           tile.setFacadeState(null);
         }
         else {
-          //  StorageNetworkMod.log("Network Packet facade  SAVE " + message.blockStateTag);
           tile.setFacadeState(message.blockStateTag);
         }
         serverWorld.markAndNotifyBlock(message.pos, serverWorld.getChunkAt(message.pos),
             tile.getBlockState(), tile.getBlockState(), 3, 1);
       }
     });
-    ctx.get().setPacketHandled(true);
-  }
-
-  public static CableFacadeMessage decode(FriendlyByteBuf buf) {
-    CableFacadeMessage message = new CableFacadeMessage();
-    message.erase = buf.readBoolean();
-    message.pos = buf.readBlockPos();
-    message.blockStateTag = buf.readNbt();
-    return message;
-  }
-
-  public static void encode(CableFacadeMessage msg, FriendlyByteBuf buf) {
-    buf.writeBoolean(msg.erase);
-    buf.writeBlockPos(msg.pos);
-    buf.writeNbt(msg.blockStateTag);
   }
 }

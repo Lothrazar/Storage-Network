@@ -2,7 +2,9 @@ package com.lothrazar.storagenetwork.item;
 
 import java.util.List;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.component.CustomData;
 import org.apache.commons.lang3.tuple.Triple;
 import com.lothrazar.library.item.ItemFlib;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
@@ -26,9 +28,9 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 
 public class ItemCollector extends ItemFlib {
   private static final String NBT_ENABLED = "Enabled";
@@ -45,16 +47,16 @@ public class ItemCollector extends ItemFlib {
 
   public void toggleEnabled(ItemStack stack, Player player) {
     boolean newEnabled = !isEnabled(stack);
-    stack.getOrCreateTag().putBoolean(NBT_ENABLED, newEnabled);
+    stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, data -> data.update(tag -> tag.putBoolean(NBT_ENABLED, newEnabled)));
     player.displayClientMessage(makeDisabledTooltip(newEnabled), true);
   }
 
   // not subscribe, called from SsnEvents.java
-  public void onEntityItemPickupEvent(EntityItemPickupEvent event) {
-    if (event.getEntity() instanceof Player &&
-        event.getItem() != null &&
-        !event.getItem().getItem().isEmpty()) {
-      Player player = event.getEntity();
+  public void onEntityItemPickupEvent(ItemEntityPickupEvent.Pre event) {
+    if (event.getPlayer() instanceof Player &&
+        event.getItemEntity() != null &&
+        !event.getItemEntity().getItem().isEmpty()) {
+      Player player = event.getPlayer();
 
       // find the collector that the player has with them (main hand, offhand, curios...)
       ItemStack collectorStack = this.findAmmo(player, this);
@@ -67,7 +69,7 @@ public class ItemCollector extends ItemFlib {
         return;
       }
 
-      ItemStack item = event.getItem().getItem();
+      ItemStack item = event.getItemEntity().getItem();
       Level world = player.level();
       DimPos dp = DimPos.getPosStored(collectorStack);
       if (dp != null && !world.isClientSide) {
@@ -90,7 +92,8 @@ public class ItemCollector extends ItemFlib {
   }
 
   private static boolean isEnabled(ItemStack collectorStack) {
-    return collectorStack.getOrCreateTag().getBoolean(NBT_ENABLED);
+    CustomData customData = collectorStack.get(DataComponents.CUSTOM_DATA);
+    return customData != null && customData.copyTag().getBoolean(NBT_ENABLED);
   }
 
   @Override
@@ -110,11 +113,11 @@ public class ItemCollector extends ItemFlib {
 
   @Override
   @OnlyIn(Dist.CLIENT)
-  public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+  public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
     MutableComponent t = Component.translatable(getDescriptionId() + ".tooltip");
     t.withStyle(ChatFormatting.GRAY);
     tooltip.add(t);
-    if (stack.hasTag()) {
+    if (stack.has(DataComponents.CUSTOM_DATA)) {
       DimPos dp = DimPos.getPosStored(stack);
       if (dp != null) {
         tooltip.add(dp.makeTooltip());

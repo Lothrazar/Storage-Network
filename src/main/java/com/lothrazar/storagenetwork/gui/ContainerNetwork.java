@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
 import com.lothrazar.storagenetwork.network.StackRefreshClientMessage;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
@@ -26,9 +26,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
-import net.minecraftforge.network.NetworkDirection;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper;
 
 public abstract class ContainerNetwork extends AbstractContainerMenu {
 
@@ -171,14 +170,13 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
       }
       else if (tileMain != null) {
         int rest = tileMain.insertStack(itemstack1, false);
-        ItemStack stack = rest == 0 ? ItemStack.EMPTY : ItemHandlerHelper.copyStackWithSize(itemstack1, rest);
+        ItemStack stack = rest == 0 ? ItemStack.EMPTY : itemstack1.copyWithCount(rest);
         slot.set(stack);
         broadcastChanges();
         List<ItemStack> list = tileMain.getNetwork().getSortedStacks();
         if (playerIn instanceof ServerPlayer) {
           ServerPlayer sp = (ServerPlayer) playerIn;
-          PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()),
-              sp.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+          PacketDistributor.sendToPlayer(sp, new StackRefreshClientMessage(list, new ArrayList<>()));
         }
         if (stack.isEmpty()) {
           return ItemStack.EMPTY;
@@ -268,7 +266,7 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
           if (slot.isEmpty()) {
             this.matrix.setItem(i, remainderCurrent);
           }
-          else if (ItemStack.matches(slot, remainderCurrent) && ItemStack.isSameItemSameTags(slot, remainderCurrent)) {
+          else if (ItemStack.matches(slot, remainderCurrent) && ItemStack.isSameItemSameComponents(slot, remainderCurrent)) {
             remainderCurrent.grow(slot.getCount());
             this.matrix.setItem(i, remainderCurrent);
           }

@@ -3,20 +3,18 @@ package com.lothrazar.storagenetwork.block;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumSortType;
+import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.capability.CapabilityConnectable;
-import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
 /**
  * Base class for Cable, Control, Request
@@ -30,51 +28,53 @@ public abstract class TileConnectable extends BlockEntity {
     connectable = new CapabilityConnectable();
   }
 
+  public IConnectable getConnectable() {
+    return connectable;
+  }
+
   public EnumSortType getSort() {
-    return EnumSortType.NAME; //unused by some blocks
+    return EnumSortType.NAME;
   }
 
   public boolean isDownwards() {
-    return false; //unused by some blocks
+    return false;
   }
 
   @Override
   public void setChanged() {
     super.setChanged();
-    // super.setPosition(posIn);
-    //   StorageNetwork.log("TILE CONNECTABLE :: SET POS on the capability" + posIn + "?" + world);
     connectable.setPos(new DimPos(level, worldPosition));
   }
 
   @Override
-  public void load(CompoundTag compound) {
+  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
     if (compound.contains("connectable")) {
-      connectable.deserializeNBT(compound.getCompound("connectable"));
+      connectable.deserializeNBT(registries, compound.getCompound("connectable"));
     }
-    super.load(compound);
+    super.loadAdditional(compound, registries);
   }
 
   @Override
-  public void saveAdditional(CompoundTag compound) {
-    compound.put("connectable", connectable.serializeNBT());
-    super.saveAdditional(compound);
+  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    compound.put("connectable", connectable.serializeNBT(registries));
+    super.saveAdditional(compound, registries);
   }
 
   @Override
   public ClientboundBlockEntityDataPacket getUpdatePacket() {
-    return ClientboundBlockEntityDataPacket.create(this); //new ClientboundBlockEntityDataPacket(worldPosition, 0, syncData);
+    return ClientboundBlockEntityDataPacket.create(this);
   }
 
   @Override
-  public CompoundTag getUpdateTag() {
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
     CompoundTag updateTag = new CompoundTag();
-    this.saveAdditional(updateTag);
+    this.saveAdditional(updateTag, registries);
     return updateTag;
   }
 
   @Override
-  public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-    load(pkt.getTag());
+  public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
+    loadAdditional(pkt.getTag() == null ? new CompoundTag() : pkt.getTag(), registries);
   }
 
   @Override
@@ -91,15 +91,6 @@ public abstract class TileConnectable extends BlockEntity {
         StorageNetworkMod.LOGGER.info("Error on chunk unload " + e);
       }
     }
-  }
-
-  @Override
-  public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
-    if (capability == StorageNetworkCapabilities.CONNECTABLE_CAPABILITY) {
-      LazyOptional<CapabilityConnectable> cap = LazyOptional.of(() -> connectable);
-      return cap.cast();
-    }
-    return super.getCapability(capability, facing);
   }
 
   public DimPos getMain() {

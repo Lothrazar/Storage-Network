@@ -6,9 +6,7 @@ import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
-import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 /**
  * @author ajsnarr98 Created MasterItemStackHandler * ItemStackHandler used for interfacing with TileMain like a chest. https://github.com/ajsnarr98/Storage-Network/tree/ajsnarr98-inventory
@@ -46,7 +44,7 @@ public class CollectionItemStackHandler extends ItemStackHandlerEx {
       return stack;
     }
     validateSlotIndex(slot);
-    IConnectable cap = tile.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY).orElse(null);
+    IConnectable cap = tile.getConnectable();
     //
     FilterItemStackHandler filter = cap.getFilter();
     if (filter != null
@@ -62,7 +60,7 @@ public class CollectionItemStackHandler extends ItemStackHandlerEx {
       if (remaining > 0) {
         // if failed, refresh whole list
         update();
-        return ItemHandlerHelper.copyStackWithSize(stack, remaining);
+        return stack.copyWithCount(remaining);
       }
     }
     catch (Exception e) {

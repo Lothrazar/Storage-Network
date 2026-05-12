@@ -2,47 +2,79 @@ package com.lothrazar.storagenetwork.network;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class RequestMessage {
+public class RequestMessage implements CustomPacketPayload {
 
-  private int mouseButton = 0;
-  private ItemStack stack = ItemStack.EMPTY;
-  private boolean shift;
-  private boolean ctrl;
+  public static final CustomPacketPayload.Type<RequestMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "request"));
+
+  public static final StreamCodec<RegistryFriendlyByteBuf, RequestMessage> STREAM_CODEC = StreamCodec.of(
+      RequestMessage::write,
+      RequestMessage::read
+  );
+
+  private final int mouseButton;
+  private final ItemStack stack;
+  private final boolean shift;
+  private final boolean ctrl;
+
+  public RequestMessage() {
+    this(0, ItemStack.EMPTY, false, false);
+  }
+
+  public RequestMessage(int id, ItemStack stackIn, boolean shift, boolean ctrl) {
+    this.mouseButton = id;
+    ItemStack s = stackIn.copy();
+    if (s.getCount() > 64) {
+      s.setCount(64);
+    }
+    this.stack = s;
+    this.shift = shift;
+    this.ctrl = ctrl;
+  }
+
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
 
   @Override
   public String toString() {
     return "RequestMessage [mouseButton=" + mouseButton + ", shift=" + shift + ", ctrl=" + ctrl + ", stack=" + stack.toString() + "]";
   }
 
-  public RequestMessage() {}
-
-  public RequestMessage(int id, ItemStack stackIn, boolean shift, boolean ctrl) {
-    mouseButton = id;
-    this.stack = stackIn.copy();
-    if (this.stack.getCount() > 64) {
-      this.stack.setCount(64); //important or it will be killed by a filter
-    }
-    this.shift = shift;
-    this.ctrl = ctrl;
+  private static void write(RegistryFriendlyByteBuf buf, RequestMessage msg) {
+    buf.writeInt(msg.mouseButton);
+    ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, msg.stack);
+    buf.writeBoolean(msg.shift);
+    buf.writeBoolean(msg.ctrl);
   }
 
-  public static void handle(RequestMessage message, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer player = ctx.get().getSender();
+  private static RequestMessage read(RegistryFriendlyByteBuf buf) {
+    int mouseButton = buf.readInt();
+    ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+    boolean shift = buf.readBoolean();
+    boolean ctrl = buf.readBoolean();
+    return new RequestMessage(mouseButton, stack, shift, ctrl);
+  }
+
+  public static void handle(RequestMessage message, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer player = (ServerPlayer) ctx.player();
       TileMain root = null;
       ContainerNetwork ctr = null;
       if (player.containerMenu instanceof ContainerNetwork) {
@@ -53,7 +85,6 @@ public class RequestMessage {
         StorageNetworkMod.log("Bad container");
       }
       if (root == null) {
-        //maybe the table broke after doing this, rare case
         StorageNetworkMod.log("Request message cancelled, null tile");
         return;
       }
@@ -72,51 +103,22 @@ public class RequestMessage {
         sizeRequested = Math.min(message.stack.getMaxStackSize() / 2, in / 2);
       }
       sizeRequested = Math.max(sizeRequested, 1);
-      boolean ore = false;
-      boolean nbt = true;
-      //try NBT first
-      stack = root.request(
-          new ItemStackMatcher(message.stack, ore, nbt),
-          sizeRequested, false);
+      stack = root.request(new ItemStackMatcher(message.stack, false, true), sizeRequested, false);
       if (stack.isEmpty()) {
-        //try again with NBT as false, ONLY if true didnt work
-        nbt = false;
-        stack = root.request(
-            new ItemStackMatcher(message.stack, ore, nbt),
-            sizeRequested, false);
+        stack = root.request(new ItemStackMatcher(message.stack, false, false), sizeRequested, false);
       }
       if (!stack.isEmpty()) {
         if (message.shift) {
           ItemHandlerHelper.giveItemToPlayer(player, stack);
         }
         else {
-          //when player TAKES an item, go here
           player.containerMenu.setCarried(stack);
-          PacketRegistry.INSTANCE.sendTo(new StackResponseClientMessage(stack),
-              player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+          PacketDistributor.sendToPlayer(player, new StackResponseClientMessage(stack));
         }
       }
       List<ItemStack> list = root.getNetwork().getSortedStacks();
-      PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()),
-          player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+      PacketDistributor.sendToPlayer(player, new StackRefreshClientMessage(list, new ArrayList<>()));
       player.containerMenu.broadcastChanges();
     });
-    ctx.get().setPacketHandled(true);
-  }
-
-  public static RequestMessage decode(FriendlyByteBuf buf) {
-    RequestMessage msg = new RequestMessage();
-    msg.mouseButton = buf.readInt();
-    msg.stack = ItemStack.of(buf.readNbt());
-    msg.shift = buf.readBoolean();
-    msg.ctrl = buf.readBoolean();
-    return msg;
-  }
-
-  public static void encode(RequestMessage msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.mouseButton);
-    buf.writeNbt(msg.stack.serializeNBT());
-    buf.writeBoolean(msg.shift);
-    buf.writeBoolean(msg.ctrl);
   }
 }

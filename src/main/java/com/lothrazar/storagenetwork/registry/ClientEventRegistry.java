@@ -7,16 +7,16 @@ import com.lothrazar.storagenetwork.registry.SsnRegistry.Tiles;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.settings.KeyConflictContext;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD, modid = StorageNetworkMod.MODID)
 public class ClientEventRegistry {
 
-  public static final ResourceLocation SLOT = new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/slot.png");
+  public static final ResourceLocation SLOT = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/slot.png");
   public static final KeyMapping INVENTORY_KEY = new KeyMapping("key.storagenetwork.remote", KeyConflictContext.UNIVERSAL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, "key.categories.inventory");
   public static final KeyMapping COLLECTOR_TOGGLE_KEY = new KeyMapping("key.storagenetwork.collector_toggle", KeyConflictContext.UNIVERSAL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_DELETE, "key.categories.inventory");
 

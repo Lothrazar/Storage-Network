@@ -3,6 +3,7 @@ package com.lothrazar.storagenetwork.block.cable;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -29,8 +30,8 @@ public class TileCable extends TileConnectable {
   }
 
   @Override
-  public void load(CompoundTag compound) {
-    super.load(compound);
+  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.loadAdditional(compound, registries);
     if (compound.contains(NBT_FACADE)) {
       setFacadeState(compound.getCompound(NBT_FACADE));
     }
@@ -40,14 +41,14 @@ public class TileCable extends TileConnectable {
   }
 
   @Override
-  public void saveAdditional(CompoundTag compound) {
+  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
     if (facadeState == null) {
       compound.remove(NBT_FACADE);
     }
     else {
       compound.put(NBT_FACADE, facadeState);
     }
-    super.saveAdditional(compound);
+    super.saveAdditional(compound, registries);
   }
 
   public static TileCable getTileCable(BlockGetter world, BlockPos pos) {

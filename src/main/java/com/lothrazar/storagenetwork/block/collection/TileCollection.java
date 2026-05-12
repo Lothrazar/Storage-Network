@@ -1,13 +1,11 @@
 package com.lothrazar.storagenetwork.block.collection;
 
 import com.lothrazar.storagenetwork.api.DimPos;
-import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -15,10 +13,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullSupplier;
 
 public class TileCollection extends TileConnectable implements MenuProvider {
 
@@ -30,14 +24,23 @@ public class TileCollection extends TileConnectable implements MenuProvider {
     itemHandler.tile = this;
   }
 
-  @Override
-  public void load(CompoundTag compound) {
-    super.load(compound);
+  public CollectionItemStackHandler getItemHandler() {
+    DimPos m = getMain();
+    if (m != null) {
+      TileMain tileMain = m.getTileEntity(TileMain.class);
+      itemHandler.setMain(tileMain);
+    }
+    return itemHandler;
   }
 
   @Override
-  public void saveAdditional(CompoundTag compound) {
-    super.saveAdditional(compound);
+  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.loadAdditional(compound, registries);
+  }
+
+  @Override
+  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.saveAdditional(compound, registries);
   }
 
   @Override
@@ -48,25 +51,5 @@ public class TileCollection extends TileConnectable implements MenuProvider {
   @Override
   public Component getDisplayName() {
     return Component.translatable("block.storagenetwork.collector");
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-    if (cap == ForgeCapabilities.ITEM_HANDLER) {
-      IConnectable capabilityConnectable = super.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY, side).orElse(null);
-      DimPos m = getMain();
-      if (capabilityConnectable != null && m != null) {
-        TileMain tileMain = m.getTileEntity(TileMain.class);
-        itemHandler.setMain(tileMain);
-      }
-      return LazyOptional.of(new NonNullSupplier<T>() {
-
-        public @Override T get() {
-          return (T) itemHandler;
-        }
-      });
-    }
-    return super.getCapability(cap, side);
   }
 }

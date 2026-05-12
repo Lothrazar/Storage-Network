@@ -2,44 +2,38 @@ package com.lothrazar.storagenetwork.network;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
+import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ClearRecipeMessage {
+public class ClearRecipeMessage implements CustomPacketPayload {
 
-  public static void handle(ClearRecipeMessage message, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer player = ctx.get().getSender();
+  public static final CustomPacketPayload.Type<ClearRecipeMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "clear_recipe"));
+
+  public static final StreamCodec<net.minecraft.network.FriendlyByteBuf, ClearRecipeMessage> STREAM_CODEC =
+      StreamCodec.unit(new ClearRecipeMessage());
+
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
+
+  public static void handle(ClearRecipeMessage message, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer player = (ServerPlayer) ctx.player();
       ClearRecipeMessage.clearContainerRecipe(player, true);
     });
-    ctx.get().setPacketHandled(true);
   }
 
-  public static ClearRecipeMessage decode(FriendlyByteBuf buf) {
-    return new ClearRecipeMessage();
-  }
-
-  public static void encode(ClearRecipeMessage msg, FriendlyByteBuf buf) {}
-
-  /**
-   * Should be in a public util.
-   * 
-   * Clears recipe and puts ingredients back in the network. If possible.
-   * 
-   * May stop partway and leave items in if network is disconnected.
-   * 
-   * @param player
-   * @param doRefresh
-   */
   static void clearContainerRecipe(ServerPlayer player, boolean doRefresh) {
     if (player.containerMenu instanceof ContainerNetwork) {
       ContainerNetwork container = (ContainerNetwork) player.containerMenu;
@@ -63,13 +57,12 @@ public class ClearRecipeMessage {
             craftMatrix.setItem(i, ItemStack.EMPTY);
           }
           else {
-            craftMatrix.setItem(i, ItemHandlerHelper.copyStackWithSize(stackInSlot, remainingAfter));
+            craftMatrix.setItem(i, stackInSlot.copyWithCount(remainingAfter));
           }
         }
         if (doRefresh) {
           List<ItemStack> list = root.getNetwork().getStacks();
-          PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()),
-              player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+          PacketDistributor.sendToPlayer(player, new StackRefreshClientMessage(list, new ArrayList<>()));
           container.broadcastChanges();
         }
       }

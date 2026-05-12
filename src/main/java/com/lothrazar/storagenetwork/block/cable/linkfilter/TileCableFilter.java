@@ -1,11 +1,12 @@
 package com.lothrazar.storagenetwork.block.cable.linkfilter;
 
+import com.lothrazar.storagenetwork.api.IConnectableLink;
 import com.lothrazar.storagenetwork.block.TileCableWithFacing;
 import com.lothrazar.storagenetwork.capability.CapabilityConnectableLink;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -15,8 +16,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class TileCableFilter extends TileCableWithFacing implements MenuProvider {
 
@@ -25,6 +24,10 @@ public class TileCableFilter extends TileCableWithFacing implements MenuProvider
   public TileCableFilter(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.FILTER_KABEL.get(), pos, state);
     this.capability = new CapabilityConnectableLink(this);
+  }
+
+  public IConnectableLink getCapabilityLink() {
+    return capability;
   }
 
   @Override
@@ -38,30 +41,21 @@ public class TileCableFilter extends TileCableWithFacing implements MenuProvider
   }
 
   @Override
-  public void load(CompoundTag compound) {
-    super.load(compound);
-    this.capability.deserializeNBT(compound.getCompound("capability"));
-  }
-
-  @Override
-  public void saveAdditional(CompoundTag compound) {
-    super.saveAdditional(compound);
-    compound.put("capability", capability.serializeNBT());
-  }
-
-  @Override
   public void setDirection(Direction direction) {
     super.setDirection(direction);
     this.capability.setInventoryFace(direction);
   }
 
   @Override
-  public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
-    if (capability == StorageNetworkCapabilities.CONNECTABLE_ITEM_STORAGE_CAPABILITY) {
-      LazyOptional<CapabilityConnectableLink> cap = LazyOptional.of(() -> this.capability);
-      return cap.cast();
-    }
-    return super.getCapability(capability, facing);
+  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.loadAdditional(compound, registries);
+    this.capability.deserializeNBT(registries, compound.getCompound("capability"));
+  }
+
+  @Override
+  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.saveAdditional(compound, registries);
+    compound.put("capability", capability.serializeNBT(registries));
   }
 
   public static void clientTick(Level level, BlockPos blockPos, BlockState blockState, TileCableFilter tile) {}

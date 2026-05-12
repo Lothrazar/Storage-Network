@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.lothrazar.storagenetwork.network.RecipeMessage;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
@@ -32,7 +32,7 @@ public abstract class RequestRecipeTransferHandler<C extends AbstractContainerMe
       boolean maxTransfer, boolean doTransfer) {
     if (doTransfer) {
       CompoundTag nbt = RequestRecipeTransferHandler.recipeToTag(c, recipeSlots);
-      PacketRegistry.INSTANCE.sendToServer(new RecipeMessage(nbt));
+      PacketDistributor.sendToServer(new RecipeMessage(nbt));
     }
     return null;
   }

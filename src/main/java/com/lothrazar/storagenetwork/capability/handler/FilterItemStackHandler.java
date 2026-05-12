@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.lothrazar.library.cap.ItemStackHandlerEx;
 import com.lothrazar.storagenetwork.api.IItemStackMatcher;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 public class FilterItemStackHandler extends ItemStackHandlerEx {
 
@@ -84,8 +84,8 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
   }
 
   @Override
-  public void deserializeNBT(CompoundTag nbt) {
-    super.deserializeNBT(nbt);
+  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
+    super.deserializeNBT(registries, nbt);
     CompoundTag rulesTag = nbt.getCompound("rules");
     tags = rulesTag.getBoolean("tags");
     this.nbt = rulesTag.getBoolean("nbt");
@@ -93,8 +93,8 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
   }
 
   @Override
-  public CompoundTag serializeNBT() {
-    CompoundTag result = super.serializeNBT();
+  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
+    CompoundTag result = super.serializeNBT(registries);
     CompoundTag rulesTag = new CompoundTag();
     rulesTag.putBoolean("tags", tags);
     rulesTag.putBoolean("nbt", nbt);
@@ -106,7 +106,7 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
   public int getStackCount(ItemStack stackCurrent) {
     int s = 0;
     for (IItemStackMatcher m : getStackMatchers()) {
-      if (ItemHandlerHelper.canItemStacksStack(stackCurrent, m.getStack())) {
+      if (ItemStack.isSameItemSameComponents(stackCurrent, m.getStack())) {
         return s += m.getStack().getCount();
       }
     }

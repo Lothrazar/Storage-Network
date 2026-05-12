@@ -2,39 +2,26 @@ package com.lothrazar.storagenetwork.registry;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.network.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 public class PacketRegistry {
 
-  private static final String PROTOCOL_VERSION = Integer.toString(1);
-  //??https://wiki.mcjty.eu/modding/index.php?title=Tut14_Ep10 
-  public static final SimpleChannel INSTANCE = NetworkRegistry.ChannelBuilder
-      .named(new ResourceLocation(StorageNetworkMod.MODID, "main_channel"))
-      .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-      .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-      .networkProtocolVersion(() -> PROTOCOL_VERSION)
-      .simpleChannel();
-
-  public static void init() {
-    //https://gist.github.com/williewillus/353c872bcf1a6ace9921189f6100d09a
-    int id = 0;
-    INSTANCE.registerMessage(id++, CableDataMessage.class, CableDataMessage::encode, CableDataMessage::decode, CableDataMessage::handle);
-    INSTANCE.registerMessage(id++, CableIOMessage.class, CableIOMessage::encode, CableIOMessage::decode, CableIOMessage::handle);
-    INSTANCE.registerMessage(id++, StackRefreshClientMessage.class, StackRefreshClientMessage::encode, StackRefreshClientMessage::decode, StackRefreshClientMessage::handle);
-    INSTANCE.registerMessage(id++, InsertMessage.class, InsertMessage::encode, InsertMessage::decode, InsertMessage::handle);
-    INSTANCE.registerMessage(id++, RequestMessage.class, RequestMessage::encode, RequestMessage::decode, RequestMessage::handle);
-    INSTANCE.registerMessage(id++, ClearRecipeMessage.class, ClearRecipeMessage::encode, ClearRecipeMessage::decode, ClearRecipeMessage::handle);
-    INSTANCE.registerMessage(id++, SettingsSyncMessage.class, SettingsSyncMessage::encode, SettingsSyncMessage::decode, SettingsSyncMessage::handle);
-    INSTANCE.registerMessage(id++, RecipeMessage.class, RecipeMessage::encode, RecipeMessage::decode, RecipeMessage::handle);
-    id++; //    INSTANCE.registerMessage(id++, CableFilterMessage.class, CableFilterMessage::encode, CableFilterMessage::decode, CableFilterMessage::handle);
-    INSTANCE.registerMessage(id++, CableLimitMessage.class, CableLimitMessage::encode, CableLimitMessage::decode, CableLimitMessage::handle);
-    INSTANCE.registerMessage(id++, StackResponseClientMessage.class, StackResponseClientMessage::encode, StackResponseClientMessage::decode, StackResponseClientMessage::handle);
-    INSTANCE.registerMessage(id++, RefreshFilterClientMessage.class, RefreshFilterClientMessage::encode, RefreshFilterClientMessage::decode, RefreshFilterClientMessage::handle);
-    INSTANCE.registerMessage(id++, SortClientMessage.class, SortClientMessage::encode, SortClientMessage::decode, SortClientMessage::handle);
-    INSTANCE.registerMessage(id++, KeybindCurioMessage.class, KeybindCurioMessage::encode, KeybindCurioMessage::decode, KeybindCurioMessage::handle);
-    INSTANCE.registerMessage(id++, KeybindCollectorToggleMessage.class, KeybindCollectorToggleMessage::encode, KeybindCollectorToggleMessage::decode, KeybindCollectorToggleMessage::handle);
-    INSTANCE.registerMessage(id++, CableFacadeMessage.class, CableFacadeMessage::encode, CableFacadeMessage::decode, CableFacadeMessage::handle);
+  public static void registerPayloads(RegisterPayloadHandlersEvent event) {
+    var reg = event.registrar(StorageNetworkMod.MODID);
+    reg.serverbound(CableDataMessage.TYPE, CableDataMessage.STREAM_CODEC, CableDataMessage::handle);
+    reg.serverbound(CableIOMessage.TYPE, CableIOMessage.STREAM_CODEC, CableIOMessage::handle);
+    reg.serverbound(InsertMessage.TYPE, InsertMessage.STREAM_CODEC, InsertMessage::handle);
+    reg.serverbound(RequestMessage.TYPE, RequestMessage.STREAM_CODEC, RequestMessage::handle);
+    reg.serverbound(ClearRecipeMessage.TYPE, ClearRecipeMessage.STREAM_CODEC, ClearRecipeMessage::handle);
+    reg.serverbound(SettingsSyncMessage.TYPE, SettingsSyncMessage.STREAM_CODEC, SettingsSyncMessage::handle);
+    reg.serverbound(RecipeMessage.TYPE, RecipeMessage.STREAM_CODEC, RecipeMessage::handle);
+    reg.serverbound(CableLimitMessage.TYPE, CableLimitMessage.STREAM_CODEC, CableLimitMessage::handle);
+    reg.serverbound(CableFacadeMessage.TYPE, CableFacadeMessage.STREAM_CODEC, CableFacadeMessage::handle);
+    reg.serverbound(KeybindCurioMessage.TYPE, KeybindCurioMessage.STREAM_CODEC, KeybindCurioMessage::handle);
+    reg.serverbound(KeybindCollectorToggleMessage.TYPE, KeybindCollectorToggleMessage.STREAM_CODEC, KeybindCollectorToggleMessage::handle);
+    reg.clientbound(StackRefreshClientMessage.TYPE, StackRefreshClientMessage.STREAM_CODEC, StackRefreshClientMessage::handle);
+    reg.clientbound(StackResponseClientMessage.TYPE, StackResponseClientMessage.STREAM_CODEC, StackResponseClientMessage::handle);
+    reg.clientbound(RefreshFilterClientMessage.TYPE, RefreshFilterClientMessage.STREAM_CODEC, RefreshFilterClientMessage::handle);
+    reg.clientbound(SortClientMessage.TYPE, SortClientMessage.STREAM_CODEC, SortClientMessage::handle);
   }
 }

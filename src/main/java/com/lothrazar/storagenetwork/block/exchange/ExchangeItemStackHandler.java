@@ -6,7 +6,6 @@ import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 /**
  * @author ajsnarr98 Created MasterItemStackHandler
@@ -80,7 +79,7 @@ public class ExchangeItemStackHandler extends ItemStackHandlerEx {
       if (remaining > 0) {
         // if failed, refresh whole list
         update();
-        return ItemHandlerHelper.copyStackWithSize(stack, remaining);
+        return stack.copyWithCount(remaining);
       }
     }
     catch (Exception e) {

@@ -53,17 +53,15 @@ public class ItemSlotNetwork {
         amount = UtilInventory.formatLargeNumber(size);
       }
       final float scale = 0.85F;
-      PoseStack viewModelPose = RenderSystem.getModelViewStack();
-      viewModelPose.pushPose();
-      viewModelPose.translate(x + 3, y + 3, 0);
-      viewModelPose.scale(scale, scale, scale);
-      viewModelPose.translate(-1 * x, -1 * y, 0);
-      RenderSystem.applyModelViewMatrix();
+      PoseStack pose = poseStack.pose();
+      pose.pushPose();
+      pose.translate(x + 3, y + 3, 0);
+      pose.scale(scale, scale, scale);
+      pose.translate(-1 * x, -1 * y, 0);
       if (isShowNumbers() && size > 1) {
         poseStack.renderItemDecorations(font, stack, x, y, amount);
       }
-      viewModelPose.popPose();
-      RenderSystem.applyModelViewMatrix();
+      pose.popPose();
       if (isMouseOverSlot(mx, my)) {
         int j1 = x;
         int k1 = y;

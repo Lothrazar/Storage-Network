@@ -8,18 +8,18 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import com.lothrazar.library.util.StringParseUtil;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.common.ForgeConfigSpec.IntValue;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 
 public class ConfigRegistry {
 
-  private static final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
-  private static ForgeConfigSpec COMMON_CONFIG;
+  private static final ModConfigSpec.Builder COMMON_BUILDER = new ModConfigSpec.Builder();
+  private static ModConfigSpec COMMON_CONFIG;
   private static BooleanValue LOGSPAM;
   private static IntValue REFRESHTICKS;
   public static IntValue EXCHANGEBUFFER;
@@ -34,7 +34,7 @@ public class ConfigRegistry {
   }
 
   public static boolean isFacadeAllowed(ItemStack item) {
-    ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(item.getItem());
+    ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item.getItem());
     if (StringParseUtil.isInList(CABLEIGNORELIST.get(), itemId)) {
       return false;
     }
