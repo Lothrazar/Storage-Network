@@ -35,7 +35,7 @@ public class ItemCollector extends ItemFlib {
   public static final String NBT_BOUND = "bound";
   private static final String NBT_ENABLED = "Enabled";
 
-    public ItemCollector(Properties properties) {
+  public ItemCollector(Properties properties) {
     super(properties.stacksTo(1));
   }
 
@@ -45,55 +45,55 @@ public class ItemCollector extends ItemFlib {
     return remote.getRight();
   }
 
-    public void toggleEnabled(ItemStack stack, Player player) {
-        boolean enabled = stack.getOrCreateTag().getBoolean(NBT_ENABLED);
-        stack.getOrCreateTag().putBoolean(NBT_ENABLED, !enabled);
-        player.displayClientMessage(
-                Component.literal("Collector " + (!enabled ? "enabled" : "disabled")),
-                true
-        );
-    }
+  public void toggleEnabled(ItemStack stack, Player player) {
+    boolean enabled = stack.getOrCreateTag().getBoolean(NBT_ENABLED);
+    stack.getOrCreateTag().putBoolean(NBT_ENABLED, !enabled);
+    player.displayClientMessage(
+        Component.literal("Collector " + (!enabled ? "enabled" : "disabled")),
+        true
+    );
+  }
 
-    // not subscribe, called from SsnEvents.java
-    public void onEntityItemPickupEvent(EntityItemPickupEvent event) {
-        if (event.getEntity() instanceof Player &&
-                event.getItem() != null &&
-                !event.getItem().getItem().isEmpty()) {
-            Player player = event.getEntity();
+  // not subscribe, called from SsnEvents.java
+  public void onEntityItemPickupEvent(EntityItemPickupEvent event) {
+    if (event.getEntity() instanceof Player &&
+        event.getItem() != null &&
+        !event.getItem().getItem().isEmpty()) {
+      Player player = event.getEntity();
 
-            // find the collector that the player has with them (main hand, offhand, curios...)
-            ItemStack collectorStack = this.findAmmo(player, this);
-            if (collectorStack.isEmpty()) {
-                return;
-            }
+      // find the collector that the player has with them (main hand, offhand, curios...)
+      ItemStack collectorStack = this.findAmmo(player, this);
+      if (collectorStack.isEmpty()) {
+        return;
+      }
 
-            // check if it is turned on
-            CompoundTag tag = collectorStack.getOrCreateTag();
-            if (!tag.getBoolean("Enabled")) {
-                return;
-            }
+      // check if it is turned on
+      CompoundTag tag = collectorStack.getOrCreateTag();
+      if (!tag.getBoolean("Enabled")) {
+        return;
+      }
 
-            ItemStack item = event.getItem().getItem();
-            Level world = player.level();
-            DimPos dp = DimPos.getPosStored(collectorStack);
-            if (dp != null && !world.isClientSide) {
-                ServerLevel serverTargetWorld = DimPos.stringDimensionLookup(dp.getDimension(), world.getServer());
-                if (serverTargetWorld == null) {
-                    StorageNetworkMod.LOGGER.error("Missing dimension key " + dp.getDimension());
-                    return;
-                }
-                BlockEntity tile = serverTargetWorld.getBlockEntity(dp.getBlockPos());
-                if (tile instanceof TileMain network) {
-                    int countUnmoved = network.insertStack(item.copy(), false);
-                    item.setCount(countUnmoved);
-                    if (countUnmoved == 0) {
-                        UtilTileEntity.playSoundFromServer((ServerPlayer) player, SoundEvents.ITEM_PICKUP, 0.2F);
-                    }
-                }
-                // else { StorageNetworkMod.LOGGER.error("item.remote.notfound"); }
-            }
+      ItemStack item = event.getItem().getItem();
+      Level world = player.level();
+      DimPos dp = DimPos.getPosStored(collectorStack);
+      if (dp != null && !world.isClientSide) {
+        ServerLevel serverTargetWorld = DimPos.stringDimensionLookup(dp.getDimension(), world.getServer());
+        if (serverTargetWorld == null) {
+          StorageNetworkMod.LOGGER.error("Missing dimension key " + dp.getDimension());
+          return;
         }
+        BlockEntity tile = serverTargetWorld.getBlockEntity(dp.getBlockPos());
+        if (tile instanceof TileMain network) {
+          int countUnmoved = network.insertStack(item.copy(), false);
+          item.setCount(countUnmoved);
+          if (countUnmoved == 0) {
+            UtilTileEntity.playSoundFromServer((ServerPlayer) player, SoundEvents.ITEM_PICKUP, 0.2F);
+          }
+        }
+        // else { StorageNetworkMod.LOGGER.error("item.remote.notfound"); }
+      }
     }
+  }
 
   @Override
   public InteractionResult useOn(UseOnContext context) {

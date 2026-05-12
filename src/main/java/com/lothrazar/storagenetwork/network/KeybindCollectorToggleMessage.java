@@ -11,46 +11,46 @@ import java.util.function.Supplier;
 
 public class KeybindCollectorToggleMessage {
 
-    public KeybindCollectorToggleMessage() {
-    }
+  public KeybindCollectorToggleMessage() {
+  }
 
-    public static void handle(KeybindCollectorToggleMessage msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player != null) {
-                Inventory inv = player.getInventory();
+  public static void handle(KeybindCollectorToggleMessage msg, Supplier<NetworkEvent.Context> ctx) {
+    ctx.get().enqueueWork(() -> {
+      ServerPlayer player = ctx.get().getSender();
+      if (player != null) {
+        Inventory inv = player.getInventory();
 
-                for (ItemStack stack : inv.items) {
-                    if (stack.getItem() instanceof ItemCollector collector) {
-                        collector.toggleEnabled(stack, player);
-                        return;
-                    }
-                }
+        for (ItemStack stack : inv.items) {
+          if (stack.getItem() instanceof ItemCollector collector) {
+            collector.toggleEnabled(stack, player);
+            return;
+          }
+        }
 
-                for (ItemStack stack : inv.armor) {
-                    if (stack.getItem() instanceof ItemCollector collector) {
-                        collector.toggleEnabled(stack, player);
-                        return;
-                    }
-                }
+        for (ItemStack stack : inv.armor) {
+          if (stack.getItem() instanceof ItemCollector collector) {
+            collector.toggleEnabled(stack, player);
+            return;
+          }
+        }
 
-                for (ItemStack stack : inv.offhand) {
-                    if (stack.getItem() instanceof ItemCollector collector) {
-                        collector.toggleEnabled(stack, player);
-                        return;
-                    }
-                }
-            }
-        });
-        ctx.get().setPacketHandled(true);
-    }
+        for (ItemStack stack : inv.offhand) {
+          if (stack.getItem() instanceof ItemCollector collector) {
+            collector.toggleEnabled(stack, player);
+            return;
+          }
+        }
+      }
+    });
+    ctx.get().setPacketHandled(true);
+  }
 
 
-    public void encode(FriendlyByteBuf friendlyByteBuf) {
-    }
+  public void encode(FriendlyByteBuf friendlyByteBuf) {
+  }
 
-    public static KeybindCollectorToggleMessage decode(FriendlyByteBuf friendlyByteBuf) {
-        KeybindCollectorToggleMessage message = new KeybindCollectorToggleMessage();
-        return message;
-    }
+  public static KeybindCollectorToggleMessage decode(FriendlyByteBuf friendlyByteBuf) {
+    KeybindCollectorToggleMessage message = new KeybindCollectorToggleMessage();
+    return message;
+  }
 }

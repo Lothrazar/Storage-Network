@@ -32,51 +32,51 @@ import net.minecraftforge.fml.loading.FMLPaths;
 @Mod(StorageNetworkMod.MODID)
 public class StorageNetworkMod {
 
-    public static final String MODID = "storagenetwork";
-    public static final Logger LOGGER = LogManager.getLogger();
-    public static ConfigRegistry CONFIG;
+  public static final String MODID = "storagenetwork";
+  public static final Logger LOGGER = LogManager.getLogger();
+  public static ConfigRegistry CONFIG;
 
-    public StorageNetworkMod() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageNetworkMod::setup);
-        MinecraftForge.EVENT_BUS.register(new SsnRegistry.Tiles());
-        MinecraftForge.EVENT_BUS.register(new SsnEvents());
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        SsnRegistry.BLOCKS.register(bus);
-        SsnRegistry.ITEMS.register(bus);
-        SsnRegistry.TILES.register(bus);
-        SsnRegistry.CONTAINERS.register(bus);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerMapping);
-        });
-    }
+  public StorageNetworkMod() {
+    FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageNetworkMod::setup);
+    MinecraftForge.EVENT_BUS.register(new SsnRegistry.Tiles());
+    MinecraftForge.EVENT_BUS.register(new SsnEvents());
+    IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+    SsnRegistry.BLOCKS.register(bus);
+    SsnRegistry.ITEMS.register(bus);
+    SsnRegistry.TILES.register(bus);
+    SsnRegistry.CONTAINERS.register(bus);
+    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+      FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
+      FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerMapping);
+    });
+  }
 
-    private static void setup(FMLCommonSetupEvent event) {
-        PacketRegistry.init();
-        CONFIG = new ConfigRegistry(FMLPaths.CONFIGDIR.get().resolve(MODID + ".toml"));
-    }
+  private static void setup(FMLCommonSetupEvent event) {
+    PacketRegistry.init();
+    CONFIG = new ConfigRegistry(FMLPaths.CONFIGDIR.get().resolve(MODID + ".toml"));
+  }
 
-    private void setupClient(final FMLClientSetupEvent event) {
-        MenuScreens.register(SsnRegistry.Menus.REQUEST.get(), ScreenNetworkTable::new);
-        MenuScreens.register(SsnRegistry.Menus.FILTER_KABEL.get(), ScreenCableFilter::new);
-        MenuScreens.register(SsnRegistry.Menus.IMPORT_FILTER_KABEL.get(), ScreenCableImportFilter::new);
-        MenuScreens.register(SsnRegistry.Menus.EXPORT_KABEL.get(), ScreenCableExportFilter::new);
-        MenuScreens.register(SsnRegistry.Menus.INVENTORY_REMOTE.get(), ScreenNetworkRemote::new);
-        MenuScreens.register(SsnRegistry.Menus.CRAFTING_REMOTE.get(), ScreenNetworkCraftingRemote::new);
-        MenuScreens.register(SsnRegistry.Menus.INVENTORY.get(), ScreenNetworkInventory::new);
-        MenuScreens.register(SsnRegistry.Menus.COLLECTOR.get(), ScreenCollectionFilter::new);
-        MenuScreens.register(SsnRegistry.Menus.REQUEST_EXPANDED.get(), ScreenNetworkInventoryExpanded::new);
-        MenuScreens.register(SsnRegistry.Menus.EXPANDED_REMOTE.get(), ScreenNetworkExpandedRemote::new);
-    }
+  private void setupClient(final FMLClientSetupEvent event) {
+    MenuScreens.register(SsnRegistry.Menus.REQUEST.get(), ScreenNetworkTable::new);
+    MenuScreens.register(SsnRegistry.Menus.FILTER_KABEL.get(), ScreenCableFilter::new);
+    MenuScreens.register(SsnRegistry.Menus.IMPORT_FILTER_KABEL.get(), ScreenCableImportFilter::new);
+    MenuScreens.register(SsnRegistry.Menus.EXPORT_KABEL.get(), ScreenCableExportFilter::new);
+    MenuScreens.register(SsnRegistry.Menus.INVENTORY_REMOTE.get(), ScreenNetworkRemote::new);
+    MenuScreens.register(SsnRegistry.Menus.CRAFTING_REMOTE.get(), ScreenNetworkCraftingRemote::new);
+    MenuScreens.register(SsnRegistry.Menus.INVENTORY.get(), ScreenNetworkInventory::new);
+    MenuScreens.register(SsnRegistry.Menus.COLLECTOR.get(), ScreenCollectionFilter::new);
+    MenuScreens.register(SsnRegistry.Menus.REQUEST_EXPANDED.get(), ScreenNetworkInventoryExpanded::new);
+    MenuScreens.register(SsnRegistry.Menus.EXPANDED_REMOTE.get(), ScreenNetworkExpandedRemote::new);
+  }
 
-    private void registerMapping(final RegisterKeyMappingsEvent event) {
-        event.register(ClientEventRegistry.INVENTORY_KEY);
-        event.register(ClientEventRegistry.COLLECTOR_TOGGLE_KEY);
-    }
+  private void registerMapping(final RegisterKeyMappingsEvent event) {
+    event.register(ClientEventRegistry.INVENTORY_KEY);
+    event.register(ClientEventRegistry.COLLECTOR_TOGGLE_KEY);
+  }
 
-    public static void log(String s) {
-        if (CONFIG.logspam()) {
-            LOGGER.info(s);
-        }
+  public static void log(String s) {
+    if (CONFIG.logspam()) {
+      LOGGER.info(s);
     }
+  }
 }
