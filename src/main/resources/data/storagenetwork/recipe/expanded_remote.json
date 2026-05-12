@@ -3,17 +3,17 @@
   "pattern": [
     " i ",
     "imi",
-  	" i "
+    " i "
   ],
   "key": {
-    "i":  {
+    "i": {
       "item": "storagenetwork:import_filter_kabel"
-	},
-    "m":  {
-	  "item": "storagenetwork:request_expanded"
-	}
+    },
+    "m": {
+      "item": "storagenetwork:request_expanded"
+    }
   },
   "result": {
-    "item": "storagenetwork:expanded_remote"
+    "id": "storagenetwork:expanded_remote"
   }
 }

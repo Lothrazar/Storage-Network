@@ -10,13 +10,13 @@
       "item": "storagenetwork:stack_upgrade"
     },
     "d": {
-      "tag": "forge:nuggets/iron"
+      "tag": "c:nuggets/iron"
     },
     "c": {
       "item": "storagenetwork:inventory"
     }
   },
   "result": {
-    "item": "storagenetwork:exchange"
+    "id": "storagenetwork:exchange"
   }
 }

@@ -10,11 +10,11 @@
       "item": "storagenetwork:kabel"
     },
     "p": {
-      "tag": "forge:chests/wooden"
+      "tag": "c:chests/wooden"
     }
   },
   "result": {
-    "item": "storagenetwork:storage_kabel",
+    "id": "storagenetwork:storage_kabel",
     "count": 4
   }
 }

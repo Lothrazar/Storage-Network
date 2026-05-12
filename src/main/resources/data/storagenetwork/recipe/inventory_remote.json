@@ -1,26 +1,25 @@
 {
-
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "pcp",
     "imi",
-  	"p p"
+    "p p"
   ],
   "key": {
     "c": {
-      "tag": "forge:dusts/glowstone"
+      "tag": "c:dusts/glowstone"
     },
-    "i":  {
-	  "tag": "forge:ingots/gold"
-	},
-    "m":  {
-	  "item": "storagenetwork:master"
-	},
-    "p":  {
-	  "tag": "forge:slimeballs"
-}
+    "i": {
+      "tag": "c:ingots/gold"
+    },
+    "m": {
+      "item": "storagenetwork:master"
+    },
+    "p": {
+      "tag": "c:slimeballs"
+    }
   },
   "result": {
-    "item": "storagenetwork:inventory_remote"
+    "id": "storagenetwork:inventory_remote"
   }
 }

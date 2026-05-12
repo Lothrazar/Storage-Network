@@ -1,20 +1,19 @@
 {
-
   "type": "minecraft:crafting_shaped",
   "pattern": [
     " i ",
     "imi",
-  	" i "
+    " i "
   ],
   "key": {
-    "i":  {
-	  "item": "storagenetwork:request"
-	},
-    "m":  {
-	  "item": "storagenetwork:inventory_remote"
-	}
+    "i": {
+      "item": "storagenetwork:request"
+    },
+    "m": {
+      "item": "storagenetwork:inventory_remote"
+    }
   },
   "result": {
-    "item": "storagenetwork:builder_remote"
+    "id": "storagenetwork:builder_remote"
   }
 }

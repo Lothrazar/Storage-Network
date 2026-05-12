@@ -10,13 +10,13 @@
       "item": "minecraft:crafting_table"
     },
     "d": {
-      "tag": "forge:ingots/gold"
+      "tag": "c:ingots/gold"
     },
     "c": {
       "item": "storagenetwork:inventory"
     }
   },
   "result": {
-    "item": "storagenetwork:request"
+    "id": "storagenetwork:request"
   }
 }

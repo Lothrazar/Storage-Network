@@ -14,7 +14,7 @@
     }
   },
   "result": {
-    "item": "storagenetwork:filter_kabel",
+    "id": "storagenetwork:filter_kabel",
     "count": 4
   }
 }

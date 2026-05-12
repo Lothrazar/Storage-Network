@@ -7,15 +7,14 @@
   ],
   "key": {
     "s": {
-      "item": "minecraft:stone_slab",
-      "data": 0
+      "item": "minecraft:stone_slab"
     },
     "i": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     }
   },
   "result": {
-    "item": "storagenetwork:kabel",
+    "id": "storagenetwork:kabel",
     "count": 8
   }
 }

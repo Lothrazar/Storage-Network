@@ -10,13 +10,13 @@
       "item": "storagenetwork:kabel"
     },
     "d": {
-      "tag": "forge:nuggets/iron"
+      "tag": "c:nuggets/iron"
     },
     "c": {
       "item": "minecraft:dropper"
     }
   },
   "result": {
-    "item": "storagenetwork:inventory"
+    "id": "storagenetwork:inventory"
   }
 }

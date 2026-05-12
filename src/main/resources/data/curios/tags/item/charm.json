@@ -1,5 +1,5 @@
 {
-  "replace": "false",
+  "replace": false,
   "values": [
     "storagenetwork:expanded_remote",
     "storagenetwork:inventory_remote",

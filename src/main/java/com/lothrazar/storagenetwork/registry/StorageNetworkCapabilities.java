@@ -22,12 +22,10 @@ import com.lothrazar.storagenetwork.block.request.TileRequest;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = StorageNetworkMod.MODID)
 public class StorageNetworkCapabilities {
 
   public static final BlockCapability<IConnectable,  Direction> CONNECTABLE =

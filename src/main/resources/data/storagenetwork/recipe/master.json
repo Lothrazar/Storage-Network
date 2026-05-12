@@ -13,10 +13,10 @@
       "item": "minecraft:quartz"
     },
     "c": {
-      "tag": "forge:gems/diamond"
+      "tag": "c:gems/diamond"
     }
   },
   "result": {
-    "item": "storagenetwork:master"
+    "id": "storagenetwork:master"
   }
 }

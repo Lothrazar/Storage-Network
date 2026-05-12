@@ -1,23 +1,22 @@
 {
-
   "type": "minecraft:crafting_shaped",
   "pattern": [
     " c ",
     "gig",
-	" c "
+    " c "
   ],
   "key": {
     "c": {
-      "tag": "forge:dusts/redstone"
+      "tag": "c:dusts/redstone"
     },
-    "i":  {
-	  "item": "storagenetwork:kabel"
-	},
-    "g":  {
+    "i": {
+      "item": "storagenetwork:kabel"
+    },
+    "g": {
       "item": "minecraft:comparator"
-	}
+    }
   },
   "result": {
-    "item": "storagenetwork:operation_upgrade"
+    "id": "storagenetwork:operation_upgrade"
   }
 }

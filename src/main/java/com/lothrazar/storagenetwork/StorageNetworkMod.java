@@ -19,6 +19,8 @@ import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.lothrazar.storagenetwork.registry.SsnEvents;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
+import com.lothrazar.storagenetwork.registry.SsnTab;
+import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -40,6 +42,8 @@ public class StorageNetworkMod {
     modContainer.registerConfig(ModConfig.Type.COMMON, ConfigRegistry.COMMON_CONFIG);
     modEventBus.addListener(StorageNetworkMod::setup);
     modEventBus.addListener(PacketRegistry::registerPayloads);
+    modEventBus.register(SsnTab.class);
+    modEventBus.register(StorageNetworkCapabilities.class);
     NeoForge.EVENT_BUS.register(new SsnEvents());
     SsnRegistry.Blocks.init();
     SsnRegistry.BLOCKS.register(modEventBus);
@@ -50,6 +54,7 @@ public class StorageNetworkMod {
     SsnRegistry.Menus.init();
     SsnRegistry.CONTAINERS.register(modEventBus);
     if (FMLEnvironment.dist == Dist.CLIENT) {
+      modEventBus.register(ClientEventRegistry.class);
       modEventBus.addListener(this::setupClient);
       modEventBus.addListener(this::registerScreens);
       modEventBus.addListener(this::registerMapping);
