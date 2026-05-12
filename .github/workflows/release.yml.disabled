@@ -1,9 +1,12 @@
-name: Build
+name: Release
 
-on: [pull_request, push]
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
@@ -16,5 +19,8 @@ jobs:
           cache: 'gradle'
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew build
+      - name: publish
+        run: ./gradlew publishCurseForge publishModrinth publish
+        env:
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
