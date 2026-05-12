@@ -14,7 +14,7 @@
 		,"1.11.3":"Fixed item tooltips not rendering in Storage Remote.  Fixed visual rendering and text errors inside of import/export cables using the 'operation upgrade'"
 		,"1.12.0":"Added a new Expanded Request Table and the Expanded Remote to support GUI Scale 2 or larger for players on large monitors/resolutions.  Internal refactoring for Import and Export cable capabilities: item transactions are now executed inside the cable tile-entities instead of the main node tile-entity (meaning the main root node is doing less processing work, and also the network overall should have fewer wasted cycles).  "
 		,"1.12.1": "Fix JEI/EMI recipe autocomplete"
-		,"1.13.0": "Merge pull request #593 from KishCom/trunk/1.20.1, Fix multiple export cables not working fixing #581\n  Merge pull request #586 from ArtByteFilip/trunk/1.20.1 added the option to turn the network collector remote on and off "
+		,"1.13.0": "Improved look and feel of the plain Network Cable intersections.  Merge pull request #593 from KishCom/trunk/1.20.1, Fix multiple export cables not working fixing #581\n  Merge pull request #586 from ArtByteFilip/trunk/1.20.1 added the option to turn the network collector remote on and off "
 
 	}
 }
