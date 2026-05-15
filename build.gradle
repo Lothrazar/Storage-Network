@@ -40,10 +40,7 @@ sourceSets.main.resources {
 repositories {
 //    mavenLocal()
   flatDir { dir 'libs' }
-  maven {
-    name = "EMI"
-    url = "https://maven.terraformersmc.com/"
-  }
+
   maven {
       name = "curios"
       url = 'https://maven.theillusivec4.top/'
@@ -169,9 +166,6 @@ dependencies {
   compileOnly "com.blamejared.crafttweaker:CraftTweaker-neoforge-${minecraft_version}:${crafttweaker_version}"
 
 
-  compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
-  runtimeOnly "dev.emi:emi-neoforge:${emi_version}"
-
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${minecraft_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"
@@ -186,6 +180,8 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+  if (file('extra.gradle').exists()) { apply from: 'extra.gradle' }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

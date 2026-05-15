@@ -1,0 +1,12 @@
+repositories {
+  maven {
+    name = "EMI"
+    url = "https://maven.terraformersmc.com/"
+  }
+}
+
+dependencies {
+
+  compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
+  runtimeOnly "dev.emi:emi-neoforge:${emi_version}"
+}
