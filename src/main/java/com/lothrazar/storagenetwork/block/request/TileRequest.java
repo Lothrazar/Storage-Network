@@ -6,6 +6,7 @@ import com.lothrazar.storagenetwork.api.ITileNetworkSync;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -29,7 +30,7 @@ public class TileRequest extends TileConnectable implements MenuProvider, ITileN
   }
 
   @Override
-  public void load(CompoundTag compound) {
+  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
     autoFocus = compound.getBoolean("autoFocus");
     setDownwards(compound.getBoolean(NBT_DIR));
     if (compound.contains(NBT_SORT)) {
@@ -38,15 +39,16 @@ public class TileRequest extends TileConnectable implements MenuProvider, ITileN
     if (compound.contains(NBT_JEI)) {
       this.setJeiSearchSynced(compound.getBoolean(NBT_JEI));
     }
-    super.load(compound);
+    super.loadAdditional(compound, registries);
   }
 
   @Override
-  public void saveAdditional(CompoundTag compound) {
+  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
     compound.putBoolean("autoFocus", autoFocus);
     compound.putBoolean(NBT_DIR, isDownwards());
     compound.putInt(NBT_SORT, getSort().ordinal());
     compound.putBoolean(NBT_JEI, this.isJeiSearchSynced());
+    super.saveAdditional(compound, registries);
   }
 
   @Override

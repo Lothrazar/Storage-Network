@@ -4,15 +4,13 @@ import com.lothrazar.storagenetwork.api.IConnectableItemProcessing;
 import com.lothrazar.storagenetwork.block.TileCableWithFacing;
 import com.lothrazar.storagenetwork.capability.CapabilityConnectableProcessing;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class TileCableProcess extends TileCableWithFacing {
 
@@ -24,17 +22,21 @@ public class TileCableProcess extends TileCableWithFacing {
     this.itemStorage = new CapabilityConnectableProcessing(this);
   }
 
+  public IConnectableItemProcessing getItemStorage() {
+    return itemStorage;
+  }
+
   @Override
-  public void load(CompoundTag compound) {
-    super.load(compound);
-    this.itemStorage.deserializeNBT(compound.getCompound("capability"));
+  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.loadAdditional(compound, registries);
+    this.itemStorage.deserializeNBT(registries, compound.getCompound("capability"));
     this.processModel.readFromNBT(compound);
   }
 
   @Override
-  public void saveAdditional(CompoundTag compound) {
-    super.saveAdditional(compound);
-    compound.put("capability", itemStorage.serializeNBT());
+  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.saveAdditional(compound, registries);
+    compound.put("capability", itemStorage.serializeNBT(registries));
     this.processModel.writeToNBT(compound);
   }
 
@@ -42,15 +44,6 @@ public class TileCableProcess extends TileCableWithFacing {
   public void setDirection(Direction direction) {
     super.setDirection(direction);
     this.itemStorage.setInventoryFace(direction);
-  }
-
-  @Override
-  public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
-    if (capability == StorageNetworkCapabilities.PROCESSING_CAPABILITY) {
-      LazyOptional<IConnectableItemProcessing> cap = LazyOptional.of(() -> itemStorage);
-      return cap.cast();
-    }
-    return super.getCapability(capability, facing);
   }
 
   public static void clientTick(Level level, BlockPos blockPos, BlockState blockState, TileCableProcess tile) {}

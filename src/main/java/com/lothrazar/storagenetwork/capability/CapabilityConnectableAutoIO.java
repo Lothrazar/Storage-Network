@@ -21,13 +21,13 @@ import com.lothrazar.storagenetwork.util.Request;
 import com.lothrazar.storagenetwork.util.RequestBatch;
 import com.lothrazar.storagenetwork.util.UtilInventory;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag>, IConnectableItemAutoIO {
 
@@ -84,7 +84,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     }
     DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
     // Test whether the connected block has the IItemHandler capability
-    IItemHandler itemHandler = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+    IItemHandler itemHandler = inventoryPos.getItemHandler(inventoryFace.getOpposite());
     if (itemHandler == null) {
       return Collections.emptyList();
     }
@@ -114,7 +114,8 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   }
 
   public CapabilityConnectableAutoIO(BlockEntity tile, EnumStorageDirection direction) {
-    connectable = tile.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY, null).orElse(null);
+    connectable = (tile instanceof com.lothrazar.storagenetwork.block.TileConnectable tc)
+        ? tc.getConnectable() : null;
     this.direction = direction;
     // Set some defaults
     if (direction == EnumStorageDirection.OUT) {
@@ -130,17 +131,19 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   }
 
   @Override
-  public CompoundTag serializeNBT() {
+  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
     CompoundTag result = new CompoundTag();
-    result.put("upgrades", this.upgrades.serializeNBT());
-    result.put("filters", this.filters.serializeNBT());
+    result.put("upgrades", this.upgrades.serializeNBT(registries));
+    result.put("filters", this.filters.serializeNBT(registries));
     result.putInt("prio", priority);
     if (inventoryFace != null) {
       result.putString("inventoryFace", inventoryFace.toString());
     }
     result.putBoolean("needsRedstone", this.needsRedstone());
     CompoundTag operation = new CompoundTag();
-    operation.put("stack", operationStack.serializeNBT());
+    if (!operationStack.isEmpty()) {
+      operation.put("stack", (CompoundTag) operationStack.save(registries));
+    }
     operation.putInt("operationType", operationType);
     operation.putInt("limit", operationLimit);
     result.put("operation", operation);
@@ -148,14 +151,14 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   }
 
   @Override
-  public void deserializeNBT(CompoundTag nbt) {
+  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
     CompoundTag upgrades = nbt.getCompound("upgrades");
     if (upgrades != null) {
-      this.upgrades.deserializeNBT(upgrades);
+      this.upgrades.deserializeNBT(registries, upgrades);
     }
     CompoundTag filters = nbt.getCompound("filters");
     if (filters != null) {
-      this.filters.deserializeNBT(filters);
+      this.filters.deserializeNBT(registries, filters);
     }
     priority = nbt.getInt("prio");
     if (nbt.contains("inventoryFace")) {
@@ -166,7 +169,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     this.operationLimit = operation.getInt("limit");
     this.operationType = operation.getInt("operationType");
     if (operation.contains("stack")) {
-      this.operationStack = ItemStack.of(operation.getCompound("stack"));
+      this.operationStack = ItemStack.parseOptional(registries, operation.getCompound("stack"));
     }
     else {
       this.operationStack = ItemStack.EMPTY;
@@ -195,7 +198,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     }
     DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
     // Test whether the connected block has the IItemHandler capability
-    IItemHandler itemHandler = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+    IItemHandler itemHandler = inventoryPos.getItemHandler(inventoryFace.getOpposite());
     if (itemHandler == null) {
       return stack;
     }
@@ -208,7 +211,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     }
     DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
     // Test whether the connected block has the IItemHandler capability
-    IItemHandler itemHandler = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+    IItemHandler itemHandler = inventoryPos.getItemHandler(inventoryFace.getOpposite());
     if (itemHandler == null) {
       return Collections.emptyList();
     }
@@ -242,7 +245,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
       return null;
     }
     DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
-    return inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+    return inventoryPos.getItemHandler(inventoryFace.getOpposite());
   }
   //  @Deprecated
   //  @Override
@@ -260,7 +263,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   //    }
   //    DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
   //    // Test whether the connected block has the IItemHandler capability
-  //    IItemHandler itemHandler = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+  //    IItemHandler itemHandler = inventoryPos.getItemHandler(inventoryFace.getOpposite());
   //    if (itemHandler == null) {
   //      return ItemStack.EMPTY;
   //    }
@@ -389,7 +392,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
         // STOCK upgrade means
         try {
           DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
-          IItemHandler targetInventory = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+          IItemHandler targetInventory = inventoryPos.getItemHandler(inventoryFace.getOpposite());
           // request with false to see how many even exist in there.
           int stillNeeds = UtilInventory.containsAtLeastHowManyNeeded(targetInventory, matcher.getStack(),
               matcher.getStack().getCount());
@@ -434,7 +437,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
         if (this.isStockMode()) {
           int filterSize = this.getFilters().getStackCount(stackCurrent);
           DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
-          IItemHandler targetInventory = inventoryPos.getCapability(ForgeCapabilities.ITEM_HANDLER, inventoryFace.getOpposite());
+          IItemHandler targetInventory = inventoryPos.getItemHandler(inventoryFace.getOpposite());
           //request with false to see how many even exist in there.
           int chestHowMany = UtilInventory.countHowMany(targetInventory, stackCurrent);
           //so if chest=37 items of that kind

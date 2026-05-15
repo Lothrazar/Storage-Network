@@ -15,7 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class UtilRemote {
 
@@ -86,7 +86,7 @@ public class UtilRemote {
     }
     BlockEntity tile = serverTargetWorld.getBlockEntity(posTarget);
     if (tile instanceof TileMain) {
-      NetworkHooks.openScreen((ServerPlayer) player, theRemoteItem);
+      ((ServerPlayer) player).openMenu(theRemoteItem);
       return true;
     }
     else {

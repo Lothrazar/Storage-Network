@@ -4,12 +4,13 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.neoforge.capabilities.Capabilities;
 
 public class UtilConnections {
 
@@ -17,7 +18,7 @@ public class UtilConnections {
     if (state.getBlock() == Blocks.AIR) {
       return false;
     }
-    String blockId = ForgeRegistries.BLOCKS.getKey(state.getBlock()).toString();
+    String blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
     for (String s : StorageNetworkMod.CONFIG.ignorelist()) {
       if (blockId.equals(s)) {
         return false;
@@ -49,10 +50,12 @@ public class UtilConnections {
       return false;
     }
     BlockEntity neighbor = world.getBlockEntity(facingPos);
-    if (neighbor != null
-        && neighbor.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite()).orElse(null) != null) {
-      return true;
+    if (neighbor == null) {
+      return false;
     }
-    return false;
+    if (world instanceof Level level) {
+      return level.getCapability(Capabilities.ItemHandler.BLOCK, facingPos, facing.getOpposite()) != null;
+    }
+    return true;
   }
 }

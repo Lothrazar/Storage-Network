@@ -11,7 +11,7 @@ import com.lothrazar.storagenetwork.gui.components.ButtonRequest;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest.TextureEnum;
 import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.CableDataMessage;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
@@ -27,7 +27,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
     return supplier.get();
   };
-  private final ResourceLocation texture = new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/cable.png");
+  private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable.png");
   ContainerCableFilter containerCableLink;
   private ButtonRequest btnRedstone;
   private ButtonRequest btnMinus;
@@ -65,20 +65,20 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
   }
 
   private void importFilterSlots() {
-    PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.IMPORT_FILTER.ordinal()));
+    PacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.IMPORT_FILTER.ordinal()));
   }
 
   private void sendStackSlot(int value, ItemStack stack) {
-    PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.SAVE_FITLER.ordinal(), value, stack));
+    PacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.SAVE_FITLER.ordinal(), value, stack));
   }
 
   private void syncData(int priority) {
-    PacketRegistry.INSTANCE.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.SYNC_DATA.ordinal(), priority, isAllowlist));
+    PacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.SYNC_DATA.ordinal(), priority, isAllowlist));
   }
 
   @Override
   public void render(GuiGraphics ms, int mouseX, int mouseY, float partialTicks) {
-    renderBackground(ms);
+    renderBackground(ms, mouseX, mouseY, partialTicks);
     super.render(ms, mouseX, mouseY, partialTicks);
     btnAllowIgn.setTextureId(this.isAllowlist ? TextureEnum.ALLOWLIST : TextureEnum.IGNORELIST);
     if (containerCableLink == null || containerCableLink.cap == null || containerCableLink.cap.connectable == null) {
@@ -205,12 +205,12 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
   }
 
   @Override
-  public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-    if (delta != 0) {
+  public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    if (scrollY != 0) {
       for (int i = 0; i < this.itemSlotsGhost.size(); i++) {
         ItemSlotNetwork slot = itemSlotsGhost.get(i);
         if (slot.isMouseOverSlot((int) mouseX, (int) mouseY)) {
-          ItemStack changeme = ScreenCableImportFilter.scrollStack(delta, slot);
+          ItemStack changeme = ScreenCableImportFilter.scrollStack(scrollY, slot);
           if (changeme != null) {
             this.sendStackSlot(i, changeme);
             return true;
@@ -218,7 +218,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
         }
       }
     }
-    return super.mouseScrolled(mouseX, mouseY, delta);
+    return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
   }
 
   @Override

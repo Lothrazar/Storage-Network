@@ -1,9 +1,0 @@
-{
-  "replace": "false",
-  "values": [
-    "storagenetwork:expanded_remote",
-    "storagenetwork:inventory_remote",
-    "storagenetwork:crafting_remote",
-    "storagenetwork:collector_remote"
-  ]
-}

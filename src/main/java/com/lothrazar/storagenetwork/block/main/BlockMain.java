@@ -41,8 +41,8 @@ public class BlockMain extends EntityBlockFlib {
   }
 
   @Override
-  public InteractionResult use(BlockState state, Level worldIn, BlockPos pos,
-      Player playerIn, InteractionHand hand, BlockHitResult result) {
+  public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos,
+      Player playerIn, BlockHitResult result) {
     if (worldIn.isClientSide) {
       return InteractionResult.SUCCESS;
     }
@@ -51,7 +51,7 @@ public class BlockMain extends EntityBlockFlib {
       return InteractionResult.PASS;
     }
     //    float hitX, float hitY, float hitZ;
-    if (hand == InteractionHand.MAIN_HAND && playerIn.getItemInHand(hand).isEmpty()) {
+    if (playerIn.getMainHandItem().isEmpty()) {
       displayConnections(playerIn, tileHere);
       return InteractionResult.SUCCESS;
     }

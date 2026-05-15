@@ -9,9 +9,10 @@ import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.capability.handler.UpgradesItemStackHandler;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 
 public class CapabilityConnectableProcessing implements INBTSerializable<CompoundTag>, IConnectableItemProcessing {
 
@@ -35,7 +36,8 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
   }
 
   public CapabilityConnectableProcessing(BlockEntity tile) {
-    connectable = tile.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY, null).orElse(null);
+    connectable = (tile instanceof com.lothrazar.storagenetwork.block.TileConnectable tc)
+        ? tc.getConnectable() : null;
   }
 
   public void setInventoryFace(Direction inventoryFace) {
@@ -43,12 +45,12 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
   }
 
   @Override
-  public CompoundTag serializeNBT() {
+  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
     CompoundTag result = new CompoundTag();
     result.putInt("prio", priority);
-    result.put("upgrades", this.upgrades.serializeNBT());
-    result.put("filtersIn", this.filters.serializeNBT());
-    result.put("filtersOut", this.filtersOut.serializeNBT());
+    result.put("upgrades", this.upgrades.serializeNBT(registries));
+    result.put("filtersIn", this.filters.serializeNBT(registries));
+    result.put("filtersOut", this.filtersOut.serializeNBT(registries));
     if (inventoryFace != null) {
       result.putString("inventoryFace", inventoryFace.toString());
     }
@@ -56,19 +58,19 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
   }
 
   @Override
-  public void deserializeNBT(CompoundTag nbt) {
+  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
     priority = nbt.getInt("prio");
     CompoundTag upgrades = nbt.getCompound("upgrades");
     if (upgrades != null) {
-      this.upgrades.deserializeNBT(upgrades);
+      this.upgrades.deserializeNBT(registries, upgrades);
     }
     CompoundTag filters = nbt.getCompound("filters");
     if (filters != null) {
-      this.filters.deserializeNBT(filters);
+      this.filters.deserializeNBT(registries, filters);
     }
     CompoundTag filtersOut = nbt.getCompound("filtersOut");
     if (filtersOut != null) {
-      this.filtersOut.deserializeNBT(filtersOut);
+      this.filtersOut.deserializeNBT(registries, filtersOut);
     }
     if (nbt.contains("inventoryFace")) {
       inventoryFace = Direction.byName(nbt.getString("inventoryFace"));

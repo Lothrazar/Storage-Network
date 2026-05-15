@@ -13,6 +13,7 @@ import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import com.lothrazar.storagenetwork.util.Request;
 import com.lothrazar.storagenetwork.util.RequestBatch;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -36,22 +37,20 @@ public class TileMain extends BlockEntity {
   }
 
   @Override
-  public CompoundTag getUpdateTag() {
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
     CompoundTag nbt = new CompoundTag();
-    this.saveAdditional(nbt);
+    this.saveAdditional(nbt, registries);
     return nbt;
   }
 
   @Override
   public ClientboundBlockEntityDataPacket getUpdatePacket() {
-    saveWithFullMetadata();
     return ClientboundBlockEntityDataPacket.create(this);
   }
 
   @Override
-  public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-    load(pkt.getTag() == null ? new CompoundTag() : pkt.getTag());
-    super.onDataPacket(net, pkt);
+  public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
+    loadAdditional(pkt.getTag() == null ? new CompoundTag() : pkt.getTag(), registries);
   }
 
   /**
@@ -130,7 +129,7 @@ public class TileMain extends BlockEntity {
       }
       //does it have processing capability?
       //in practice it will not have both, its either IO or processing
-      IConnectableItemProcessing processingCap = connectable.getPos().getCapability(StorageNetworkCapabilities.PROCESSING_CAPABILITY, null);
+      IConnectableItemProcessing processingCap = connectable.getPos().getCapability(StorageNetworkCapabilities.PROCESSING, null);
       if (processingCap != null && isRunnable(connectable)) {
         processingCap.execute(this);
       }

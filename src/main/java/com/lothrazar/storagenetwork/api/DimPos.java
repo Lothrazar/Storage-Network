@@ -5,13 +5,14 @@ import com.google.common.base.Objects;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -19,17 +20,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraft.core.Direction;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.items.IItemHandler;
 
-public class DimPos implements INBTSerializable<CompoundTag> {
+public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
   private String dimension;
   private BlockPos pos = new BlockPos(0, 0, 0);
   private Level world;
 
   public DimPos(CompoundTag tag) {
-    deserializeNBT(tag);
+    if (tag.contains(NBT_X)) {
+      pos = new BlockPos(tag.getInt(NBT_X), tag.getInt(NBT_Y), tag.getInt(NBT_Z));
+    }
+    dimension = tag.getString(NBT_DIM);
   }
 
   public DimPos(Level world, BlockPos pos) {
@@ -41,10 +48,11 @@ public class DimPos implements INBTSerializable<CompoundTag> {
   }
 
   public static DimPos getPosStored(ItemStack itemStackIn) {
-    if (itemStackIn.getTag() == null || !itemStackIn.getTag().getBoolean(NBT_BOUND)) {
+    CustomData data = itemStackIn.get(DataComponents.CUSTOM_DATA);
+    if (data == null || !data.getUnsafe().getBoolean(NBT_BOUND)) {
       return null;
     }
-    return new DimPos(itemStackIn.getTag());
+    return new DimPos(data.getUnsafe());
   }
 
   public Level getWorld() {
@@ -75,20 +83,23 @@ public class DimPos implements INBTSerializable<CompoundTag> {
   public static final String NBT_BOUND = "bound";
 
   public static void putPos(ItemStack stack, BlockPos pos, Level world) {
-    CompoundTag tag = stack.getOrCreateTag();
-    tag.putInt(NBT_X, pos.getX());
-    tag.putInt(NBT_Y, pos.getY());
-    tag.putInt(NBT_Z, pos.getZ());
-    tag.putString(NBT_DIM, DimPos.dimensionToString(world));
-    tag.putBoolean(NBT_BOUND, true);
+    stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, data -> data.update(tag -> {
+      tag.putInt(NBT_X, pos.getX());
+      tag.putInt(NBT_Y, pos.getY());
+      tag.putInt(NBT_Z, pos.getZ());
+      tag.putString(NBT_DIM, DimPos.dimensionToString(world));
+      tag.putBoolean(NBT_BOUND, true);
+    }));
   }
 
   public static String getDim(ItemStack stack) {
-    return stack.getOrCreateTag().getString(NBT_DIM);
+    CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+    return data != null ? data.getUnsafe().getString(NBT_DIM) : "";
   }
 
   public static void putDim(ItemStack stack, Level world) {
-    stack.getOrCreateTag().putString(NBT_DIM, DimPos.dimensionToString(world));
+    stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, data -> data.update(tag ->
+        tag.putString(NBT_DIM, DimPos.dimensionToString(world))));
   }
 
   public static ServerLevel stringDimensionLookup(String s, MinecraftServer serv) {
@@ -134,16 +145,20 @@ public class DimPos implements INBTSerializable<CompoundTag> {
     return (V) tileEntity;
   }
 
-  public <V> V getCapability(Capability<V> capability, Direction side) {
+  public <V> V getCapability(BlockCapability<V, Direction> capability, Direction side) {
     Level world = getWorld();
     if (world == null || getBlockPos() == null) {
       return null;
     }
-    BlockEntity tileEntity = world.getBlockEntity(getBlockPos());
-    if (tileEntity == null) {
+    return world.getCapability(capability, getBlockPos(), side);
+  }
+
+  public IItemHandler getItemHandler(Direction side) {
+    Level world = getWorld();
+    if (world == null || getBlockPos() == null) {
       return null;
     }
-    return tileEntity.getCapability(capability, side).orElse(null);
+    return world.getCapability(Capabilities.ItemHandler.BLOCK, getBlockPos(), side);
   }
 
   @SuppressWarnings("deprecation")
@@ -186,18 +201,23 @@ public class DimPos implements INBTSerializable<CompoundTag> {
   }
 
   @Override
-  public CompoundTag serializeNBT() {
+  public CompoundTag serializeNBT(net.minecraft.core.HolderLookup.Provider registries) {
     if (pos == null) {
       pos = new BlockPos(0, 0, 0);
     }
-    CompoundTag result = NbtUtils.writeBlockPos(pos);
-    result.putString(NBT_DIM, dimension);
+    CompoundTag result = new CompoundTag();
+    result.putInt(NBT_X, pos.getX());
+    result.putInt(NBT_Y, pos.getY());
+    result.putInt(NBT_Z, pos.getZ());
+    result.putString(NBT_DIM, dimension != null ? dimension : "");
     return result;
   }
 
   @Override
-  public void deserializeNBT(CompoundTag nbt) {
-    pos = NbtUtils.readBlockPos(nbt);
+  public void deserializeNBT(net.minecraft.core.HolderLookup.Provider registries, CompoundTag nbt) {
+    if (nbt.contains(NBT_X)) {
+      pos = new BlockPos(nbt.getInt(NBT_X), nbt.getInt(NBT_Y), nbt.getInt(NBT_Z));
+    }
     dimension = nbt.getString(NBT_DIM);
   }
 

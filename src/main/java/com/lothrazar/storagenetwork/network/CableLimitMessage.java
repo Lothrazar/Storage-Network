@@ -1,48 +1,50 @@
 package com.lothrazar.storagenetwork.network;
 
-import java.util.function.Supplier;
-import net.minecraft.network.FriendlyByteBuf;
+import com.lothrazar.storagenetwork.StorageNetworkMod;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class CableLimitMessage {
+public class CableLimitMessage implements CustomPacketPayload {
 
-  private int limit;
-  private ItemStack stack;
+  public static final CustomPacketPayload.Type<CableLimitMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "cable_limit"));
 
-  private CableLimitMessage() {}
+  public static final StreamCodec<RegistryFriendlyByteBuf, CableLimitMessage> STREAM_CODEC = StreamCodec.of(
+      CableLimitMessage::write,
+      CableLimitMessage::read
+  );
+
+  private final int limit;
+  private final ItemStack stack;
 
   public CableLimitMessage(int limit, ItemStack stack) {
-    super();
     this.limit = limit;
     this.stack = stack;
   }
 
-  public static void handle(CableLimitMessage message, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      //      ServerPlayerEntity player = ctx.get().getSender();
-      //      if (player.openContainer instanceof ContainerCableIO) {
-      //        ContainerCableIO con = (ContainerCableIO) player.openContainer;
-      //        if (con == null || con.autoIO == null) {
-      //          return;
-      //        }
-      //        con.autoIO.operationLimit = message.limit;
-      //        con.autoIO.operationStack = message.stack;
-      //        con.tile.markDirty();
-      //      }
-    });
-    ctx.get().setPacketHandled(true);
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
   }
 
-  public static CableLimitMessage decode(FriendlyByteBuf buf) {
-    CableLimitMessage message = new CableLimitMessage();
-    message.limit = buf.readInt();
-    message.stack = ItemStack.of(buf.readNbt());
-    return message;
-  }
-
-  public static void encode(CableLimitMessage msg, FriendlyByteBuf buf) {
+  private static void write(RegistryFriendlyByteBuf buf, CableLimitMessage msg) {
     buf.writeInt(msg.limit);
-    buf.writeNbt(msg.stack.serializeNBT());
+    ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, msg.stack);
+  }
+
+  private static CableLimitMessage read(RegistryFriendlyByteBuf buf) {
+    int limit = buf.readInt();
+    ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+    return new CableLimitMessage(limit, stack);
+  }
+
+  public static void handle(CableLimitMessage message, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
+      // handler body intentionally left empty (see original comments)
+    });
   }
 }

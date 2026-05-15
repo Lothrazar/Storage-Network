@@ -1,28 +1,37 @@
 package com.lothrazar.storagenetwork.network;
 
-import java.util.function.Supplier;
+import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.ITileNetworkSync;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkCraftingRemote;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkRemote;
 import com.lothrazar.storagenetwork.item.remote.ItemRemote;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class SettingsSyncMessage {
+public class SettingsSyncMessage implements CustomPacketPayload {
 
-  private BlockPos pos;
-  private boolean direction;
-  private EnumSortType sort;
-  private boolean targetTileEntity;
-  private boolean jeiSync;
-  private boolean autoFocus;
+  public static final CustomPacketPayload.Type<SettingsSyncMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "settings_sync"));
 
-  private SettingsSyncMessage() {}
+  public static final StreamCodec<RegistryFriendlyByteBuf, SettingsSyncMessage> STREAM_CODEC = StreamCodec.of(
+      SettingsSyncMessage::write,
+      SettingsSyncMessage::read
+  );
+
+  private final BlockPos pos;
+  private final boolean direction;
+  private final EnumSortType sort;
+  private final boolean targetTileEntity;
+  private final boolean jeiSync;
+  private final boolean autoFocus;
 
   public SettingsSyncMessage(BlockPos pos, boolean direction, EnumSortType sort, boolean jeiSync, boolean autoFocus) {
     this.pos = pos;
@@ -30,12 +39,42 @@ public class SettingsSyncMessage {
     this.sort = sort;
     this.jeiSync = jeiSync;
     this.autoFocus = autoFocus;
+    this.targetTileEntity = (pos != null);
   }
 
-  public static void handle(SettingsSyncMessage message, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer player = ctx.get().getSender();
-      //TODO: how to refactor this
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
+
+  private static void write(RegistryFriendlyByteBuf buf, SettingsSyncMessage msg) {
+    buf.writeBoolean(msg.direction);
+    buf.writeInt(msg.sort.ordinal());
+    if (msg.pos != null) {
+      buf.writeBoolean(true);
+      buf.writeBlockPos(msg.pos);
+    }
+    else {
+      buf.writeBoolean(false);
+      buf.writeBlockPos(BlockPos.ZERO);
+    }
+    buf.writeBoolean(msg.jeiSync);
+    buf.writeBoolean(msg.autoFocus);
+  }
+
+  private static SettingsSyncMessage read(RegistryFriendlyByteBuf buf) {
+    boolean direction = buf.readBoolean();
+    EnumSortType sort = EnumSortType.values()[buf.readInt()];
+    boolean hasPos = buf.readBoolean();
+    BlockPos pos = buf.readBlockPos();
+    boolean jeiSync = buf.readBoolean();
+    boolean autoFocus = buf.readBoolean();
+    return new SettingsSyncMessage(hasPos ? pos : null, direction, sort, jeiSync, autoFocus);
+  }
+
+  public static void handle(SettingsSyncMessage message, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer player = (ServerPlayer) ctx.player();
       if (message.targetTileEntity) {
         BlockEntity tileEntity = player.level().getBlockEntity(message.pos);
         if (tileEntity instanceof ITileNetworkSync) {
@@ -66,33 +105,5 @@ public class SettingsSyncMessage {
         }
       }
     });
-    ctx.get().setPacketHandled(true);
-  }
-
-  public static SettingsSyncMessage decode(FriendlyByteBuf buf) {
-    SettingsSyncMessage message = new SettingsSyncMessage();
-    message.direction = buf.readBoolean();
-    int sort = buf.readInt();
-    message.sort = EnumSortType.values()[sort];
-    message.targetTileEntity = buf.readBoolean();
-    message.pos = buf.readBlockPos();
-    message.jeiSync = buf.readBoolean();
-    message.autoFocus = buf.readBoolean();
-    return message;
-  }
-
-  public static void encode(SettingsSyncMessage msg, FriendlyByteBuf buf) {
-    buf.writeBoolean(msg.direction);
-    buf.writeInt(msg.sort.ordinal());
-    if (msg.pos != null) {
-      buf.writeBoolean(true);
-      buf.writeBlockPos(msg.pos);
-    }
-    else { // to avoid null values // inconsistent buffer size
-      buf.writeBoolean(false);
-      buf.writeBlockPos(BlockPos.ZERO);
-    }
-    buf.writeBoolean(msg.jeiSync);
-    buf.writeBoolean(msg.autoFocus);
   }
 }

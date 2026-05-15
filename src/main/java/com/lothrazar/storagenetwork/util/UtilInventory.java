@@ -9,10 +9,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.items.IItemHandler;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotResult;
 
@@ -24,7 +23,7 @@ public class UtilInventory {
   }
 
   public static String getStackKey(ItemStack stackInCopy) {
-    return ForgeRegistries.ITEMS.getKey(stackInCopy.getItem()).toString();
+    return BuiltInRegistries.ITEM.getKey(stackInCopy.getItem()).toString();
   }
 
   /**
@@ -71,7 +70,7 @@ public class UtilInventory {
 
   private static boolean isRemoteWithData(ItemStack stack, Item remote) {
     //if it has a tag, assume pos to network is valid
-    return stack.getItem() == remote && stack.hasTag();
+    return stack.getItem() == remote && stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
   }
 
   public static String formatLargeNumber(int size) {
@@ -97,7 +96,7 @@ public class UtilInventory {
   public static int countHowMany(IItemHandler inv, ItemStack stackIn) {
     int found = 0;
     for (int i = 0; i < inv.getSlots(); i++) {
-      if (ItemHandlerHelper.canItemStacksStack(inv.getStackInSlot(i), stackIn)) {
+      if (ItemStack.isSameItemSameComponents(inv.getStackInSlot(i), stackIn)) {
         found += inv.getStackInSlot(i).getCount();
       }
     }
@@ -107,7 +106,7 @@ public class UtilInventory {
   public static int containsAtLeastHowManyNeeded(IItemHandler inv, ItemStack stackIn, int minimumCount) {
     int found = 0;
     for (int i = 0; i < inv.getSlots(); i++) {
-      if (ItemHandlerHelper.canItemStacksStack(inv.getStackInSlot(i), stackIn)) {
+      if (ItemStack.isSameItemSameComponents(inv.getStackInSlot(i), stackIn)) {
         found += inv.getStackInSlot(i).getCount();
       }
     }
@@ -130,7 +129,7 @@ public class UtilInventory {
         if (!ex.isEmpty()) {
           extracted++;
           if (extracted == num) {
-            return ItemHandlerHelper.copyStackWithSize(slot, num);
+            return slot.copyWithCount(num);
           }
           else {
             i--;

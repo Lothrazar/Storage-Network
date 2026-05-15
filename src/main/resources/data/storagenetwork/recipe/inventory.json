@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "dkd",
+    "kck",
+    "dkd"
+  ],
+  "key": {
+    "k": {
+      "item": "storagenetwork:kabel"
+    },
+    "d": {
+      "tag": "c:nuggets/iron"
+    },
+    "c": {
+      "item": "minecraft:dropper"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:inventory"
+  }
+}

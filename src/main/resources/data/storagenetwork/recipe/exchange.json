@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "dkd",
+    "kck",
+    "dkd"
+  ],
+  "key": {
+    "k": {
+      "item": "storagenetwork:stack_upgrade"
+    },
+    "d": {
+      "tag": "c:nuggets/iron"
+    },
+    "c": {
+      "item": "storagenetwork:inventory"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:exchange"
+  }
+}

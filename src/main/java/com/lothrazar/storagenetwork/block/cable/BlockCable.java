@@ -37,8 +37,8 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBlock {
 
@@ -67,7 +67,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
 
   @Deprecated
   @Override
-  public boolean isPathfindable(BlockState bs, BlockGetter bg, BlockPos pos, PathComputationType path) {
+  public boolean isPathfindable(BlockState bs, PathComputationType path) {
     return false;
   }
 
@@ -75,23 +75,19 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
   @Override
   public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
     if (state.getBlock() != newState.getBlock()) {
-      BlockEntity tileentity = worldIn.getBlockEntity(pos);
-      if (tileentity != null) {
-        IItemHandler items = tileentity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
-        if (items != null) {
-          for (int i = 0; i < items.getSlots(); ++i) {
-            Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), items.getStackInSlot(i));
-          }
-          worldIn.updateNeighbourForOutputSignal(pos, this);
+      IItemHandler items = worldIn.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
+      if (items != null) {
+        for (int i = 0; i < items.getSlots(); ++i) {
+          Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), items.getStackInSlot(i));
         }
-        IConnectableItemAutoIO connectable = tileentity.getCapability(StorageNetworkCapabilities.CONNECTABLE_AUTO_IO).orElse(null);
-        if (connectable instanceof CapabilityConnectableAutoIO) {
-          CapabilityConnectableAutoIO filterCable = (CapabilityConnectableAutoIO) connectable;
-          for (int i = 0; i < filterCable.upgrades.getSlots(); ++i) {
-            Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), filterCable.upgrades.getStackInSlot(i));
-          }
-          worldIn.updateNeighbourForOutputSignal(pos, this);
+        worldIn.updateNeighbourForOutputSignal(pos, this);
+      }
+      IConnectableItemAutoIO connectable = worldIn.getCapability(StorageNetworkCapabilities.CONNECTABLE_AUTO_IO, pos, null);
+      if (connectable instanceof CapabilityConnectableAutoIO filterCable) {
+        for (int i = 0; i < filterCable.upgrades.getSlots(); ++i) {
+          Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), filterCable.upgrades.getStackInSlot(i));
         }
+        worldIn.updateNeighbourForOutputSignal(pos, this);
       }
       super.onRemove(state, worldIn, pos, newState, isMoving);
     }
@@ -125,7 +121,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
 
   @Override
   public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-    if (ConfigRegistry.enableFacades.get()) {
+    if (ConfigRegistry.COMMON_CONFIG.isLoaded() && ConfigRegistry.enableFacades.get()) {
       TileCable tile = TileCable.getTileCable(worldIn, pos);
       if (tile != null && tile.getFacadeState() != null) {
         return tile.getFacadeState().getShape(worldIn, pos, context);
@@ -190,8 +186,8 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
       StorageNetworkMod.log("new Inventory from updateShape " + facingState);
       return stateIn.setValue(property, EnumConnectType.INVENTORY);
     }
-    if (tileOffset != null) {
-      IConnectable cap = tileOffset.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY).orElse(null);
+    if (tileOffset != null && world instanceof Level levelInstance) {
+      IConnectable cap = levelInstance.getCapability(StorageNetworkCapabilities.CONNECTABLE, facingPos, null);
       if (cap != null) {
         StorageNetworkMod.log("Normal network item  " + facingState);
         return stateIn.setValue(property, EnumConnectType.CABLE);

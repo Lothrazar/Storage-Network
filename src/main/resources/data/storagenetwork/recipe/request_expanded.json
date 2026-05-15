@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "csc",
+    "eme",
+    "cpc"
+  ],
+  "key": {
+    "e": {
+      "item": "minecraft:ender_eye"
+    },
+    "c": {
+      "tag": "c:storage_blocks/copper"
+    },
+    "m": {
+      "item": "storagenetwork:operation_upgrade"
+    },
+    "s": {
+      "item": "storagenetwork:stack_upgrade"
+    },
+    "p": {
+      "item": "storagenetwork:speed_upgrade"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:request_expanded"
+  }
+}

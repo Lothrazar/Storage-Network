@@ -2,7 +2,7 @@ package com.lothrazar.storagenetwork.gui.components;
 //package com.lothrazar.cyclic.gui;
 
 import com.lothrazar.storagenetwork.network.CableIOMessage;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 
@@ -39,7 +39,7 @@ public class TextboxInteger extends EditBox {
   }
 
   private void saveValue() {
-    PacketRegistry.INSTANCE.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SYNC_OP_TEXT.ordinal(), this.getCurrent(), false));
+    PacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SYNC_OP_TEXT.ordinal(), this.getCurrent(), false));
   }
 
   @Override

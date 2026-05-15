@@ -1,40 +1,46 @@
 package com.lothrazar.storagenetwork.network;
 
-import java.util.function.Supplier;
+import com.lothrazar.storagenetwork.StorageNetworkMod;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/**
- * Used by InsertMessage and RequestMessage as a response back to the client
- * 
- *
- */
-public class StackResponseClientMessage {
+public class StackResponseClientMessage implements CustomPacketPayload {
 
-  private ItemStack stack;
+  public static final CustomPacketPayload.Type<StackResponseClientMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "stack_response_client"));
 
-  private StackResponseClientMessage() {}
+  public static final StreamCodec<RegistryFriendlyByteBuf, StackResponseClientMessage> STREAM_CODEC = StreamCodec.of(
+      StackResponseClientMessage::write,
+      StackResponseClientMessage::read
+  );
 
-  StackResponseClientMessage(ItemStack a) {
-    stack = a;
+  private final ItemStack stack;
+
+  public StackResponseClientMessage(ItemStack stack) {
+    this.stack = stack;
   }
 
-  public static void handle(StackResponseClientMessage message, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      Minecraft.getInstance().player.containerMenu.setCarried(message.stack); // .setCarried(message.stack);
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
+
+  private static void write(RegistryFriendlyByteBuf buf, StackResponseClientMessage msg) {
+    ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, msg.stack);
+  }
+
+  private static StackResponseClientMessage read(RegistryFriendlyByteBuf buf) {
+    return new StackResponseClientMessage(ItemStack.OPTIONAL_STREAM_CODEC.decode(buf));
+  }
+
+  public static void handle(StackResponseClientMessage message, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
+      Minecraft.getInstance().player.containerMenu.setCarried(message.stack);
     });
-    ctx.get().setPacketHandled(true);
-  }
-
-  public static StackResponseClientMessage decode(FriendlyByteBuf buf) {
-    StackResponseClientMessage message = new StackResponseClientMessage();
-    message.stack = ItemStack.of(buf.readNbt());
-    return message;
-  }
-
-  public static void encode(StackResponseClientMessage msg, FriendlyByteBuf buf) {
-    buf.writeNbt(msg.stack.serializeNBT());
   }
 }

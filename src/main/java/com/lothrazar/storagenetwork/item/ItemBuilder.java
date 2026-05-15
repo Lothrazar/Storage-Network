@@ -10,6 +10,7 @@ import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -21,15 +22,15 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
-import net.minecraftforge.eventbus.api.Event.Result;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
 
 public class ItemBuilder extends ItemFlib {
 
@@ -41,14 +42,19 @@ public class ItemBuilder extends ItemFlib {
 
   public static void setBlockState(ItemStack wand, BlockState target) {
     CompoundTag encoded = NbtUtils.writeBlockState(target);
-    wand.getOrCreateTag().put(NBTBLOCKSTATE, encoded);
+    wand.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, data -> data.update(tag -> tag.put(NBTBLOCKSTATE, encoded)));
   }
 
   public static BlockState getBlockState(Level level, ItemStack wand) {
-    if (!wand.getOrCreateTag().contains(NBTBLOCKSTATE)) {
+    CustomData customData = wand.get(DataComponents.CUSTOM_DATA);
+    if (customData == null) {
       return null;
     }
-    return NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), wand.getOrCreateTag().getCompound(NBTBLOCKSTATE));
+    CompoundTag tag = customData.copyTag();
+    if (!tag.contains(NBTBLOCKSTATE)) {
+      return null;
+    }
+    return NbtUtils.readBlockState(level.registryAccess().lookupOrThrow(Registries.BLOCK), tag.getCompound(NBTBLOCKSTATE));
   }
 
   @SuppressWarnings("deprecation")
@@ -61,9 +67,7 @@ public class ItemBuilder extends ItemFlib {
     BlockPos buildAt = pos.relative(context.getClickedFace());
     if (world.getBlockEntity(pos) instanceof TileMain) {
       ItemStack stack = player.getItemInHand(hand);
-      CompoundTag tag = stack.getOrCreateTag();
       DimPos.putPos(stack, pos, world);
-      stack.setTag(tag);
       UtilTileEntity.statusMessage(player, "item.remote.connected");
       return InteractionResult.SUCCESS;
     }
@@ -117,16 +121,19 @@ public class ItemBuilder extends ItemFlib {
 
   @Override
   @OnlyIn(Dist.CLIENT)
-  public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+  public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
     MutableComponent t = Component.translatable(getDescriptionId() + ".tooltip");
     t.withStyle(ChatFormatting.GRAY);
     tooltip.add(t);
-    if (stack.hasTag()) {
+    if (stack.has(DataComponents.CUSTOM_DATA)) {
       DimPos dp = DimPos.getPosStored(stack);
       if (dp != null) {
         tooltip.add(dp.makeTooltip());
       } // block state?
-      BlockState target = ItemBuilder.getBlockState(worldIn, stack);
+      BlockState target = null;
+      if (context.level() != null) {
+        target = ItemBuilder.getBlockState(context.level(), stack);
+      }
       if (target != null) {
         String block = target.getBlock().getDescriptionId();
         t = Component.translatable(block);
@@ -150,7 +157,7 @@ public class ItemBuilder extends ItemFlib {
       BlockState target = world.getBlockState(event.getPos());
       ItemBuilder.setBlockState(held, target);
       UtilTileEntity.statusMessage(player, target);
-      event.setResult(Result.DENY);
+      event.setCanceled(true);
     }
   }
 }

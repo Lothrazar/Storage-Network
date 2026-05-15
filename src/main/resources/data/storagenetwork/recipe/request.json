@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "dkd",
+    "kck",
+    "dkd"
+  ],
+  "key": {
+    "k": {
+      "item": "minecraft:crafting_table"
+    },
+    "d": {
+      "tag": "c:ingots/gold"
+    },
+    "c": {
+      "item": "storagenetwork:inventory"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:request"
+  }
+}

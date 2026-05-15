@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " c ",
+    "gig",
+    " c "
+  ],
+  "key": {
+    "c": {
+      "tag": "c:dusts/redstone"
+    },
+    "i": {
+      "item": "storagenetwork:kabel"
+    },
+    "g": {
+      "item": "minecraft:coal"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:single_upgrade"
+  }
+}

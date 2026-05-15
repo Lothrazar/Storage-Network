@@ -10,13 +10,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 
 public class ScreenNetworkInventory extends AbstractNetworkScreen<ContainerNetworkInventory> {
 
   protected int HEIGHT = 256;
   public int WIDTH = 176;
-  private final ResourceLocation texture = new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/inventory.png");
+  private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/inventory.png");
   protected final NetworkWidget network;
   private TileInventory tile;
 

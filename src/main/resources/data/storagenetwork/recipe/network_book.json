@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "neoforge:conditions": [
+    {"type": "neoforge:mod_loaded", "modid": "patchouli"}
+  ],
+  "ingredients": [
+    {"item": "storagenetwork:kabel"},
+    {"item": "minecraft:book"}
+  ],
+  "result": {
+    "id": "patchouli:guide_book",
+    "count": 1,
+    "components": {
+      "patchouli:book": "storagenetwork:network_book"
+    }
+  }
+}

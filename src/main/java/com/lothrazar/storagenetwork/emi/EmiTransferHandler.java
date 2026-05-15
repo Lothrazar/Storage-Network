@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkWidget;
 import com.lothrazar.storagenetwork.network.RecipeMessage;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -18,8 +18,10 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -66,7 +68,7 @@ public class EmiTransferHandler<T extends ContainerNetwork> implements StandardR
   public boolean craft(EmiRecipe recipe, EmiCraftContext<T> context) {
     AbstractContainerScreen<T> screen = context.getScreen();
     CompoundTag nbt = buildRecipe(recipe, screen);
-    PacketRegistry.INSTANCE.sendToServer(new RecipeMessage(nbt));
+    PacketDistributor.sendToServer(new RecipeMessage(nbt));
     Minecraft.getInstance().setScreen(screen);
     return true;
   }
@@ -91,6 +93,7 @@ public class EmiTransferHandler<T extends ContainerNetwork> implements StandardR
         if (possibleItems.isEmpty()) {
           continue;
         }
+        HolderLookup.Provider registries = Minecraft.getInstance().level.registryAccess();
         ListTag invList = new ListTag();
         for (int i = 0; i < possibleItems.size(); i++) {
           if (i >= ConfigRegistry.RECIPEMAXTAGS.get()) {
@@ -98,8 +101,7 @@ public class EmiTransferHandler<T extends ContainerNetwork> implements StandardR
           }
           ItemStack itemStack = possibleItems.get(i);
           if (!itemStack.isEmpty()) {
-            CompoundTag stackTag = new CompoundTag();
-            itemStack.save(stackTag);
+            Tag stackTag = itemStack.save(registries);
             invList.add(stackTag);
           }
         }

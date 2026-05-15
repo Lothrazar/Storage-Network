@@ -81,12 +81,12 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
   }
 
   @Override
-  public boolean mouseScrolled(double x, double y, double mouseButton) {
-    super.mouseScrolled(x, y, mouseButton);
+  public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+    super.mouseScrolled(x, y, scrollX, scrollY);
     //<0 going down
     // >0 going up
-    if (isScrollable(x, y) && mouseButton != 0) {
-      getNetwork().mouseScrolled(mouseButton);
+    if (isScrollable(x, y) && scrollY != 0) {
+      getNetwork().mouseScrolled(scrollY);
     }
     return true;
   }
@@ -105,7 +105,7 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
 
   @Override
   public void render(GuiGraphics ms, int mouseX, int mouseY, float partialTicks) {
-    this.renderBackground(ms);
+    this.renderBackground(ms, mouseX, mouseY, partialTicks);
     super.render(ms, mouseX, mouseY, partialTicks);
     this.renderTooltip(ms, mouseX, mouseY);
     getNetwork().searchBar.render(ms, mouseX, mouseY, partialTicks);

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " k ",
+    "kpk",
+    " k "
+  ],
+  "key": {
+    "k": {
+      "item": "storagenetwork:kabel"
+    },
+    "p": {
+      "item": "minecraft:observer"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:filter_kabel",
+    "count": 4
+  }
+}

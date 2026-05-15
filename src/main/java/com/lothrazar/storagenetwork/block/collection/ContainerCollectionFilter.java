@@ -1,10 +1,10 @@
 package com.lothrazar.storagenetwork.block.collection;
 
+import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.block.cable.ContainerCable;
 import com.lothrazar.storagenetwork.capability.CapabilityConnectable;
 import com.lothrazar.storagenetwork.item.ItemUpgrade;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -20,9 +20,10 @@ public class ContainerCollectionFilter extends ContainerCable {
   public ContainerCollectionFilter(int windowId, Level world, BlockPos pos, Inventory playerInv, Player player) {
     super(SsnRegistry.Menus.COLLECTOR.get(), windowId);
     tile = (TileCollection) world.getBlockEntity(pos);
-    tile.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY).ifPresent(h -> {
-      this.cap = (CapabilityConnectable) h;
-    });
+    IConnectable connectable = tile.getConnectable();
+    if (connectable instanceof CapabilityConnectable pc) {
+      this.cap = pc;
+    }
     this.bindPlayerInvo(playerInv);
   }
 

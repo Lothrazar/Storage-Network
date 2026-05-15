@@ -6,6 +6,7 @@ import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.request.TileRequest;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -42,8 +43,8 @@ public class TileInventory extends TileConnectable implements MenuProvider, ITil
   }
 
   @Override
-  public void load(CompoundTag compound) {
-    super.load(compound);
+  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.loadAdditional(compound, registries);
     autoFocus = compound.getBoolean("autoFocus");
     setDownwards(compound.getBoolean("dir"));
     setSort(EnumSortType.values()[compound.getInt("sort")]);
@@ -53,8 +54,8 @@ public class TileInventory extends TileConnectable implements MenuProvider, ITil
   }
 
   @Override
-  public void saveAdditional(CompoundTag compound) {
-    super.saveAdditional(compound);
+  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.saveAdditional(compound, registries);
     compound.putBoolean("dir", isDownwards());
     compound.putInt("sort", getSort().ordinal());
     compound.putBoolean("autoFocus", autoFocus);

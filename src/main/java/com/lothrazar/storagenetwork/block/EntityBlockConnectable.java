@@ -2,7 +2,6 @@ package com.lothrazar.storagenetwork.block;
 
 import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.storagenetwork.network.SortClientMessage;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -16,8 +15,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public abstract class EntityBlockConnectable extends EntityBlockFlib {
 
@@ -37,7 +35,7 @@ public abstract class EntityBlockConnectable extends EntityBlockFlib {
   }
 
   @Override
-  public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+  public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult result) {
     if (!world.isClientSide && hasGui) {
       if (world.getBlockEntity(pos) instanceof TileConnectable tile) {
         if (tile.getMain() == null || tile.getMain().getBlockPos() == null) {
@@ -45,10 +43,10 @@ public abstract class EntityBlockConnectable extends EntityBlockFlib {
         }
         //sync
         ServerPlayer sp = (ServerPlayer) player;
-        PacketRegistry.INSTANCE.sendTo(new SortClientMessage(pos, tile.isDownwards(), tile.getSort()), sp.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        PacketDistributor.sendToPlayer(sp, new SortClientMessage(pos, tile.isDownwards(), tile.getSort()));
         //end sync
         if (tile instanceof MenuProvider) {
-          NetworkHooks.openScreen((ServerPlayer) player, (MenuProvider) tile, tile.getBlockPos());
+          sp.openMenu((MenuProvider) tile, buf -> buf.writeBlockPos(tile.getBlockPos()));
         }
         else {
           throw new IllegalStateException("Our named container provider is missing!");

@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 
 public class BlockCableExport extends BlockCable {
 
@@ -33,13 +32,13 @@ public class BlockCableExport extends BlockCable {
   }
 
   @Override
-  public InteractionResult use(BlockState state, Level world, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult result) {
+  public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player playerIn, BlockHitResult result) {
     if (!world.isClientSide) {
       BlockEntity tile = world.getBlockEntity(pos);
       if (tile instanceof MenuProvider) {
         ServerPlayer player = (ServerPlayer) playerIn;
         player.connection.send(tile.getUpdatePacket());
-        NetworkHooks.openScreen(player, (MenuProvider) tile, tile.getBlockPos());
+        player.openMenu((MenuProvider) tile, buf -> buf.writeBlockPos(tile.getBlockPos()));
       }
       else {
         throw new IllegalStateException("Our named container provider is missing!" + tile);

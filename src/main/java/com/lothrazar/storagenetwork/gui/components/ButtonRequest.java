@@ -108,12 +108,7 @@ public class ButtonRequest extends Button {
 
   public ButtonRequest(int xPos, int yPos, String displayString, OnPress handler, CreateNarration narration) {
     super(xPos, yPos, SIZE, SIZE, Component.translatable(displayString), handler, narration);
-    texture = new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/cable.png");
-  }
-
-  @Override
-  public void render(GuiGraphics ms, int mx, int my, float pt) {
-    super.render(ms, mx, my, pt);
+    texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable.png");
   }
 
   private int getTextureY() {

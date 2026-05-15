@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.lothrazar.storagenetwork.network.RecipeMessage;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.HolderLookup;
+import net.neoforged.neoforge.network.PacketDistributor;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
@@ -19,27 +21,28 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 /**
  * https://github.com/mezz/JustEnoughItems/blob/1.19/Common/src/main/java/mezz/jei/common/transfer/BasicRecipeTransferHandler.java
- * 
+ *
  * NEW in mc1.19: abstract class to override in the Plugin during registration
  */
-public abstract class RequestRecipeTransferHandler<C extends AbstractContainerMenu> implements IRecipeTransferHandler<C, CraftingRecipe> {
+public abstract class RequestRecipeTransferHandler<C extends AbstractContainerMenu> implements IRecipeTransferHandler<C, RecipeHolder<CraftingRecipe>> {
 
   @Override
-  public IRecipeTransferError transferRecipe(C c, CraftingRecipe recipe, IRecipeSlotsView recipeSlots, Player playerEntity,
+  public IRecipeTransferError transferRecipe(C c, RecipeHolder<CraftingRecipe> recipe, IRecipeSlotsView recipeSlots, Player playerEntity,
       boolean maxTransfer, boolean doTransfer) {
     if (doTransfer) {
       CompoundTag nbt = RequestRecipeTransferHandler.recipeToTag(c, recipeSlots);
-      PacketRegistry.INSTANCE.sendToServer(new RecipeMessage(nbt));
+      PacketDistributor.sendToServer(new RecipeMessage(nbt));
     }
     return null;
   }
 
   public static CompoundTag recipeToTag(AbstractContainerMenu container, IRecipeSlotsView recipeSlots) {
     CompoundTag nbt = new CompoundTag();
-
+    HolderLookup.Provider registries = Minecraft.getInstance().level.registryAccess();
     List<IRecipeSlotView> slotsViewList = recipeSlots.getSlotViews();
     for (Slot slot : container.slots) {
       if (slot.container instanceof net.minecraft.world.inventory.CraftingContainer) {
@@ -59,9 +62,7 @@ public abstract class RequestRecipeTransferHandler<C extends AbstractContainerMe
           }
           ItemStack itemStack = possibleItems.get(i);
           if (!itemStack.isEmpty()) {
-            CompoundTag stackTag = new CompoundTag();
-            itemStack.save(stackTag);
-            invList.add(stackTag);
+            invList.add(itemStack.save(registries));
           }
         }
         nbt.put("s" + (slot.getSlotIndex()), invList);
@@ -71,7 +72,7 @@ public abstract class RequestRecipeTransferHandler<C extends AbstractContainerMe
   }
 
   @Override
-  public RecipeType<CraftingRecipe> getRecipeType() {
+  public RecipeType<RecipeHolder<CraftingRecipe>> getRecipeType() {
     return RecipeTypes.CRAFTING;
   }
 }

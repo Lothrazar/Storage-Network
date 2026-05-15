@@ -10,13 +10,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 
 public class ScreenNetworkCraftingRemote extends AbstractNetworkScreen<ContainerNetworkCraftingRemote> {
 
   private static final int HEIGHT = 256;
   private static final int WIDTH = 176;
-  private static final ResourceLocation textureCraft = new ResourceLocation(StorageNetworkMod.MODID, "textures/gui/request.png");
+  private static final ResourceLocation textureCraft = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/request.png");
   private final NetworkWidget network;
   private final ItemStack remote;
 

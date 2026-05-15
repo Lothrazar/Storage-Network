@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
 import com.lothrazar.storagenetwork.network.StackRefreshClientMessage;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
@@ -23,12 +23,13 @@ import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
-import net.minecraftforge.network.NetworkDirection;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper;
 
 public abstract class ContainerNetwork extends AbstractContainerMenu {
 
@@ -127,10 +128,10 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
 
   //it runs on server tho
   protected void findMatchingRecipeClient(Level world, CraftingContainer inventory, ResultContainer result) {
-    Optional<CraftingRecipe> optional = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventory, world);
+    CraftingInput craftingInput = inventory.asCraftInput();
+    Optional<RecipeHolder<CraftingRecipe>> optional = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftingInput, world);
     if (optional.isPresent()) {
-      CraftingRecipe icraftingrecipe = optional.get();
-      this.recipeCurrent = icraftingrecipe;
+      this.recipeCurrent = optional.get().value();
     }
   }
 
@@ -140,11 +141,13 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
       final int slotId = 0;
       ServerPlayer serverplayerentity = (ServerPlayer) player;
       ItemStack itemstack = ItemStack.EMPTY;
-      Optional<CraftingRecipe> optional = world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, inventory, world);
+      CraftingInput craftingInput = inventory.asCraftInput();
+      Optional<RecipeHolder<CraftingRecipe>> optional = world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftingInput, world);
       if (optional.isPresent()) {
-        CraftingRecipe icraftingrecipe = optional.get();
-        if (result.setRecipeUsed(world, serverplayerentity, icraftingrecipe)) {
-          itemstack = icraftingrecipe.assemble(inventory, world.registryAccess());
+        RecipeHolder<CraftingRecipe> holder = optional.get();
+        CraftingRecipe icraftingrecipe = holder.value();
+        if (result.setRecipeUsed(world, serverplayerentity, holder)) {
+          itemstack = icraftingrecipe.assemble(craftingInput, world.registryAccess());
           this.recipeCurrent = icraftingrecipe;
         }
       }
@@ -171,14 +174,13 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
       }
       else if (tileMain != null) {
         int rest = tileMain.insertStack(itemstack1, false);
-        ItemStack stack = rest == 0 ? ItemStack.EMPTY : ItemHandlerHelper.copyStackWithSize(itemstack1, rest);
+        ItemStack stack = rest == 0 ? ItemStack.EMPTY : itemstack1.copyWithCount(rest);
         slot.set(stack);
         broadcastChanges();
         List<ItemStack> list = tileMain.getNetwork().getSortedStacks();
         if (playerIn instanceof ServerPlayer) {
           ServerPlayer sp = (ServerPlayer) playerIn;
-          PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()),
-              sp.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+          PacketDistributor.sendToPlayer(sp, new StackRefreshClientMessage(list, new ArrayList<>()));
         }
         if (stack.isEmpty()) {
           return ItemStack.EMPTY;
@@ -224,7 +226,7 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
     for (int i = 0; i < matrix.getContainerSize(); i++) {
       recipeCopy.add(matrix.getItem(i).copy());
     }
-    ItemStack res = recipeCurrent.assemble(matrix, level.registryAccess());
+    ItemStack res = recipeCurrent.assemble(matrix.asCraftInput(), level.registryAccess());
     if (res.isEmpty()) {
       StorageNetworkMod.LOGGER.error("err Recipe output is an empty stack " + recipeCurrent);
       return;
@@ -232,14 +234,14 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
     int sizePerCraft = res.getCount();
     //StorageNetwork.log("[craftShift] sizePerCraft = " + sizePerCraft + " for stack " + res);
     while (crafted + sizePerCraft <= res.getMaxStackSize()) {
-      res = recipeCurrent.assemble(matrix, level.registryAccess());
+      res = recipeCurrent.assemble(matrix.asCraftInput(), level.registryAccess());
       //  StorageNetwork.log("[craftShift]  crafted = " + crafted + " ; res.count() = " + res.getCount() + " MAX=" + res.getMaxStackSize());
       if (!ItemHandlerHelper.insertItemStacked(new PlayerMainInvWrapper(playerInv), res, true).isEmpty()) {
         //  StorageNetwork.log("[craftShift] cannot insert more, end");
         break;
       }
       //stop if empty
-      if (recipeCurrent.matches(matrix, level) == false) {
+      if (recipeCurrent.matches(matrix.asCraftInput(), level) == false) {
         // StorageNetwork.log("[craftShift] recipe doesnt match i quit");
         break;
       }
@@ -248,7 +250,7 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
       if (!player.getInventory().add(res)) {
         player.drop(res, false);
       }
-      NonNullList<ItemStack> remainder = recipeCurrent.getRemainingItems(this.matrix);
+      NonNullList<ItemStack> remainder = recipeCurrent.getRemainingItems(this.matrix.asCraftInput());
       for (int i = 0; i < remainder.size(); ++i) {
         ItemStack remainderCurrent = remainder.get(i);
         ItemStack slot = this.matrix.getItem(i);
@@ -268,7 +270,7 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
           if (slot.isEmpty()) {
             this.matrix.setItem(i, remainderCurrent);
           }
-          else if (ItemStack.matches(slot, remainderCurrent) && ItemStack.isSameItemSameTags(slot, remainderCurrent)) {
+          else if (ItemStack.matches(slot, remainderCurrent) && ItemStack.isSameItemSameComponents(slot, remainderCurrent)) {
             remainderCurrent.grow(slot.getCount());
             this.matrix.setItem(i, remainderCurrent);
           }

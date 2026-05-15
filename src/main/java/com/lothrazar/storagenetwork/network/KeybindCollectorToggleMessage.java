@@ -1,27 +1,33 @@
 package com.lothrazar.storagenetwork.network;
 
-import com.lothrazar.storagenetwork.item.ItemCollector;
+import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import com.lothrazar.storagenetwork.util.UtilInventory;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
+public class KeybindCollectorToggleMessage implements CustomPacketPayload {
 
-public class KeybindCollectorToggleMessage {
+  public static final CustomPacketPayload.Type<KeybindCollectorToggleMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "keybind_collector_toggle"));
 
-  public KeybindCollectorToggleMessage() {
+  public static final StreamCodec<FriendlyByteBuf, KeybindCollectorToggleMessage> STREAM_CODEC =
+      StreamCodec.unit(new KeybindCollectorToggleMessage());
+
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
   }
 
-  public static void handle(KeybindCollectorToggleMessage msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer player = ctx.get().getSender();
+  public static void handle(KeybindCollectorToggleMessage msg, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer player = (ServerPlayer) ctx.player();
       if (player != null) {
-
-        // added curios compatibility to toggle feature
         var searchResult = UtilInventory.getCurioRemote(player, SsnRegistry.Items.COLLECTOR_REMOTE.get());
         ItemStack remoteFound = searchResult.getRight();
         if (!remoteFound.isEmpty()) {
@@ -29,14 +35,5 @@ public class KeybindCollectorToggleMessage {
         }
       }
     });
-    ctx.get().setPacketHandled(true);
-  }
-
-  public void encode(FriendlyByteBuf friendlyByteBuf) {
-  }
-
-  public static KeybindCollectorToggleMessage decode(FriendlyByteBuf friendlyByteBuf) {
-    KeybindCollectorToggleMessage message = new KeybindCollectorToggleMessage();
-    return message;
   }
 }

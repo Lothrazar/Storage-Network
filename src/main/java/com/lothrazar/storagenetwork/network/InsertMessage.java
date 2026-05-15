@@ -2,32 +2,54 @@ package com.lothrazar.storagenetwork.network;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
+import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
-import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class InsertMessage {
+public class InsertMessage implements CustomPacketPayload {
 
-  private int dim, mouseButton;
+  public static final CustomPacketPayload.Type<InsertMessage> TYPE =
+      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "insert"));
+
+  public static final StreamCodec<RegistryFriendlyByteBuf, InsertMessage> STREAM_CODEC = StreamCodec.of(
+      InsertMessage::write,
+      InsertMessage::read
+  );
+
+  private final int dim;
+  private final int mouseButton;
 
   public InsertMessage(int dim, int buttonID) {
     this.dim = dim;
     this.mouseButton = buttonID;
   }
 
-  private InsertMessage() {}
+  @Override
+  public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
 
-  public static void handle(InsertMessage message, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer player = ctx.get().getSender();
+  private static void write(RegistryFriendlyByteBuf buf, InsertMessage msg) {
+    buf.writeInt(msg.dim);
+    buf.writeInt(msg.mouseButton);
+  }
+
+  private static InsertMessage read(RegistryFriendlyByteBuf buf) {
+    return new InsertMessage(buf.readInt(), buf.readInt());
+  }
+
+  public static void handle(InsertMessage message, IPayloadContext ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer player = (ServerPlayer) ctx.player();
       TileMain root = null;
       if (player.containerMenu instanceof ContainerNetwork) {
         root = ((ContainerNetwork) player.containerMenu).getTileMain();
@@ -38,7 +60,7 @@ public class InsertMessage {
       if (message.mouseButton == UtilTileEntity.MOUSE_BTN_LEFT) {
         rest = root.insertStack(stack, false);
         if (rest != 0) {
-          send = ItemHandlerHelper.copyStackWithSize(stack, rest);
+          send = stack.copyWithCount(rest);
         }
       }
       else if (message.mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT) {
@@ -47,30 +69,14 @@ public class InsertMessage {
         stack.shrink(1);
         rest = root.insertStack(stack1, false) + stack.getCount();
         if (rest != 0) {
-          send = ItemHandlerHelper.copyStackWithSize(stack, rest);
+          send = stack.copyWithCount(rest);
         }
       }
       player.containerMenu.setCarried(send);
-      //
-      PacketRegistry.INSTANCE.sendTo(new StackResponseClientMessage(send),
-          player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+      PacketDistributor.sendToPlayer(player, new StackResponseClientMessage(send));
       List<ItemStack> list = root.getNetwork().getStacks();
-      PacketRegistry.INSTANCE.sendTo(new StackRefreshClientMessage(list, new ArrayList<>()),
-          player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+      PacketDistributor.sendToPlayer(player, new StackRefreshClientMessage(list, new ArrayList<>()));
       player.containerMenu.broadcastChanges();
     });
-    ctx.get().setPacketHandled(true);
-  }
-
-  public static InsertMessage decode(FriendlyByteBuf buf) {
-    InsertMessage message = new InsertMessage();
-    message.dim = buf.readInt();
-    message.mouseButton = buf.readInt();
-    return message;
-  }
-
-  public static void encode(InsertMessage msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.dim);
-    buf.writeInt(msg.mouseButton);
   }
 }

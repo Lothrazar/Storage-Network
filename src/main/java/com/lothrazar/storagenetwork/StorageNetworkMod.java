@@ -1,5 +1,7 @@
 package com.lothrazar.storagenetwork;
 
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.lothrazar.storagenetwork.block.cable.export.ScreenCableExportFilter;
@@ -17,17 +19,17 @@ import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.lothrazar.storagenetwork.registry.SsnEvents;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLPaths;
+import com.lothrazar.storagenetwork.registry.SsnTab;
+import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(StorageNetworkMod.MODID)
 public class StorageNetworkMod {
@@ -36,37 +38,47 @@ public class StorageNetworkMod {
   public static final Logger LOGGER = LogManager.getLogger();
   public static ConfigRegistry CONFIG;
 
-  public StorageNetworkMod() {
-    FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageNetworkMod::setup);
-    MinecraftForge.EVENT_BUS.register(new SsnRegistry.Tiles());
-    MinecraftForge.EVENT_BUS.register(new SsnEvents());
-    IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-    SsnRegistry.BLOCKS.register(bus);
-    SsnRegistry.ITEMS.register(bus);
-    SsnRegistry.TILES.register(bus);
-    SsnRegistry.CONTAINERS.register(bus);
-    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-      FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
-      FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerMapping);
-    });
+  public StorageNetworkMod(IEventBus modEventBus, ModContainer modContainer) {
+    modContainer.registerConfig(ModConfig.Type.COMMON, ConfigRegistry.COMMON_CONFIG);
+    modEventBus.addListener(StorageNetworkMod::setup);
+    modEventBus.addListener(PacketRegistry::registerPayloads);
+    modEventBus.register(SsnTab.class);
+    modEventBus.register(StorageNetworkCapabilities.class);
+    NeoForge.EVENT_BUS.register(new SsnEvents());
+    SsnRegistry.Blocks.init();
+    SsnRegistry.BLOCKS.register(modEventBus);
+    SsnRegistry.Items.init();
+    SsnRegistry.ITEMS.register(modEventBus);
+    SsnRegistry.Tiles.init();
+    SsnRegistry.TILES.register(modEventBus);
+    SsnRegistry.Menus.init();
+    SsnRegistry.CONTAINERS.register(modEventBus);
+    if (FMLEnvironment.dist == Dist.CLIENT) {
+      modEventBus.register(ClientEventRegistry.class);
+      modEventBus.addListener(this::setupClient);
+      modEventBus.addListener(this::registerScreens);
+      modEventBus.addListener(this::registerMapping);
+    }
   }
 
   private static void setup(FMLCommonSetupEvent event) {
-    PacketRegistry.init();
-    CONFIG = new ConfigRegistry(FMLPaths.CONFIGDIR.get().resolve(MODID + ".toml"));
+    CONFIG = new ConfigRegistry();
   }
 
   private void setupClient(final FMLClientSetupEvent event) {
-    MenuScreens.register(SsnRegistry.Menus.REQUEST.get(), ScreenNetworkTable::new);
-    MenuScreens.register(SsnRegistry.Menus.FILTER_KABEL.get(), ScreenCableFilter::new);
-    MenuScreens.register(SsnRegistry.Menus.IMPORT_FILTER_KABEL.get(), ScreenCableImportFilter::new);
-    MenuScreens.register(SsnRegistry.Menus.EXPORT_KABEL.get(), ScreenCableExportFilter::new);
-    MenuScreens.register(SsnRegistry.Menus.INVENTORY_REMOTE.get(), ScreenNetworkRemote::new);
-    MenuScreens.register(SsnRegistry.Menus.CRAFTING_REMOTE.get(), ScreenNetworkCraftingRemote::new);
-    MenuScreens.register(SsnRegistry.Menus.INVENTORY.get(), ScreenNetworkInventory::new);
-    MenuScreens.register(SsnRegistry.Menus.COLLECTOR.get(), ScreenCollectionFilter::new);
-    MenuScreens.register(SsnRegistry.Menus.REQUEST_EXPANDED.get(), ScreenNetworkInventoryExpanded::new);
-    MenuScreens.register(SsnRegistry.Menus.EXPANDED_REMOTE.get(), ScreenNetworkExpandedRemote::new);
+  }
+
+  private void registerScreens(final RegisterMenuScreensEvent event) {
+    event.register(SsnRegistry.Menus.REQUEST.get(), ScreenNetworkTable::new);
+    event.register(SsnRegistry.Menus.FILTER_KABEL.get(), ScreenCableFilter::new);
+    event.register(SsnRegistry.Menus.IMPORT_FILTER_KABEL.get(), ScreenCableImportFilter::new);
+    event.register(SsnRegistry.Menus.EXPORT_KABEL.get(), ScreenCableExportFilter::new);
+    event.register(SsnRegistry.Menus.INVENTORY_REMOTE.get(), ScreenNetworkRemote::new);
+    event.register(SsnRegistry.Menus.CRAFTING_REMOTE.get(), ScreenNetworkCraftingRemote::new);
+    event.register(SsnRegistry.Menus.INVENTORY.get(), ScreenNetworkInventory::new);
+    event.register(SsnRegistry.Menus.COLLECTOR.get(), ScreenCollectionFilter::new);
+    event.register(SsnRegistry.Menus.REQUEST_EXPANDED.get(), ScreenNetworkInventoryExpanded::new);
+    event.register(SsnRegistry.Menus.EXPANDED_REMOTE.get(), ScreenNetworkExpandedRemote::new);
   }
 
   private void registerMapping(final RegisterKeyMappingsEvent event) {

@@ -33,7 +33,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 /**
  * Responsible for network connection list, cache, requests and single inserts.
@@ -63,11 +62,7 @@ public class NetworkModule {
       if (!pos.isLoaded()) {
         continue;
       }
-      BlockEntity tileEntity = pos.getTileEntity(BlockEntity.class);
-      if (tileEntity == null) {
-        continue;
-      }
-      IConnectable cap = tileEntity.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY, null).orElse(null);
+      IConnectable cap = pos.getCapability(StorageNetworkCapabilities.CONNECTABLE, null);
       if (cap == null) {
         StorageNetworkMod.LOGGER.info("Somehow stored a dimpos that is not connectable... Skipping " + pos);
         continue;
@@ -228,7 +223,7 @@ public class NetworkModule {
     String key = UtilInventory.getStackKey(stack);
     if (ch.hasCachedSlot(stack)) {
       DimPos cachedStoragePos = ch.getCachedSlot(stack);
-      IConnectableLink storage = cachedStoragePos.getCapability(StorageNetworkCapabilities.CONNECTABLE_ITEM_STORAGE_CAPABILITY, null);
+      IConnectableLink storage = cachedStoragePos.getCapability(StorageNetworkCapabilities.CONNECTABLE_ITEM_STORAGE, null);
       if (storage == null) {
         // The block at the cached position is not even an IConnectableLink anymore
         ch.remove(key);
@@ -306,7 +301,7 @@ public class NetworkModule {
     if (alreadyTransferred <= 0) {
       return ItemStack.EMPTY;
     }
-    return ItemHandlerHelper.copyStackWithSize(usedMatcher.getStack(), alreadyTransferred);
+    return usedMatcher.getStack().copyWithCount(alreadyTransferred);
   }
 
   public void executeRequestBatch(RequestBatch batch) {
@@ -385,7 +380,7 @@ public class NetworkModule {
       if (tileHere == null) {
         continue;
       }
-      IConnectable capabilityConnectable = tileHere.getCapability(StorageNetworkCapabilities.CONNECTABLE_CAPABILITY, direction.getOpposite()).orElse(null);
+      IConnectable capabilityConnectable = lookPos.getCapability(StorageNetworkCapabilities.CONNECTABLE, direction.getOpposite());
       if (capabilityConnectable == null) {
         continue;
       }
@@ -434,11 +429,7 @@ public class NetworkModule {
       if (!dimpos.isLoaded()) {
         continue;
       }
-      BlockEntity tileEntity = dimpos.getTileEntity(BlockEntity.class);
-      if (tileEntity == null) {
-        continue;
-      }
-      IConnectableLink capConnect = tileEntity.getCapability(StorageNetworkCapabilities.CONNECTABLE_ITEM_STORAGE_CAPABILITY, null).orElse(null);
+      IConnectableLink capConnect = dimpos.getCapability(StorageNetworkCapabilities.CONNECTABLE_ITEM_STORAGE, null);
       if (capConnect == null) {
         continue;
       }

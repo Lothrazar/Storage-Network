@@ -15,8 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class UtilTileEntity {
 
@@ -28,7 +27,7 @@ public class UtilTileEntity {
   public static void addOrMergeIntoList(List<ItemStack> list, ItemStack stackToAdd) {
     boolean added = false;
     for (ItemStack stack : list) {
-      if (ItemHandlerHelper.canItemStacksStack(stackToAdd, stack)) {
+      if (ItemStack.isSameItemSameComponents(stackToAdd, stack)) {
         stack.setCount(stack.getCount() + stackToAdd.getCount());
         added = true;
         break;
@@ -43,7 +42,7 @@ public class UtilTileEntity {
     if (soundIn == null || entityIn == null) {
       return;
     }
-    entityIn.connection.send(new ClientboundSoundPacket(ForgeRegistries.SOUND_EVENTS.getHolder(soundIn).get(), SoundSource.PLAYERS, entityIn.xOld, entityIn.yOld, entityIn.zOld, volume, 1.0F, 0)); // pitch=1; seed=0
+    entityIn.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundIn), SoundSource.PLAYERS, entityIn.xOld, entityIn.yOld, entityIn.zOld, volume, 1.0F, 0)); // pitch=1; seed=0
   }
 
   public static void chatMessage(Player player, String message) {
@@ -91,7 +90,7 @@ public class UtilTileEntity {
     if (modNamesForIds.containsKey(theitem)) {
       return modNamesForIds.get(theitem);
     }
-    String modId = ForgeRegistries.ITEMS.getKey(theitem).getNamespace();
+    String modId = BuiltInRegistries.ITEM.getKey(theitem).getNamespace();
     String lowercaseModId = modId.toLowerCase(Locale.ENGLISH);
     modNamesForIds.put(theitem, lowercaseModId);
     return lowercaseModId;

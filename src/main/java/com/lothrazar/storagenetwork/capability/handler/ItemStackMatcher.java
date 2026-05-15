@@ -1,6 +1,7 @@
 package com.lothrazar.storagenetwork.capability.handler;
 
 import com.lothrazar.storagenetwork.api.IItemStackMatcher;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
@@ -22,20 +23,20 @@ public class ItemStackMatcher implements IItemStackMatcher {
 
   private ItemStackMatcher() {}
 
-  public void readFromNBT(CompoundTag compound) {
+  public void readFromNBT(HolderLookup.Provider registries, CompoundTag compound) {
     CompoundTag c = (CompoundTag) compound.get("stack");
-    stack = ItemStack.of(c);
+    stack = c != null ? ItemStack.parseOptional(registries, c) : ItemStack.EMPTY;
     ore = compound.getBoolean("ore");
     nbt = compound.getBoolean("nbt");
   }
 
-  public CompoundTag writeToNBT(CompoundTag compound) {
-    CompoundTag c = new CompoundTag();
-    stack.save(c);
-    compound.put("stack", c);
+  public CompoundTag writeToNBT(HolderLookup.Provider registries, CompoundTag compound) {
+    if (!stack.isEmpty()) {
+      compound.put("stack", stack.save(registries));
+    }
     compound.putBoolean("ore", ore);
     compound.putBoolean("nbt", nbt);
-    return c;
+    return compound;
   }
 
   @Override
@@ -68,9 +69,9 @@ public class ItemStackMatcher implements IItemStackMatcher {
     this.nbt = nbt;
   }
 
-  public static ItemStackMatcher loadFilterItemFromNBT(CompoundTag nbt) {
+  public static ItemStackMatcher loadFilterItemFromNBT(HolderLookup.Provider registries, CompoundTag nbt) {
     ItemStackMatcher fil = new ItemStackMatcher();
-    fil.readFromNBT(nbt);
+    fil.readFromNBT(registries, nbt);
     return fil.getStack() != null && fil.getStack().getItem() != null ? fil : null;
   }
 
@@ -79,7 +80,7 @@ public class ItemStackMatcher implements IItemStackMatcher {
     if (stackIn.isEmpty()) {
       return false;
     }
-    if (nbt && !ItemStack.isSameItemSameTags(stack, stackIn)) {
+    if (nbt && !ItemStack.isSameItemSameComponents(stack, stackIn)) {
       return false;
     }
     return stackIn.getItem() == stack.getItem();

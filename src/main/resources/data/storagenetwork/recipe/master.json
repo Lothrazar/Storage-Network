@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "dkd",
+    "kck",
+    "dkd"
+  ],
+  "key": {
+    "k": {
+      "item": "storagenetwork:kabel"
+    },
+    "d": {
+      "item": "minecraft:quartz"
+    },
+    "c": {
+      "tag": "c:gems/diamond"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:master"
+  }
+}

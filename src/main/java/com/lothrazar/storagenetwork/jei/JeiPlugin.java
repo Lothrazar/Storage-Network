@@ -23,7 +23,7 @@ public class JeiPlugin implements IModPlugin {
 
   @Override
   public ResourceLocation getPluginUid() {
-    return new ResourceLocation(StorageNetworkMod.MODID, "jei");
+    return ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "jei");
   }
 
   @Override
