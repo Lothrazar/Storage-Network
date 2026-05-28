@@ -163,7 +163,7 @@ public class NetworkWidget {
       }
       clearGridBtn = new ButtonRequest(
           x, y, "", (p) -> {
-            PacketDistributor.sendToServer(new ClearRecipeMessage());
+            PacketDistributor.sendToServer(ClearRecipeMessage.INSTANCE);
             PacketDistributor.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
           }, DEFAULT_NARRATION);
       clearGridBtn.setHeight(7);

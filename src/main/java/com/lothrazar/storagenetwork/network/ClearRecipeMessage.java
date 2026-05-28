@@ -16,11 +16,13 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClearRecipeMessage implements CustomPacketPayload {
 
+  public static final ClearRecipeMessage INSTANCE = new ClearRecipeMessage();
+
   public static final CustomPacketPayload.Type<ClearRecipeMessage> TYPE =
       new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "clear_recipe"));
 
   public static final StreamCodec<net.minecraft.network.FriendlyByteBuf, ClearRecipeMessage> STREAM_CODEC =
-      StreamCodec.unit(new ClearRecipeMessage());
+      StreamCodec.unit(INSTANCE);
 
   @Override
   public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
