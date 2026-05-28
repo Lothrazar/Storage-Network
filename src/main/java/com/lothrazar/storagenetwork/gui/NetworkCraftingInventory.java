@@ -1,9 +1,6 @@
 package com.lothrazar.storagenetwork.gui;
 
 import java.util.Map;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -11,23 +8,19 @@ import net.minecraft.world.item.ItemStack;
 public class NetworkCraftingInventory extends TransientCraftingContainer {
 
   private static final int SIZE = 3;
-  /** stupid thing is private with no getter so overwrite */
-  private final NonNullList<ItemStack> stackList;
-  private final AbstractContainerMenu eventHandler;
   private boolean skipEvents;
 
   public NetworkCraftingInventory(AbstractContainerMenu eventHandlerIn) {
     super(eventHandlerIn, SIZE, SIZE);
-    eventHandler = eventHandlerIn;
-    stackList = NonNullList.<ItemStack> withSize(SIZE * SIZE, ItemStack.EMPTY);
   }
 
   public NetworkCraftingInventory(AbstractContainerMenu eventHandlerIn, Map<Integer, ItemStack> matrix) {
     this(eventHandlerIn);
     skipEvents = true;
     for (int i = 0; i < SIZE * SIZE; i++) {
-      if (matrix.get(i) != null && matrix.get(i).isEmpty() == false) {
-        setItem(i, matrix.get(i));
+      ItemStack stack = matrix.get(i);
+      if (stack != null && !stack.isEmpty()) {
+        setItem(i, stack);
       }
     }
     skipEvents = false;
@@ -35,55 +28,11 @@ public class NetworkCraftingInventory extends TransientCraftingContainer {
 
   @Override
   public void setItem(int index, ItemStack stack) {
-    stackList.set(index, stack);
-    if (skipEvents == false) {
-      eventHandler.slotsChanged(this);
+    if (skipEvents) {
+      getItems().set(index, stack);
     }
-  }
-
-  @Override
-  public int getContainerSize() {
-    return stackList.size();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    for (ItemStack itemstack : stackList) {
-      if (!itemstack.isEmpty()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public ItemStack getItem(int index) {
-    return index >= getContainerSize() ? ItemStack.EMPTY : (ItemStack) stackList.get(index);
-  }
-
-  @Override
-  public ItemStack removeItemNoUpdate(int index) {
-    return ContainerHelper.takeItem(stackList, index);
-  }
-
-  @Override
-  public ItemStack removeItem(int index, int count) {
-    ItemStack itemstack = ContainerHelper.removeItem(stackList, index, count);
-    if (!itemstack.isEmpty()) {
-      eventHandler.slotsChanged(this);
-    }
-    return itemstack;
-  }
-
-  @Override
-  public void clearContent() {
-    stackList.clear();
-  }
-
-  @Override
-  public void fillStackedContents(StackedContents helper) {
-    for (ItemStack itemstack : stackList) {
-      helper.accountStack(itemstack);
+    else {
+      super.setItem(index, stack);
     }
   }
 }
