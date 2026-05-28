@@ -64,7 +64,7 @@ public class NetworkModule {
       }
       IConnectable cap = pos.getCapability(StorageNetworkCapabilities.CONNECTABLE, null);
       if (cap == null) {
-        StorageNetworkMod.LOGGER.info("Somehow stored a dimpos that is not connectable... Skipping " + pos);
+        StorageNetworkMod.LOGGER.debug("Somehow stored a dimpos that is not connectable... Skipping " + pos);
         continue;
       }
       result.add(cap);
