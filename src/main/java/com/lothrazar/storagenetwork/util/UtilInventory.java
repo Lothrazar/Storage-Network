@@ -41,8 +41,9 @@ public class UtilInventory {
     }
     if (ModList.get().isLoaded("curios")) {
       //check curios slots
-      //      final ImmutableTriple<String, Integer, ItemStack> equipped = CuriosApi.getCuriosHelper().findEquippedCurio(remote, player).orElse(null);
-      SlotResult first = CuriosApi.getCuriosHelper().findFirstCurio(player, remote).orElse(null);
+      SlotResult first = CuriosApi.getCuriosInventory(player)
+          .flatMap(handler -> handler.findFirstCurio(remote))
+          .orElse(null);
       if (first != null && isRemoteWithData(first.stack(), remote)) {
         //success: try to insert items to network thru this remote 
         return Triple.of("curios", first.slotContext().index(), first.stack());
