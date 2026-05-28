@@ -21,10 +21,10 @@ public class ConfigRegistry {
   private static IntValue REFRESHTICKS;
   public static IntValue EXCHANGEBUFFER;
   private static BooleanValue RELOADONCHUNK;
-  private static ConfigValue<List<String>> IGNORELIST;
+  private static ConfigValue<List<? extends String>> IGNORELIST;
   public static IntValue ITEMRANGE;
   public static IntValue RECIPEMAXTAGS;
-  private static ConfigValue<List<String>> CABLEIGNORELIST;
+  private static ConfigValue<List<? extends String>> CABLEIGNORELIST;
   public static BooleanValue enableFacades;
   static {
     initConfig();
@@ -49,8 +49,7 @@ public class ConfigRegistry {
     List<String> list = new ArrayList<String>();
     list.add("extrautils2:playerchest");
     IGNORELIST = COMMON_BUILDER.comment("\r\n Disable these blocks from ever being able to connect to the network, they will be treated as a non-inventory.")
-        .define("NotallowedBlocks",
-            list);
+        .defineListAllowEmpty("NotallowedBlocks", list, () -> "", o -> o instanceof String);
     EXCHANGEBUFFER = COMMON_BUILDER.comment("\r\n How many itemstacks from the network are visible to external connections through the storagenetwork:exchange.  "
         + "Too low and not all items can pass through, too large and there will be packet/buffer overflows.")
         .defineInRange("exchangeBufferSize", 1024, 1, 5000);
@@ -74,7 +73,7 @@ public class ConfigRegistry {
         "cyclic:*_pipe", "cyclic:*_bars",
         "storagenetwork:*");
     CABLEIGNORELIST = COMMON_BUILDER.comment("\r\n These items are not able to be used as Facade blocks for cables (shift-left-click to add or remove block facades while in not-creative)")
-        .define("itemsNotAllowed", list);
+        .defineListAllowEmpty("itemsNotAllowed", list, () -> "", o -> o instanceof String);
     enableFacades = COMMON_BUILDER.comment("Change this to 'false' to disable facades.  The facade feature lets you hide cables with blocks (does not consume the item, use shift-left-click when not creative)")
         .define("enabled", true);
     COMMON_BUILDER.pop();
@@ -97,7 +96,7 @@ public class ConfigRegistry {
     return REFRESHTICKS.get();
   }
 
-  public List<String> ignorelist() {
+  public List<? extends String> ignorelist() {
     return IGNORELIST.get();
   }
 }
