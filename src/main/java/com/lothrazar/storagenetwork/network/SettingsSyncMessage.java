@@ -32,13 +32,15 @@ public class SettingsSyncMessage implements CustomPacketPayload {
   private final boolean targetTileEntity;
   private final boolean jeiSync;
   private final boolean autoFocus;
+  private final boolean fullStackCraft;
 
-  public SettingsSyncMessage(BlockPos pos, boolean direction, EnumSortType sort, boolean jeiSync, boolean autoFocus) {
+  public SettingsSyncMessage(BlockPos pos, boolean direction, EnumSortType sort, boolean jeiSync, boolean autoFocus, boolean fullStackCraft) {
     this.pos = pos;
     this.direction = direction;
     this.sort = sort;
     this.jeiSync = jeiSync;
     this.autoFocus = autoFocus;
+    this.fullStackCraft = fullStackCraft;
     this.targetTileEntity = (pos != null);
   }
 
@@ -60,6 +62,7 @@ public class SettingsSyncMessage implements CustomPacketPayload {
     }
     buf.writeBoolean(msg.jeiSync);
     buf.writeBoolean(msg.autoFocus);
+    buf.writeBoolean(msg.fullStackCraft);
   }
 
   private static SettingsSyncMessage read(RegistryFriendlyByteBuf buf) {
@@ -69,7 +72,8 @@ public class SettingsSyncMessage implements CustomPacketPayload {
     BlockPos pos = buf.readBlockPos();
     boolean jeiSync = buf.readBoolean();
     boolean autoFocus = buf.readBoolean();
-    return new SettingsSyncMessage(hasPos ? pos : null, direction, sort, jeiSync, autoFocus);
+    boolean fullStackCraft = buf.readBoolean();
+    return new SettingsSyncMessage(hasPos ? pos : null, direction, sort, jeiSync, autoFocus, fullStackCraft);
   }
 
   public static void handle(SettingsSyncMessage message, IPayloadContext ctx) {
@@ -83,6 +87,7 @@ public class SettingsSyncMessage implements CustomPacketPayload {
           tile.setDownwards(message.direction);
           tile.setJeiSearchSynced(message.jeiSync);
           tile.setAutoFocus(message.autoFocus);
+          tile.setFullStackCraft(message.fullStackCraft);
           tileEntity.setChanged();
         }
       }
@@ -93,6 +98,7 @@ public class SettingsSyncMessage implements CustomPacketPayload {
           ItemRemote.setDownwards(stackPlayerHeld, message.direction);
           ItemRemote.setJeiSearchSynced(stackPlayerHeld, message.jeiSync);
           ItemRemote.setAutoFocus(stackPlayerHeld, message.autoFocus);
+          ItemRemote.setFullStackCraft(stackPlayerHeld, message.fullStackCraft);
         }
       }
       else if (player.containerMenu instanceof ContainerNetworkRemote rcc) {
@@ -102,6 +108,7 @@ public class SettingsSyncMessage implements CustomPacketPayload {
           ItemRemote.setDownwards(stackPlayerHeld, message.direction);
           ItemRemote.setJeiSearchSynced(stackPlayerHeld, message.jeiSync);
           ItemRemote.setAutoFocus(stackPlayerHeld, message.autoFocus);
+          ItemRemote.setFullStackCraft(stackPlayerHeld, message.fullStackCraft);
         }
       }
     });

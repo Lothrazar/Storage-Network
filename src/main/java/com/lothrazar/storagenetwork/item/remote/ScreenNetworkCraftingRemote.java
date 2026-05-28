@@ -36,8 +36,10 @@ public class ScreenNetworkCraftingRemote extends AbstractNetworkScreen<Container
     addRenderableWidget(network.directionBtn);
     addRenderableWidget(network.sortBtn);
     addRenderableWidget(network.focusBtn);
-    if (this.network.getSize().isCrafting())
+    if (this.network.getSize().isCrafting()) {
       addRenderableWidget(network.clearGridBtn);
+      addRenderableWidget(network.fullStackBtn);
+    }
     if (this.getAutoFocus()) {
       network.searchBar.setFocused(true);
     }
@@ -94,6 +96,16 @@ public class ScreenNetworkCraftingRemote extends AbstractNetworkScreen<Container
   @Override
   public void setAutoFocus(boolean b) {
     ItemRemote.setAutoFocus(remote, b);
+  }
+
+  @Override
+  public boolean isFullStackCraft() {
+    return ItemRemote.isFullStackCraft(remote);
+  }
+
+  @Override
+  public void setFullStackCraft(boolean val) {
+    ItemRemote.setFullStackCraft(remote, val);
   }
 
   @Override

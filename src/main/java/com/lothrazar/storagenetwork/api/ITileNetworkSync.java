@@ -12,4 +12,10 @@ public interface ITileNetworkSync {
   void setJeiSearchSynced(boolean val);
 
   void setAutoFocus(boolean autoFocus);
+
+  default boolean isFullStackCraft() {
+    return true;
+  }
+
+  default void setFullStackCraft(boolean val) {}
 }

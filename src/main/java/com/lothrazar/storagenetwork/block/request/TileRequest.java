@@ -20,10 +20,12 @@ public class TileRequest extends TileConnectable implements MenuProvider, ITileN
   public static final String NBT_JEI = StorageNetworkMod.MODID + "jei";
   private static final String NBT_DIR = StorageNetworkMod.MODID + "dir";
   private static final String NBT_SORT = StorageNetworkMod.MODID + "sort";
+  public static final String NBT_FULLSTACK = StorageNetworkMod.MODID + "fullstack";
   private boolean downwards;
   private EnumSortType sort = EnumSortType.NAME;
   private boolean isJeiSearchSynced;
   private boolean autoFocus = true;
+  private boolean fullStackCraft = true;
 
   public TileRequest(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.REQUEST.get(), pos, state);
@@ -39,6 +41,9 @@ public class TileRequest extends TileConnectable implements MenuProvider, ITileN
     if (compound.contains(NBT_JEI)) {
       this.setJeiSearchSynced(compound.getBoolean(NBT_JEI));
     }
+    if (compound.contains(NBT_FULLSTACK)) {
+      this.setFullStackCraft(compound.getBoolean(NBT_FULLSTACK));
+    }
     super.loadAdditional(compound, registries);
   }
 
@@ -48,6 +53,7 @@ public class TileRequest extends TileConnectable implements MenuProvider, ITileN
     compound.putBoolean(NBT_DIR, isDownwards());
     compound.putInt(NBT_SORT, getSort().ordinal());
     compound.putBoolean(NBT_JEI, this.isJeiSearchSynced());
+    compound.putBoolean(NBT_FULLSTACK, this.isFullStackCraft());
     super.saveAdditional(compound, registries);
   }
 
@@ -97,5 +103,15 @@ public class TileRequest extends TileConnectable implements MenuProvider, ITileN
   @Override
   public void setAutoFocus(boolean autoFocus) {
     this.autoFocus = autoFocus;
+  }
+
+  @Override
+  public boolean isFullStackCraft() {
+    return fullStackCraft;
+  }
+
+  @Override
+  public void setFullStackCraft(boolean val) {
+    this.fullStackCraft = val;
   }
 }

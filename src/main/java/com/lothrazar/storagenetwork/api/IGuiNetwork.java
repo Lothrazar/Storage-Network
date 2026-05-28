@@ -28,7 +28,7 @@ public interface IGuiNetwork extends IGuiPrivate {
   }
 
   default void syncDataToServer() {
-    PacketDistributor.sendToServer(new SettingsSyncMessage(getPos(), getDownwards(), getSort(), isJeiSearchSynced(), getAutoFocus()));
+    PacketDistributor.sendToServer(new SettingsSyncMessage(getPos(), getDownwards(), getSort(), isJeiSearchSynced(), getAutoFocus(), isFullStackCraft()));
   }
 
   void setSort(EnumSortType val);
@@ -36,4 +36,10 @@ public interface IGuiNetwork extends IGuiPrivate {
   boolean getAutoFocus();
 
   void setAutoFocus(boolean b);
+
+  default boolean isFullStackCraft() {
+    return true;
+  }
+
+  default void setFullStackCraft(boolean val) {}
 }

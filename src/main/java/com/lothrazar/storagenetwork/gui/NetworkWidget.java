@@ -48,6 +48,7 @@ public class NetworkWidget {
   public ButtonRequest jeiBtn;
   public ButtonRequest focusBtn;
   public ButtonRequest clearGridBtn;
+  public ButtonRequest fullStackBtn;
   private List<ItemSlotNetwork> slots;
   private final IGuiNetwork gui;
   private long lastClick;
@@ -169,6 +170,20 @@ public class NetworkWidget {
       clearGridBtn.setHeight(7);
       clearGridBtn.setWidth(7);
       this.clearGridBtn.setTextureId(TextureEnum.CRAFTCLEAR);
+      //full-stack craft toggle - sits next to the recipe output slot
+      int fsX = gui.getGuiLeft() + 124;
+      int fsY = gui.getGuiTop() + 128;
+      if (this.getSize() == NetworkScreenSize.EXPANDED) {
+        fsX = gui.getGuiLeft() + 204;
+        fsY = gui.getGuiTop() + 260;
+      }
+      fullStackBtn = new ButtonRequest(
+          fsX, fsY, "", (p) -> {
+            gui.setFullStackCraft(!gui.isFullStackCraft());
+            gui.syncDataToServer();
+          }, DEFAULT_NARRATION);
+      fullStackBtn.setHeight(16);
+      fullStackBtn.setWidth(16);
     }
   }
 
@@ -350,6 +365,9 @@ public class NetworkWidget {
     else if (focusBtn != null && focusBtn.isMouseOver(mouseX, mouseY)) {
       tooltip = Component.translatable("gui.storagenetwork.autofocus.tooltip." + gui.getAutoFocus());
     }
+    else if (fullStackBtn != null && fullStackBtn.isMouseOver(mouseX, mouseY)) {
+      tooltip = Component.translatable(gui.isFullStackCraft() ? "gui.storagenetwork.fullstack.on" : "gui.storagenetwork.fullstack.off");
+    }
     else if (ModList.get().isLoaded("jei") && jeiBtn != null && jeiBtn.isMouseOver(mouseX, mouseY)) {
       tooltip = Component.translatable(gui.isJeiSearchSynced() ? "gui.storagenetwork.fil.tooltip_jei_on" : "gui.storagenetwork.fil.tooltip_jei_off");
     }
@@ -478,6 +496,9 @@ public class NetworkWidget {
     if (this.clearGridBtn != null) {}
     focusBtn.setTextureId(gui.getAutoFocus() ? TextureEnum.RED : TextureEnum.GREY);
     directionBtn.setTextureId(gui.getDownwards() ? TextureEnum.SORT_DOWN : TextureEnum.SORT_UP);
+    if (fullStackBtn != null) {
+      fullStackBtn.setTextureId(gui.isFullStackCraft() ? TextureEnum.SHIFT_DEFAULT : TextureEnum.SHIFT_SINGLE);
+    }
     if (jeiBtn != null && ModList.get().isLoaded("jei")) {
       jeiBtn.setTextureId(gui.isJeiSearchSynced() ? TextureEnum.JEI_GREEN : TextureEnum.JEI_RED);
     }

@@ -63,6 +63,11 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
 
   public abstract boolean isCrafting();
 
+  //subclasses backed by a tile/remote override this; default true matches the post-bugfix shift-craft-to-full-stack behavior
+  public boolean isFullStackCraft() {
+    return true;
+  }
+
   public Slot getResultSlot() {
     return result;
   }
@@ -240,10 +245,12 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
       return;
     }
     int sizePerCraft = res.getCount();
-    final int maxStack = res.getMaxStackSize();
+    //full-stack mode: keep crafting until a stack is filled (or ingredients/inventory run out)
+    //single-craft mode: exactly one recipe execution
+    final int limit = isFullStackCraft() ? res.getMaxStackSize() : sizePerCraft;
     int iter = 0;
-    StorageNetworkMod.LOGGER.debug("[craftShift] START sizePerCraft={} max={} for {}", sizePerCraft, maxStack, res);
-    while (crafted + sizePerCraft <= maxStack) {
+    StorageNetworkMod.LOGGER.debug("[craftShift] START sizePerCraft={} limit={} fullStack={} for {}", sizePerCraft, limit, isFullStackCraft(), res);
+    while (crafted + sizePerCraft <= limit) {
       iter++;
       res = recipeCurrent.assemble(matrix.asCraftInput(), level.registryAccess());
       //StorageNetworkMod.LOGGER.debug("[craftShift] iter={} crafted={} res.count={}", iter, crafted, res.getCount());

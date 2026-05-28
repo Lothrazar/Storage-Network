@@ -35,6 +35,7 @@ public class ItemRemote extends ItemFlib implements MenuProvider {
   public static final String NBT_BOUND = "bound";
   public static final String NBT_SORT = "sort";
   public static final String NBT_DOWN = "down";
+  public static final String NBT_FULLSTACK = "fullstack";
 
   public ItemRemote(Properties properties) {
     super(properties.stacksTo(1));
@@ -137,5 +138,15 @@ public class ItemRemote extends ItemFlib implements MenuProvider {
 
   public static boolean getAutoFocus(ItemStack stack) {
     return readTag(stack).getBoolean("autoFocus");
+  }
+
+  public static boolean isFullStackCraft(ItemStack stack) {
+    CompoundTag tag = readTag(stack);
+    //default true so new remotes match the post-bugfix behavior
+    return !tag.contains(NBT_FULLSTACK) || tag.getBoolean(NBT_FULLSTACK);
+  }
+
+  public static void setFullStackCraft(ItemStack stack, boolean val) {
+    stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, data -> data.update(tag -> tag.putBoolean(NBT_FULLSTACK, val)));
   }
 }

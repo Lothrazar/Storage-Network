@@ -38,6 +38,11 @@ public class ContainerNetworkCraftingTable extends ContainerNetwork {
   }
 
   @Override
+  public boolean isFullStackCraft() {
+    return tileRequest != null && tileRequest.isFullStackCraft();
+  }
+
+  @Override
   public void removed(Player player) {
     super.removed(player);
     //the contents of the crafting matrix gets returned to the player

@@ -35,8 +35,10 @@ public class ScreenNetworkTable extends AbstractNetworkScreen<ContainerNetworkCr
     addRenderableWidget(network.directionBtn);
     addRenderableWidget(network.sortBtn);
     addRenderableWidget(network.focusBtn);
-    if (this.network.getSize().isCrafting())
+    if (this.network.getSize().isCrafting()) {
       addRenderableWidget(network.clearGridBtn);
+      addRenderableWidget(network.fullStackBtn);
+    }
     if (this.getAutoFocus()) {
       network.searchBar.setFocused(true);
     }
@@ -99,6 +101,16 @@ public class ScreenNetworkTable extends AbstractNetworkScreen<ContainerNetworkCr
   @Override
   public void setAutoFocus(boolean b) {
     tile.setAutoFocus(b);
+  }
+
+  @Override
+  public boolean isFullStackCraft() {
+    return tile.isFullStackCraft();
+  }
+
+  @Override
+  public void setFullStackCraft(boolean val) {
+    tile.setFullStackCraft(val);
   }
 
   @Override

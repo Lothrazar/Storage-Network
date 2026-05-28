@@ -90,6 +90,11 @@ public class ContainerNetworkCraftingRemote extends ContainerNetwork {
     return true;
   }
 
+  @Override
+  public boolean isFullStackCraft() {
+    return remote != null && ItemRemote.isFullStackCraft(remote);
+  }
+
   public ItemStack getRemote() {
     return remote;
   }

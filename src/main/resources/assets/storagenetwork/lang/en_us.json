@@ -166,6 +166,8 @@
     "gui.storagenetwork.fil.tooltip_jei_off": "JEI search disabled",
     
     "gui.storagenetwork.req.tooltip_cleargrid":"Clear Grid",
+    "gui.storagenetwork.fullstack.on":"Shift-craft a full stack",
+    "gui.storagenetwork.fullstack.off":"Shift-craft one result",
 
     "block.storagenetwork.kabel.tooltip": "Basic network cable ",
     "block.storagenetwork.storage_kabel.tooltip": "Used to connect inventory to the network",
