@@ -1,15 +1,19 @@
 package com.lothrazar.storagenetwork.gui.slot;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
+import com.lothrazar.storagenetwork.network.StackRefreshClientMessage;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class SlotCraftingNetwork extends ResultSlot {
 
@@ -42,6 +46,10 @@ public class SlotCraftingNetwork extends ResultSlot {
       }
     }
     parent.broadcastChanges();
+    if (playerIn instanceof ServerPlayer sp && getTileMain() != null) {
+      List<ItemStack> stacks = getTileMain().getNetwork().getSortedStacks();
+      PacketDistributor.sendToPlayer(sp, new StackRefreshClientMessage(stacks, new ArrayList<>()));
+    }
     return;
   }
 

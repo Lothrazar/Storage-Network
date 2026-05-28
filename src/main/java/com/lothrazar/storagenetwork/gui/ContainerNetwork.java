@@ -10,7 +10,6 @@ import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
 import com.lothrazar.storagenetwork.network.StackRefreshClientMessage;
 import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -202,6 +201,15 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
     return itemstack;
   }
 
+  private String dumpMatrix() {
+    StringBuilder sb = new StringBuilder("[");
+    for (int i = 0; i < matrix.getContainerSize(); i++) {
+      ItemStack s = matrix.getItem(i);
+      sb.append(i).append("=").append(s.isEmpty() ? "empty" : (s.getItem() + "x" + s.getCount())).append(" ");
+    }
+    return sb.append("]").toString();
+  }
+
   /**
    * A note on the shift-craft delay bug root cause was ANY interaction with matrix (setting contents etc) was causing triggers/events to do a recipe lookup. Meaning during this shift-click action you
    * can get up to 9x64 FULL recipe scans Solution is just to disable all those triggers but only for duration of this action
@@ -232,63 +240,42 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
       return;
     }
     int sizePerCraft = res.getCount();
-    //StorageNetwork.log("[craftShift] sizePerCraft = " + sizePerCraft + " for stack " + res);
-    while (crafted + sizePerCraft <= res.getMaxStackSize()) {
+    final int maxStack = res.getMaxStackSize();
+    int iter = 0;
+    StorageNetworkMod.LOGGER.debug("[craftShift] START sizePerCraft={} max={} for {}", sizePerCraft, maxStack, res);
+    while (crafted + sizePerCraft <= maxStack) {
+      iter++;
       res = recipeCurrent.assemble(matrix.asCraftInput(), level.registryAccess());
-      //  StorageNetwork.log("[craftShift]  crafted = " + crafted + " ; res.count() = " + res.getCount() + " MAX=" + res.getMaxStackSize());
+      //StorageNetworkMod.LOGGER.debug("[craftShift] iter={} crafted={} res.count={}", iter, crafted, res.getCount());
       if (!ItemHandlerHelper.insertItemStacked(new PlayerMainInvWrapper(playerInv), res, true).isEmpty()) {
-        //  StorageNetwork.log("[craftShift] cannot insert more, end");
+        //StorageNetworkMod.LOGGER.debug("[craftShift] BREAK iter={}: simulate-insert says no room", iter);
         break;
       }
       //stop if empty
       if (recipeCurrent.matches(matrix.asCraftInput(), level) == false) {
-        // StorageNetwork.log("[craftShift] recipe doesnt match i quit");
+     //   StorageNetworkMod.LOGGER.debug("[craftShift] BREAK iter={}: recipe no longer matches. matrix={}", iter, dumpMatrix());
         break;
       }
       //onTake replaced with this handcoded rewrite
-      //StorageNetwork.log("[craftShift] addItemStackToInventory " + res);
+      //StorageNetworkMod.LOGGER.debug("[craftShift] addItemStackToInventory " + res);
       if (!player.getInventory().add(res)) {
         player.drop(res, false);
       }
-      NonNullList<ItemStack> remainder = recipeCurrent.getRemainingItems(this.matrix.asCraftInput());
-      for (int i = 0; i < remainder.size(); ++i) {
-        ItemStack remainderCurrent = remainder.get(i);
+      //iterate matrix indices directly; CraftingInput trims empty rows/cols so its index space doesn't match the 3x3 matrix
+      for (int i = 0; i < matrix.getContainerSize(); ++i) {
         ItemStack slot = this.matrix.getItem(i);
-        if (remainderCurrent.isEmpty()) {
-          matrix.getItem(i).shrink(1);
+        if (slot.isEmpty()) {
           continue;
         }
-        if (slot.getItem().getCraftingRemainingItem() != null) { //is the fix for milk and similar
-          slot = new ItemStack(slot.getItem().getCraftingRemainingItem());
-          matrix.setItem(i, slot);
+        ItemStack containerItem = slot.getItem().getCraftingRemainingItem(slot);
+        if (!containerItem.isEmpty()) {
+          //milk bucket, water bucket, etc - replace ingredient with its container
+          this.matrix.setItem(i, containerItem);
         }
-        else if (!slot.getItem().getCraftingRemainingItem(slot).isEmpty()) { //is the fix for milk and similar
-          slot = slot.getItem().getCraftingRemainingItem(slot);
-          matrix.setItem(i, slot);
-        }
-        else if (!remainderCurrent.isEmpty()) {
-          if (slot.isEmpty()) {
-            this.matrix.setItem(i, remainderCurrent);
-          }
-          else if (ItemStack.matches(slot, remainderCurrent) && ItemStack.isSameItemSameComponents(slot, remainderCurrent)) {
-            remainderCurrent.grow(slot.getCount());
-            this.matrix.setItem(i, remainderCurrent);
-          }
-          else if (ItemStack.isSameItem(slot, remainderCurrent)) { //isSameIgnoreDurability
-            //crafting that consumes durability
-            this.matrix.setItem(i, remainderCurrent);
-          }
-          else {
-            if (!player.getInventory().add(remainderCurrent)) {
-              player.drop(remainderCurrent, false);
-            }
-          }
-        }
-        else if (!slot.isEmpty()) {
+        else {
           this.matrix.removeItem(i, 1);
-          slot = this.matrix.getItem(i);
         }
-      } //end loop on remiainder
+      }
       //END onTake redo
       crafted += sizePerCraft;
       ItemStack stackInSlot;
@@ -307,9 +294,15 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
       }
       slotsChanged(matrix);
     }
+    StorageNetworkMod.LOGGER.debug("[craftShift] END iter={} crafted={} (max would be {})", iter, crafted, res.getMaxStackSize());
     broadcastChanges();
     this.recipeLocked = false;
     //update recipe again in case remnants left : IE hammer and such
     this.slotsChanged(this.matrix);
+    //dated network contents to the client so the top panel reflects consumed ingredients !!!
+    if (player instanceof ServerPlayer sp) {
+      List<ItemStack> list = tile.getNetwork().getSortedStacks();
+      PacketDistributor.sendToPlayer(sp, new StackRefreshClientMessage(list, new ArrayList<>()));
+    }
   }
 }
