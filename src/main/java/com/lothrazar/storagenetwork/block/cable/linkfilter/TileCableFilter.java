@@ -1,8 +1,8 @@
 package com.lothrazar.storagenetwork.block.cable.linkfilter;
 
-import com.lothrazar.storagenetwork.api.IConnectableLink;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectableDefault;
 import com.lothrazar.storagenetwork.block.TileCableWithFacing;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableLink;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,14 +19,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileCableFilter extends TileCableWithFacing implements MenuProvider {
 
-  protected CapabilityConnectableLink capability;
+  protected CapabilityConnectableDefault capability;
 
   public TileCableFilter(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.FILTER_KABEL.get(), pos, state);
-    this.capability = new CapabilityConnectableLink(this);
+    this.capability = new CapabilityConnectableDefault(this);
   }
 
-  public IConnectableLink getCapabilityLink() {
+  public CapabilityConnectable getCapabilityLink() {
     return capability;
   }
 

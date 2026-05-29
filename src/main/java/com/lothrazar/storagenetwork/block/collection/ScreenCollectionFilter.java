@@ -3,13 +3,12 @@ package com.lothrazar.storagenetwork.block.collection;
 import java.util.List;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.lothrazar.storagenetwork.api.IGuiPrivate;
+import com.lothrazar.storagenetwork.api.gui.GuiPrivate;
 import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.CableIOMessage;
 import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -17,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
-public class ScreenCollectionFilter extends AbstractContainerScreen<ContainerCollectionFilter> implements IGuiPrivate {
+public class ScreenCollectionFilter extends AbstractContainerScreen<ContainerCollectionFilter> implements GuiPrivate {
 
   private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/plain_filter.png");
   ContainerCollectionFilter containerCableLink;
@@ -92,7 +91,7 @@ public class ScreenCollectionFilter extends AbstractContainerScreen<ContainerCol
       if (slot.isMouseOverSlot((int) mouseX, (int) mouseY)) {
         if (slot.getStack().isEmpty() == false) {
           //i hit non-empty slot, clear it no matter what
-          if (mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT) {
+          if (mouseButton == SsnConsts.MOUSE_BTN_RIGHT) {
             int direction = hasShiftDown() ? -1 : 1;
             int newCount = Math.min(64, slot.getStack().getCount() + direction);
             if (newCount < 1) {

@@ -2,13 +2,12 @@ package com.lothrazar.storagenetwork.item.remote;
 
 import java.util.List;
 import com.lothrazar.library.item.ItemFlib;
+import com.lothrazar.library.util.ChatUtil;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.block.request.TileRequest;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.util.UtilRemote;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -85,7 +84,7 @@ public class ItemRemote extends ItemFlib implements MenuProvider {
     if (world.getBlockEntity(pos) instanceof TileMain) {
       ItemStack stack = player.getItemInHand(hand);
       DimPos.putPos(stack, pos, world);
-      UtilTileEntity.statusMessage(player, "item.remote.connected");
+      ChatUtil.sendStatusMessage(player, "item.remote.connected");
       return InteractionResult.SUCCESS;
     }
     return InteractionResult.PASS;
@@ -106,7 +105,7 @@ public class ItemRemote extends ItemFlib implements MenuProvider {
   @Override
   public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
     ItemStack itemStackIn = player.getItemInHand(hand);
-    if (UtilRemote.openRemote(world, player, itemStackIn, this)) {
+    if (RemoteHelpers.openRemote(world, player, itemStackIn, this)) {
       return InteractionResultHolder.success(itemStackIn);
     }
     return super.use(world, player, hand);

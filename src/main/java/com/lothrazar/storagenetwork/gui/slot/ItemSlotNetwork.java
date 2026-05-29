@@ -1,7 +1,7 @@
 package com.lothrazar.storagenetwork.gui.slot;
 
-import com.lothrazar.storagenetwork.api.IGuiPrivate;
-import com.lothrazar.storagenetwork.util.UtilInventory;
+import com.lothrazar.storagenetwork.api.gui.GuiPrivate;
+import com.lothrazar.storagenetwork.api.util.UtilInventory;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
@@ -22,10 +22,10 @@ public class ItemSlotNetwork {
   private final int guiLeft;
   private final int guiTop;
   private boolean showNumbers;
-  private final IGuiPrivate parent;
+  private final GuiPrivate parent;
   private ItemStack stack;
 
-  public ItemSlotNetwork(IGuiPrivate parent, ItemStack stack, int x, int y, int size, int guiLeft, int guiTop, boolean number) {
+  public ItemSlotNetwork(GuiPrivate parent, ItemStack stack, int x, int y, int size, int guiLeft, int guiTop, boolean number) {
     this.x = x;
     this.y = y;
     this.size = size;

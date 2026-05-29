@@ -1,10 +1,10 @@
 package com.lothrazar.storagenetwork.network;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectableDefault;
+import com.lothrazar.storagenetwork.block.cable.CableHelpers;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.ContainerCableFilter;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableLink;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -80,13 +80,13 @@ public class CableDataMessage implements CustomPacketPayload {
   public static void handle(CableDataMessage message, IPayloadContext ctx) {
     ctx.enqueueWork(() -> {
       ServerPlayer player = (ServerPlayer) ctx.player();
-      CapabilityConnectableLink link = null;
+      CapabilityConnectableDefault link = null;
       ContainerCableFilter container = (ContainerCableFilter) player.containerMenu;
       if (container == null || container.cap == null) {
         return;
       }
       link = container.cap;
-      TileMain root = UtilTileEntity.getTileMainForConnectable(link.connectable);
+      TileMain root = CableHelpers.getTileMainForConnectable(link.connectable);
       CableMessageType type = CableMessageType.values()[message.id];
       switch (type) {
         case IMPORT_FILTER:

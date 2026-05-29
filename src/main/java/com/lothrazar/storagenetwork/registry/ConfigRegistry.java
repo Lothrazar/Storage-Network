@@ -8,6 +8,8 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
@@ -98,5 +100,19 @@ public class ConfigRegistry {
 
   public List<? extends String> ignorelist() {
     return IGNORELIST.get();
+  }
+
+
+  public static boolean isTargetAllowed(BlockState state) {
+    if (state.getBlock() == Blocks.AIR) {
+      return false;
+    }
+    String blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
+    for (String s : StorageNetworkMod.CONFIG.ignorelist()) {
+      if (blockId.equals(s)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

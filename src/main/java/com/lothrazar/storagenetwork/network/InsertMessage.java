@@ -5,7 +5,7 @@ import java.util.List;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
+import com.lothrazar.storagenetwork.util.SsnConsts;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -57,13 +57,13 @@ public class InsertMessage implements CustomPacketPayload {
       int rest;
       ItemStack send = ItemStack.EMPTY;
       ItemStack stack = player.containerMenu.getCarried();
-      if (message.mouseButton == UtilTileEntity.MOUSE_BTN_LEFT) {
+      if (message.mouseButton == SsnConsts.MOUSE_BTN_LEFT) {
         rest = root.insertStack(stack, false);
         if (rest != 0) {
           send = stack.copyWithCount(rest);
         }
       }
-      else if (message.mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT) {
+      else if (message.mouseButton == SsnConsts.MOUSE_BTN_RIGHT) {
         ItemStack stack1 = stack.copy();
         stack1.setCount(1);
         stack.shrink(1);

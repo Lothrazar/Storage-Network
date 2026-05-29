@@ -40,7 +40,7 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
   }
 
   public List<ItemStackMatcher> getStackMatchers() {
-    return getStacks().stream().map(stack -> new DefaultItemStackMatcher(stack, tags, nbt)).collect(Collectors.toList());
+    return getStacks().stream().map(stack -> new ItemStackMatcherDefault(stack, tags, nbt)).collect(Collectors.toList());
   }
 
   public void clear() {

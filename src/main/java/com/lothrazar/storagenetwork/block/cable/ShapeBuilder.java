@@ -1,7 +1,6 @@
-package com.lothrazar.storagenetwork.util;
+package com.lothrazar.storagenetwork.block.cable;
 
 import com.lothrazar.storagenetwork.api.EnumConnectType;
-import com.lothrazar.storagenetwork.block.cable.BlockCable;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;

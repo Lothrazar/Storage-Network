@@ -1,10 +1,9 @@
 package com.lothrazar.storagenetwork.block.cable.processing;
 
 import com.lothrazar.storagenetwork.api.DimPos;
-import com.lothrazar.storagenetwork.api.IConnectableItemProcessing;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityProcessing;
 import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.block.TileCableWithFacing;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableProcessing;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,19 +22,19 @@ import net.neoforged.neoforge.items.IItemHandler;
 
 public class TileCableProcess extends TileCableWithFacing implements MenuProvider {
 
-  protected CapabilityConnectableProcessing itemStorage;
+  protected CapabilityProcessingDefault itemStorage;
   private ProcessRequestModel processModel = new ProcessRequestModel();
 
   public TileCableProcess(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.PROCESS_KABEL.get(), pos, state);
-    this.itemStorage = new CapabilityConnectableProcessing(this);
+    this.itemStorage = new CapabilityProcessingDefault(this);
   }
 
-  public IConnectableItemProcessing getItemStorage() {
+  public CapabilityProcessing getItemStorage() {
     return itemStorage;
   }
 
-  public CapabilityConnectableProcessing getCap() {
+  public CapabilityProcessingDefault getCap() {
     return itemStorage;
   }
 

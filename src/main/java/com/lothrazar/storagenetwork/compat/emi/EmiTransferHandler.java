@@ -3,9 +3,9 @@ package com.lothrazar.storagenetwork.compat.emi;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import com.lothrazar.storagenetwork.api.IGuiNetwork;
+import com.lothrazar.storagenetwork.api.gui.GuiNetwork;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
-import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
 import com.lothrazar.storagenetwork.network.RecipeMessage;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -45,8 +45,8 @@ public class EmiTransferHandler<T extends ContainerNetwork> implements StandardR
   @Override
   public EmiPlayerInventory getInventory(AbstractContainerScreen<T> screen) {
     List<EmiStack> stacks = new ArrayList<>();
-    if (screen instanceof IGuiNetwork) {
-      NetworkWidget main = ((IGuiNetwork) screen).getNetwork();
+    if (screen instanceof GuiNetwork s) {
+      var main = s.getNetwork();
       if (main != null) {
         List<ItemStack> networkStacks = main.getStacks();
         networkStacks.stream().map(EmiStack::of).forEach(stacks::add);

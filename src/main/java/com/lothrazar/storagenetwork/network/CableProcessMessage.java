@@ -4,7 +4,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.cable.processing.ContainerCableProcess;
 import com.lothrazar.storagenetwork.block.cable.processing.ProcessRequestModel;
 import com.lothrazar.storagenetwork.block.cable.processing.TileCableProcess;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableProcessing;
+import com.lothrazar.storagenetwork.block.cable.processing.CapabilityProcessingDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -79,7 +79,7 @@ public class CableProcessMessage implements CustomPacketPayload {
     if (tile == null) {
       return;
     }
-    CapabilityConnectableProcessing cap = ctr.cap;
+    CapabilityProcessingDefault cap = ctr.cap;
     ProcessRequestModel model = tile.getProcessModel();
     ProcessMessageType type = ProcessMessageType.values()[message.id];
     switch (type) {

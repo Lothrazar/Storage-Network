@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.lothrazar.storagenetwork.api.IGuiPrivate;
+import com.lothrazar.storagenetwork.api.gui.GuiPrivate;
 import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest.TextureEnum;
@@ -13,7 +13,7 @@ import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.CableProcessMessage;
 import com.lothrazar.storagenetwork.network.CableProcessMessage.ProcessMessageType;
 import com.lothrazar.storagenetwork.registry.ClientEventRegistry;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
+import com.lothrazar.storagenetwork.util.SsnConsts;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -25,7 +25,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-public class ScreenCableProcess extends AbstractContainerScreen<ContainerCableProcess> implements IGuiPrivate {
+public class ScreenCableProcess extends AbstractContainerScreen<ContainerCableProcess> implements GuiPrivate {
 
   private static final Button.CreateNarration DEFAULT_NARRATION = supplier -> supplier.get();
   private static final int FONT = 0xFFFFFFFF;
@@ -245,7 +245,7 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
         continue;
       }
       if (!slot.getStack().isEmpty()) {
-        if (mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT) {
+        if (mouseButton == SsnConsts.MOUSE_BTN_RIGHT) {
           int direction = hasShiftDown() ? -1 : 1;
           int newCount = Math.min(64, slot.getStack().getCount() + direction);
           if (newCount < 1) {

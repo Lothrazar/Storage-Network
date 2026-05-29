@@ -1,8 +1,9 @@
 package com.lothrazar.storagenetwork.block;
 
 import java.util.List;
-import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.lothrazar.storagenetwork.api.IGuiNetwork;
+
+import com.lothrazar.storagenetwork.api.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.gui.DefaultGuiNetwork;
 import com.lothrazar.storagenetwork.gui.TileableTexture;
 import com.lothrazar.storagenetwork.gui.components.TextboxInteger;
 import com.lothrazar.storagenetwork.compat.jei.JeiHooks;
@@ -16,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> implements IGuiNetwork {
+public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> implements DefaultGuiNetwork {
 
   public static final Logger LOGGER = LogManager.getLogger();
   public AbstractNetworkScreen(T container, Inventory inv, Component name) {
@@ -48,16 +49,16 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.
     }
-    if (getNetwork().searchBar.isFocused()) {
+    if (getNetwork().getSearchBar().isFocused()) {
       if (keyCode == TextboxInteger.KEY_BACKSPACE) { // BACKSPACE
         getNetwork().syncTextToJei();
       }
-      getNetwork().searchBar.keyPressed(keyCode, scanCode, b);
+      getNetwork().keyPressed(keyCode, scanCode, b);
       return true;
     }
-    else if (!getNetwork().stackUnderMouse.isEmpty()) {
+    else if (!getNetwork().getStackUnderMouse().isEmpty()) {
       try {
-        JeiHooks.testJeiKeybind(mouseKey, getNetwork().stackUnderMouse);
+        JeiHooks.testJeiKeybind(mouseKey, getNetwork().getStackUnderMouse());
       }
       catch (Throwable e) {
         LOGGER.error("Error thrown from JEI API ", e);
@@ -78,8 +79,9 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
   }
 
   public boolean isScrollable(double x, double y) {
-    return isHovering(getNetwork().xNetwork, getNetwork().yNetwork,
-        this.width, getNetwork().scrollHeight,
+    var n = getNetwork();
+    return isHovering(n.getX(), n.getY(),
+        this.width, n.getScrollHeight(),
         x, y);
   }
 
@@ -111,7 +113,7 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
     this.renderBackground(ms, mouseX, mouseY, partialTicks);
     super.render(ms, mouseX, mouseY, partialTicks);
     this.renderTooltip(ms, mouseX, mouseY);
-    getNetwork().searchBar.render(ms, mouseX, mouseY, partialTicks);
+    getNetwork().renderSearchBar(ms, mouseX, mouseY, partialTicks);
     getNetwork().render();
   }
 

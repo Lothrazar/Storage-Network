@@ -3,7 +3,7 @@ package com.lothrazar.storagenetwork.block.main;
 import java.util.HashMap;
 import java.util.Map;
 import com.lothrazar.storagenetwork.api.DimPos;
-import com.lothrazar.storagenetwork.util.UtilInventory;
+import com.lothrazar.storagenetwork.api.util.UtilInventory;
 import net.minecraft.world.item.ItemStack;
 
 /**

@@ -1,18 +1,18 @@
 package com.lothrazar.storagenetwork.api.batch;
 
-import com.lothrazar.storagenetwork.api.IConnectableLink;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 
 public class StackProvider {
 
-  IConnectableLink storage;
+  CapabilityConnectable storage;
   int slot;
 
-  public StackProvider(IConnectableLink storage, int slot) {
+  public StackProvider(CapabilityConnectable storage, int slot) {
     this.storage = storage;
     this.slot = slot;
   }
 
-  public IConnectableLink getStorage() {
+  public CapabilityConnectable getStorage() {
     return storage;
   }
 

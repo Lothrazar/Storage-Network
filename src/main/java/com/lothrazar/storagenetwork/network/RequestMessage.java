@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
+import com.lothrazar.storagenetwork.util.SsnConsts;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -87,10 +87,10 @@ public class RequestMessage implements CustomPacketPayload {
         StorageNetworkMod.LOGGER.debug("Request message cancelled, null tile");
         return;
       }
-      int in = root.getNetwork().getAmount(new DefaultItemStackMatcher(message.stack, false, true));
+      int in = root.getNetwork().getAmount(new ItemStackMatcherDefault(message.stack, false, true));
       ItemStack stack;
-      boolean isLeftClick = message.mouseButton == UtilTileEntity.MOUSE_BTN_LEFT;
-      boolean isRightClick = message.mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT;
+      boolean isLeftClick = message.mouseButton == SsnConsts.MOUSE_BTN_LEFT;
+      boolean isRightClick = message.mouseButton == SsnConsts.MOUSE_BTN_RIGHT;
       int sizeRequested = 0;
       if (message.ctrl) {
         sizeRequested = 1;
@@ -102,9 +102,9 @@ public class RequestMessage implements CustomPacketPayload {
         sizeRequested = Math.min(message.stack.getMaxStackSize() / 2, in / 2);
       }
       sizeRequested = Math.max(sizeRequested, 1);
-      stack = root.request(new DefaultItemStackMatcher(message.stack, false, true), sizeRequested, false);
+      stack = root.request(new ItemStackMatcherDefault(message.stack, false, true), sizeRequested, false);
       if (stack.isEmpty()) {
-        stack = root.request(new DefaultItemStackMatcher(message.stack, false, false), sizeRequested, false);
+        stack = root.request(new ItemStackMatcherDefault(message.stack, false, false), sizeRequested, false);
       }
       if (!stack.isEmpty()) {
         if (message.shift) {

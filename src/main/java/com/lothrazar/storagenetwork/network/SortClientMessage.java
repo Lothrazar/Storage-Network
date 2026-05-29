@@ -2,7 +2,7 @@ package com.lothrazar.storagenetwork.network;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
-import com.lothrazar.storagenetwork.api.ITileNetworkSync;
+import com.lothrazar.storagenetwork.api.network.TileNetworkSync;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -54,8 +54,8 @@ public class SortClientMessage implements CustomPacketPayload {
     ctx.enqueueWork(() -> {
       Minecraft mc = Minecraft.getInstance();
       BlockEntity tileEntity = mc.level.getBlockEntity(message.pos);
-      if (tileEntity instanceof ITileNetworkSync) {
-        ITileNetworkSync ts = (ITileNetworkSync) tileEntity;
+      if (tileEntity instanceof TileNetworkSync) {
+        TileNetworkSync ts = (TileNetworkSync) tileEntity;
         ts.setDownwards(message.direction);
         ts.setSort(message.sort);
         tileEntity.setChanged();

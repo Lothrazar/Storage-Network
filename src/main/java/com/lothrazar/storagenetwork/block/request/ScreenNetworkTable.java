@@ -3,8 +3,8 @@ package com.lothrazar.storagenetwork.block.request;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.block.AbstractNetworkScreen;
-import com.lothrazar.storagenetwork.gui.NetworkScreenSize;
-import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.api.gui.NetworkScreenSize;
+import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -17,13 +17,13 @@ public class ScreenNetworkTable extends AbstractNetworkScreen<ContainerNetworkCr
   private static final int HEIGHT = 256;
   public static final int WIDTH = 176;
   private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/request.png");
-  private final NetworkWidget network;
+  private final DefaultNetworkWidget network;
   private TileRequest tile;
 
   public ScreenNetworkTable(ContainerNetworkCraftingTable container, Inventory inv, Component name) {
     super(container, inv, name);
     tile = container.getTileRequest();
-    network = new NetworkWidget(this, NetworkScreenSize.NORMAL);
+    network = new DefaultNetworkWidget(this, NetworkScreenSize.NORMAL);
     imageWidth = WIDTH;
     imageHeight = HEIGHT;
   }
@@ -40,7 +40,7 @@ public class ScreenNetworkTable extends AbstractNetworkScreen<ContainerNetworkCr
       addRenderableWidget(network.fullStackBtn);
     }
     if (this.getAutoFocus()) {
-      network.searchBar.setFocused(true);
+      network.getSearchBar().setFocused(true);
     }
     if (ModList.get().isLoaded("jei")) {
       addRenderableWidget(network.jeiBtn);
@@ -114,7 +114,7 @@ public class ScreenNetworkTable extends AbstractNetworkScreen<ContainerNetworkCr
   }
 
   @Override
-  public NetworkWidget getNetwork() {
+  public DefaultNetworkWidget getNetwork() {
     return network;
   }
 }

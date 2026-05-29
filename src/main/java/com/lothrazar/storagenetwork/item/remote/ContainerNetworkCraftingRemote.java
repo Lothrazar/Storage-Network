@@ -10,7 +10,7 @@ import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import com.lothrazar.storagenetwork.gui.NetworkCraftingInventory;
 import com.lothrazar.storagenetwork.gui.slot.SlotCraftingNetwork;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.util.UtilInventory;
+import com.lothrazar.storagenetwork.api.util.UtilInventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;

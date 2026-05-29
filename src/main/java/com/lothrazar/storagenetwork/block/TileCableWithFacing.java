@@ -4,7 +4,7 @@ import com.lothrazar.storagenetwork.api.EnumConnectType;
 import com.lothrazar.storagenetwork.block.cable.BlockCable;
 import com.lothrazar.storagenetwork.block.cable.TileCable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.util.UtilConnections;
+import com.lothrazar.storagenetwork.block.cable.CableHelpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -31,7 +31,7 @@ public class TileCableWithFacing extends TileCable {
   public void findNewDirection() {
     for (Direction facing : Direction.values()) {
       BlockPos relative = worldPosition.relative(facing);
-      if (UtilConnections.isInventory(facing, level, relative)) {
+      if (CableHelpers.isInventory(facing, level, relative)) {
         setDirection(facing);
         return;
       }

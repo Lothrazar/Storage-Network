@@ -1,14 +1,14 @@
 package com.lothrazar.storagenetwork.network;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
+import com.lothrazar.storagenetwork.api.network.ConnectableNodeDefault;
 import com.lothrazar.storagenetwork.block.TileConnectable;
+import com.lothrazar.storagenetwork.block.cable.CableHelpers;
 import com.lothrazar.storagenetwork.block.cable.export.ContainerCableExportFilter;
 import com.lothrazar.storagenetwork.block.cable.inputfilter.ContainerCableImportFilter;
 import com.lothrazar.storagenetwork.block.collection.ContainerCollectionFilter;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableAutoIO;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExportDefault;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -94,9 +94,9 @@ public class CableIOMessage implements CustomPacketPayload {
 
   private static void handleInternal(CableIOMessage message, IPayloadContext ctx) {
     ServerPlayer player = (ServerPlayer) ctx.player();
-    CapabilityConnectableAutoIO link = null;
+    CapabilityImportExportDefault link = null;
     TileConnectable tile = null;
-    CapabilityConnectable connectable = null;
+    ConnectableNodeDefault connectable = null;
     if (player.containerMenu instanceof ContainerCableExportFilter) {
       ContainerCableExportFilter ctr = (ContainerCableExportFilter) player.containerMenu;
       link = ctr.cap;
@@ -114,7 +114,7 @@ public class CableIOMessage implements CustomPacketPayload {
     }
     TileMain root = null;
     if (link != null) {
-      root = UtilTileEntity.getTileMainForConnectable(link.connectable);
+      root = CableHelpers.getTileMainForConnectable(link.connectable);
     }
     CableMessageType type = CableMessageType.values()[message.id];
     switch (type) {

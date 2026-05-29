@@ -1,7 +1,6 @@
 package com.lothrazar.storagenetwork.block.cable.processing;
 
 import com.lothrazar.storagenetwork.block.cable.ContainerCable;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableProcessing;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,7 +12,7 @@ import net.minecraft.world.level.Level;
 public class ContainerCableProcess extends ContainerCable {
 
   public final TileCableProcess tile;
-  public final CapabilityConnectableProcessing cap;
+  public final CapabilityProcessingDefault cap;
 
   public ContainerCableProcess(int windowId, Level world, BlockPos pos, Inventory playerInv, Player player) {
     super(SsnRegistry.Menus.PROCESS_KABEL.get(), windowId);

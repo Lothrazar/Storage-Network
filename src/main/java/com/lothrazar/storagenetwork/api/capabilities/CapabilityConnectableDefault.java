@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.capabilities;
+package com.lothrazar.storagenetwork.api.capabilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,13 +6,9 @@ import java.util.List;
 
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
-import com.lothrazar.storagenetwork.api.IConnectable;
-import com.lothrazar.storagenetwork.api.IConnectableLink;
-import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
-import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
-import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -25,10 +21,10 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CapabilityConnectableLink implements IConnectableLink, INBTSerializable<CompoundTag> {
+public class CapabilityConnectableDefault implements CapabilityConnectable, INBTSerializable<CompoundTag> {
   public static final Logger LOGGER = LogManager.getLogger();
 
-  public final IConnectable connectable;
+  public final ConnectableNode connectable;
   private boolean operationMustBeSmaller = true;
   private ItemStack operationStack = ItemStack.EMPTY;
   private int operationLimit = 0;
@@ -37,12 +33,12 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
   private Direction inventoryFace;
   private int priority;
 
-  CapabilityConnectableLink() {
-    connectable = new CapabilityConnectable();
-    filters.setIsAllowlist(false);
-  }
+//  CapabilityConnectableLink() {
+//    connectable = new CapabilityConnectable();
+//    filters.setIsAllowlist(false);
+//  }
 
-  public CapabilityConnectableLink(BlockEntity tile) {
+  public CapabilityConnectableDefault(BlockEntity tile) {
     connectable = (tile instanceof com.lothrazar.storagenetwork.block.TileConnectable tc)
         ? tc.getConnectable() : null;
     filters.setIsAllowlist(false);

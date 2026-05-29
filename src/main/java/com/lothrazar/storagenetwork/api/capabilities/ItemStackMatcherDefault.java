@@ -4,23 +4,23 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
-public class DefaultItemStackMatcher implements ItemStackMatcher {
+public class ItemStackMatcherDefault implements ItemStackMatcher {
 
   private ItemStack stack;
   private boolean ore;
   private boolean nbt;
 
-  public DefaultItemStackMatcher(ItemStack stack) {
+  public ItemStackMatcherDefault(ItemStack stack) {
     this(stack, false, false);
   }
 
-  public DefaultItemStackMatcher(ItemStack stack, boolean ore, boolean nbt) {
+  public ItemStackMatcherDefault(ItemStack stack, boolean ore, boolean nbt) {
     this.stack = stack;
     this.ore = ore;
     this.nbt = nbt;
   }
 
-  private DefaultItemStackMatcher() {}
+  private ItemStackMatcherDefault() {}
 
   public void readFromNBT(HolderLookup.Provider registries, CompoundTag compound) {
     CompoundTag c = (CompoundTag) compound.get("stack");
@@ -68,8 +68,8 @@ public class DefaultItemStackMatcher implements ItemStackMatcher {
     this.nbt = nbt;
   }
 
-  public static DefaultItemStackMatcher loadFilterItemFromNBT(HolderLookup.Provider registries, CompoundTag nbt) {
-    DefaultItemStackMatcher fil = new DefaultItemStackMatcher();
+  public static ItemStackMatcherDefault loadFilterItemFromNBT(HolderLookup.Provider registries, CompoundTag nbt) {
+    ItemStackMatcherDefault fil = new ItemStackMatcherDefault();
     fil.readFromNBT(registries, nbt);
     return fil.getStack() != null && fil.getStack().getItem() != null ? fil : null;
   }

@@ -3,10 +3,10 @@ package com.lothrazar.storagenetwork.block;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumSortType;
-import com.lothrazar.storagenetwork.api.IConnectable;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
+import com.lothrazar.storagenetwork.api.network.ConnectableNodeDefault;
+import com.lothrazar.storagenetwork.block.cable.CableHelpers;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -24,14 +24,14 @@ import org.apache.logging.log4j.Logger;
 public abstract class TileConnectable extends BlockEntity {
 
   public static final Logger LOGGER = LogManager.getLogger();
-  private final CapabilityConnectable connectable;
+  private final ConnectableNodeDefault connectable;
 
   public TileConnectable(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
     super(tileEntityTypeIn, pos, state);
-    connectable = new CapabilityConnectable();
+    connectable = new ConnectableNodeDefault();
   }
 
-  public IConnectable getConnectable() {
+  public ConnectableNode getConnectable() {
     return connectable;
   }
 
@@ -85,7 +85,7 @@ public abstract class TileConnectable extends BlockEntity {
     super.onChunkUnloaded();
     if (StorageNetworkMod.CONFIG.doReloadOnChunk() && connectable != null && connectable.getMainPos() != null) {
       try {
-        TileMain maybe = UtilTileEntity.getTileMainForConnectable(connectable);
+        TileMain maybe = CableHelpers.getTileMainForConnectable(connectable);
         if (maybe != null) {
           maybe.getNetwork().setShouldRefresh();
         }

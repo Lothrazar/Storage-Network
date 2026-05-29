@@ -2,11 +2,11 @@ package com.lothrazar.storagenetwork.item;
 
 import java.util.List;
 import com.lothrazar.library.item.ItemFlib;
+import com.lothrazar.library.util.ChatUtil;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -42,7 +42,7 @@ public class ItemPicker extends ItemFlib {
     if (world.getBlockEntity(pos) instanceof TileMain) {
       ItemStack stack = player.getItemInHand(hand);
       DimPos.putPos(stack, pos, world);
-      UtilTileEntity.statusMessage(player, "item.remote.connected");
+      ChatUtil.sendStatusMessage(player, "item.remote.connected");
       return InteractionResult.SUCCESS;
     }
     else {
@@ -58,7 +58,7 @@ public class ItemPicker extends ItemFlib {
         if (tile instanceof TileMain) {
           TileMain network = (TileMain) tile;
           BlockState bs = world.getBlockState(pos);
-          DefaultItemStackMatcher matcher = new DefaultItemStackMatcher(new ItemStack(bs.getBlock()), false, false);
+          ItemStackMatcherDefault matcher = new ItemStackMatcherDefault(new ItemStack(bs.getBlock()), false, false);
           int size = player.isCrouching() ? 1 : 64;
           ItemStack found = network.request(matcher, size, false);
           if (!found.isEmpty()) {

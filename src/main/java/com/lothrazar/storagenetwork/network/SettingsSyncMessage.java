@@ -2,7 +2,7 @@ package com.lothrazar.storagenetwork.network;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
-import com.lothrazar.storagenetwork.api.ITileNetworkSync;
+import com.lothrazar.storagenetwork.api.network.TileNetworkSync;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkCraftingRemote;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkRemote;
 import com.lothrazar.storagenetwork.item.remote.ItemRemote;
@@ -81,8 +81,8 @@ public class SettingsSyncMessage implements CustomPacketPayload {
       ServerPlayer player = (ServerPlayer) ctx.player();
       if (message.targetTileEntity) {
         BlockEntity tileEntity = player.level().getBlockEntity(message.pos);
-        if (tileEntity instanceof ITileNetworkSync) {
-          ITileNetworkSync tile = (ITileNetworkSync) tileEntity;
+        if (tileEntity instanceof TileNetworkSync) {
+          TileNetworkSync tile = (TileNetworkSync) tileEntity;
           tile.setSort(message.sort);
           tile.setDownwards(message.direction);
           tile.setJeiSearchSynced(message.jeiSync);

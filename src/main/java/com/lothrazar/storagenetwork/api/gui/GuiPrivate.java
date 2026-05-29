@@ -1,9 +1,9 @@
-package com.lothrazar.storagenetwork.api;
+package com.lothrazar.storagenetwork.api.gui;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
-public interface IGuiPrivate {
+public interface GuiPrivate {
   //  void renderStackToolTip(ItemStack stack, int x, int y);
   //  void renderTooltip(List<String> t, int x, int y);
   //  void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor);

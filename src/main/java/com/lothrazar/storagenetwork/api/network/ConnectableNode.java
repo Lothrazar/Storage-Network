@@ -1,5 +1,6 @@
-package com.lothrazar.storagenetwork.api;
+package com.lothrazar.storagenetwork.api.network;
 
+import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import net.minecraft.world.item.ItemStack;
 
@@ -9,13 +10,13 @@ import net.minecraft.world.item.ItemStack;
  *
  * If you want to expose this yourself instead of accessing it, you probably want to extend the DefaultConnectable implementation for your own capability.
  */
-public interface IConnectable {
+public interface ConnectableNode {
 
-  public void toggleNeedsRedstone();
+  void toggleNeedsRedstone();
 
-  public boolean needsRedstone();
+  boolean needsRedstone();
 
-  public void needsRedstone(boolean in);
+  void needsRedstone(boolean in);
 
   /**
    * Return the position of the main. For historic reasons each block currently needs to know this.

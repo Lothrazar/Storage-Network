@@ -11,7 +11,7 @@ import com.lothrazar.storagenetwork.block.cable.linkfilter.ScreenCableFilter;
 import com.lothrazar.storagenetwork.block.collection.ScreenCollectionFilter;
 import com.lothrazar.storagenetwork.registry.CradleAdapterRegistry;
 import com.lothrazar.storagenetwork.block.cradle.ScreenStorageCradle;
-import com.lothrazar.storagenetwork.capabilities.handler.ItemHandlerCradleAdapter;
+import com.lothrazar.storagenetwork.compat.CradleAdapterDefault;
 import com.lothrazar.storagenetwork.compat.ae2.Ae2CradleBootstrap;
 import com.lothrazar.storagenetwork.compat.rs.Rs2CradleBootstrap;
 import net.neoforged.fml.ModList;
@@ -25,6 +25,7 @@ import com.lothrazar.storagenetwork.registry.ClientEventRegistry;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.PacketRegistry;
 import com.lothrazar.storagenetwork.registry.SsnEvents;
+import com.lothrazar.storagenetwork.api.UpgradeType;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import com.lothrazar.storagenetwork.registry.SsnTab;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
@@ -71,8 +72,18 @@ public class StorageNetworkMod {
 
   private static void setup(FMLCommonSetupEvent event) {
     CONFIG = new ConfigRegistry();
+    // Register upgrade items into the UpgradeType registry
+    event.enqueueWork(() -> {
+      UpgradeType.register(SsnRegistry.Items.STACK_UPGRADE.get(), UpgradeType.STACK);
+      UpgradeType.register(SsnRegistry.Items.SPEED_UPGRADE.get(), UpgradeType.SPEED);
+      UpgradeType.register(SsnRegistry.Items.SLOW_UPGRADE.get(), UpgradeType.SLOW);
+      UpgradeType.register(SsnRegistry.Items.STOCK_UPGRADE.get(), UpgradeType.STOCK);
+      UpgradeType.register(SsnRegistry.Items.SINGLE_UPGRADE.get(), UpgradeType.SINGLE);
+      UpgradeType.register(SsnRegistry.Items.VOID_UPGRADE.get(), UpgradeType.VOID);
+      UpgradeType.register(SsnRegistry.Items.OP_U.get(), UpgradeType.OP);
+    });
     // Built-in cradle adapter (vanilla shulkers + any block/item exposing IItemHandler)
-    CradleAdapterRegistry.register(new ItemHandlerCradleAdapter());
+    CradleAdapterRegistry.register(new CradleAdapterDefault());
     // Optional compat - classloaded only if the host mod is present
     if (ModList.get().isLoaded("ae2")) {
       Ae2CradleBootstrap.register();

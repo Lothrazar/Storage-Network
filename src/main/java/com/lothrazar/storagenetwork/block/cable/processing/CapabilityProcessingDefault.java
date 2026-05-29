@@ -1,19 +1,18 @@
-package com.lothrazar.storagenetwork.capabilities;
+package com.lothrazar.storagenetwork.block.cable.processing;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import com.lothrazar.storagenetwork.api.DimPos;
-import com.lothrazar.storagenetwork.api.IConnectable;
-import com.lothrazar.storagenetwork.api.IConnectableItemProcessing;
-import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
-import com.lothrazar.storagenetwork.block.cable.processing.ProcessRequestModel;
+import com.lothrazar.storagenetwork.api.network.BlockEntityMainNetwork;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityProcessing;
+import com.lothrazar.storagenetwork.api.network.ConnectableNodeDefault;
 import com.lothrazar.storagenetwork.block.cable.processing.ProcessRequestModel.ProcessStatus;
-import com.lothrazar.storagenetwork.block.cable.processing.TileCableProcess;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
-import com.lothrazar.storagenetwork.capabilities.handler.UpgradesItemStackHandler;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
+import com.lothrazar.storagenetwork.api.capabilities.UpgradesItemStackHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -22,30 +21,30 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
-public class CapabilityConnectableProcessing implements INBTSerializable<CompoundTag>, IConnectableItemProcessing {
+public class CapabilityProcessingDefault implements INBTSerializable<CompoundTag>, CapabilityProcessing {
 
-  public static class Factory implements Callable<IConnectableItemProcessing> {
+  public static class Factory implements Callable<CapabilityProcessing> {
 
     @Override
-    public IConnectableItemProcessing call() throws Exception {
-      return new CapabilityConnectableProcessing();
+    public CapabilityProcessing call() throws Exception {
+      return new CapabilityProcessingDefault();
     }
   }
 
   private Direction inventoryFace;
-  public final IConnectable connectable;
+  public final ConnectableNode connectable;
   private final TileCableProcess tile;
   public final UpgradesItemStackHandler upgrades = new UpgradesItemStackHandler();
   private final FilterItemStackHandler filters = new FilterItemStackHandler(9);
   private final FilterItemStackHandler filtersOut = new FilterItemStackHandler(9);
   private int priority;
 
-  CapabilityConnectableProcessing() {
-    connectable = new CapabilityConnectable();
+  CapabilityProcessingDefault() {
+    connectable = new ConnectableNodeDefault();
     tile = null;
   }
 
-  public CapabilityConnectableProcessing(TileCableProcess tile) {
+  public CapabilityProcessingDefault(TileCableProcess tile) {
     this.tile = tile;
     this.connectable = tile != null ? tile.getConnectable() : null;
   }
@@ -115,10 +114,10 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
     this.priority = value;
   }
 
-  @Override
-  public Direction facingInventory() {
-    return this.inventoryFace;
-  }
+//  @Override
+//  public Direction facingInventory() {
+//    return this.inventoryFace;
+//  }
 
   private List<ItemStack> nonEmpty(FilterItemStackHandler handler) {
     List<ItemStack> out = new ArrayList<>();
@@ -132,7 +131,7 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
   }
 
   @Override
-  public void execute(TileMain main) {
+  public void execute(BlockEntityMainNetwork main) {
     if (tile == null || connectable == null || connectable.getPos() == null) {
       return;
     }
@@ -162,7 +161,7 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
     tile.setChanged();
   }
 
-  private void runExport(TileMain main, ProcessRequestModel model, List<ItemStack> ingredients, DimPos targetPos) {
+  private void runExport(BlockEntityMainNetwork main, ProcessRequestModel model, List<ItemStack> ingredients, DimPos targetPos) {
     IItemHandler targetIn = targetPos.getItemHandler(model.getInputFace());
     if (targetIn == null) {
       return;
@@ -171,7 +170,7 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
     boolean exportedAll = true;
     for (int idx = start; idx < ingredients.size(); idx++) {
       ItemStack ingred = ingredients.get(idx);
-      DefaultItemStackMatcher matcher = new DefaultItemStackMatcher(ingred.copy(), filters.tags, filters.nbt);
+      ItemStackMatcherDefault matcher = new ItemStackMatcherDefault(ingred.copy(), filters.tags, filters.nbt);
       // simulate pull from network
       ItemStack simulated = main.request(matcher, ingred.getCount(), true);
       if (simulated.getCount() < ingred.getCount()) {
@@ -194,7 +193,7 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
     }
   }
 
-  private void runImport(TileMain main, ProcessRequestModel model, List<ItemStack> outputs, DimPos targetPos) {
+  private void runImport(BlockEntityMainNetwork main, ProcessRequestModel model, List<ItemStack> outputs, DimPos targetPos) {
     IItemHandler targetOut = targetPos.getItemHandler(model.getOutputFace());
     if (targetOut == null) {
       return;

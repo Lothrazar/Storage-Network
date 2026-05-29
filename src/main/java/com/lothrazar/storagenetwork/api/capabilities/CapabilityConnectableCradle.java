@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.capabilities;
+package com.lothrazar.storagenetwork.api.capabilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,8 +6,6 @@ import java.util.List;
 
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
-import com.lothrazar.storagenetwork.api.IConnectableLink;
-import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
 import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
@@ -20,17 +18,17 @@ import org.apache.logging.log4j.Logger;
  * slot (via CradleAdapterRegistry), so vanilla shulkers, AE2 cells, and RS disks all flow through
  * the same path. Empty / incompatible held slots are skipped.
  */
-public class CapabilityCradleLink implements IConnectableLink {
+public class CapabilityConnectableCradle implements CapabilityConnectable {
   public static final Logger LOGGER = LogManager.getLogger();
 
   private final TileStorageCradle tile;
   private int priority;
 
-  public CapabilityCradleLink(TileStorageCradle tile) {
+  public CapabilityConnectableCradle(TileStorageCradle tile) {
     this.tile = tile;
   }
 
-  private List<IConnectableLink> links() {
+  private List<CapabilityConnectable> links() {
     return tile.getHeldLinks();
   }
 
@@ -41,12 +39,12 @@ public class CapabilityCradleLink implements IConnectableLink {
 
   @Override
   public List<ItemStack> getStoredStacks(boolean isFiltered) {
-    List<IConnectableLink> ls = links();
+    List<CapabilityConnectable> ls = links();
     if (ls.isEmpty()) {
       return Collections.emptyList();
     }
     List<ItemStack> result = new ArrayList<>();
-    for (IConnectableLink l : ls) {
+    for (CapabilityConnectable l : ls) {
       result.addAll(l.getStoredStacks(isFiltered));
     }
     return result;
@@ -59,7 +57,7 @@ public class CapabilityCradleLink implements IConnectableLink {
     }
     ItemStack remaining = stack;
     try {
-      for (IConnectableLink l : links()) {
+      for (CapabilityConnectable l : links()) {
         remaining = l.insertStack(remaining, simulate);
         if (remaining.isEmpty()) {
           return ItemStack.EMPTY;
@@ -80,7 +78,7 @@ public class CapabilityCradleLink implements IConnectableLink {
     }
     ItemStack first = ItemStack.EMPTY;
     int remaining = size;
-    for (IConnectableLink l : links()) {
+    for (CapabilityConnectable l : links()) {
       ItemStack got = l.extractStack(matcher, remaining, simulate);
       if (got.isEmpty()) {
         continue;
@@ -106,7 +104,7 @@ public class CapabilityCradleLink implements IConnectableLink {
   @Override
   public int getEmptySlots() {
     int empty = 0;
-    for (IConnectableLink l : links()) {
+    for (CapabilityConnectable l : links()) {
       empty += l.getEmptySlots();
     }
     return empty;
@@ -115,7 +113,7 @@ public class CapabilityCradleLink implements IConnectableLink {
   @Override
   public int getFilledSlots() {
     int filled = 0;
-    for (IConnectableLink l : links()) {
+    for (CapabilityConnectable l : links()) {
       filled += l.getFilledSlots();
     }
     return filled;
@@ -124,7 +122,7 @@ public class CapabilityCradleLink implements IConnectableLink {
   @Override
   public int getTotalSlots() {
     int total = 0;
-    for (IConnectableLink l : links()) {
+    for (CapabilityConnectable l : links()) {
       total += l.getTotalSlots();
     }
     return total;
@@ -152,7 +150,7 @@ public class CapabilityCradleLink implements IConnectableLink {
   public ItemStack extractFromSlot(int slot, int amount, boolean simulate) {
     // Flat index across all held links' slot spaces.
     int cursor = slot;
-    for (IConnectableLink l : links()) {
+    for (CapabilityConnectable l : links()) {
       int n = l.getTotalSlots();
       if (cursor < n) {
         return l.extractFromSlot(cursor, amount, simulate);
@@ -165,7 +163,7 @@ public class CapabilityCradleLink implements IConnectableLink {
   @Override
   public void addToStackProviderBatch(Batch<StackProvider> availableItems) {
     // Each held link contributes its own StackProviders; they're already wired to the right child IConnectableLink.
-    for (IConnectableLink l : links()) {
+    for (CapabilityConnectable l : links()) {
       l.addToStackProviderBatch(availableItems);
     }
   }

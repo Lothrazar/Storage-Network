@@ -2,16 +2,19 @@ package com.lothrazar.storagenetwork.item;
 
 import java.util.List;
 
+import com.lothrazar.library.util.ChatUtil;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.component.CustomData;
 import org.apache.commons.lang3.tuple.Triple;
 import com.lothrazar.library.item.ItemFlib;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.util.UtilInventory;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
+import com.lothrazar.storagenetwork.api.util.UtilInventory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -83,7 +86,7 @@ public class ItemCollector extends ItemFlib {
           int countUnmoved = network.insertStack(item.copy(), false);
           item.setCount(countUnmoved);
           if (countUnmoved == 0) {
-            UtilTileEntity.playSoundFromServer((ServerPlayer) player, SoundEvents.ITEM_PICKUP, 0.2F);
+            playSoundFromServer((ServerPlayer) player, SoundEvents.ITEM_PICKUP, 0.2F);
           }
         }
         // else { StorageNetworkMod.LOGGER.error("item.remote.notfound"); }
@@ -91,6 +94,13 @@ public class ItemCollector extends ItemFlib {
     }
   }
 
+
+  public static void playSoundFromServer(ServerPlayer entityIn, SoundEvent soundIn, float volume) {
+    if (soundIn == null || entityIn == null) {
+      return;
+    }
+    entityIn.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundIn), SoundSource.PLAYERS, entityIn.xOld, entityIn.yOld, entityIn.zOld, volume, 1.0F, 0)); // pitch=1; seed=0
+  }
   private static boolean isEnabled(ItemStack collectorStack) {
     CustomData customData = collectorStack.get(DataComponents.CUSTOM_DATA);
     return customData != null && customData.copyTag().getBoolean(NBT_ENABLED);
@@ -105,7 +115,7 @@ public class ItemCollector extends ItemFlib {
     if (world.getBlockEntity(pos) instanceof TileMain) {
       ItemStack stack = player.getItemInHand(hand);
       DimPos.putPos(stack, pos, world);
-      UtilTileEntity.statusMessage(player, "item.remote.connected");
+      ChatUtil.sendStatusMessage(player, "item.remote.connected");
       return InteractionResult.SUCCESS;
     }
     return InteractionResult.PASS;

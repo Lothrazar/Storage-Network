@@ -1,7 +1,7 @@
 package com.lothrazar.storagenetwork.block.cable.export;
 
 import com.lothrazar.storagenetwork.block.cable.ContainerCable;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableAutoIO;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExportDefault;
 import com.lothrazar.storagenetwork.item.ItemUpgrade;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
@@ -15,7 +15,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 public class ContainerCableExportFilter extends ContainerCable {
 
   public final TileCableExport tile;
-  public CapabilityConnectableAutoIO cap;
+  public CapabilityImportExportDefault cap;
 
   public ContainerCableExportFilter(int windowId, Level world, BlockPos pos, Inventory playerInv, Player player) {
     super(SsnRegistry.Menus.EXPORT_KABEL.get(), windowId);

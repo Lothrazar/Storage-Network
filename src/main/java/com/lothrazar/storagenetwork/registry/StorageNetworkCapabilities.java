@@ -2,24 +2,10 @@ package com.lothrazar.storagenetwork.registry;
 
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.lothrazar.storagenetwork.api.IConnectable;
-import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
-import com.lothrazar.storagenetwork.api.IConnectableItemProcessing;
-import com.lothrazar.storagenetwork.api.IConnectableLink;
-import com.lothrazar.storagenetwork.block.cable.export.TileCableExport;
-import com.lothrazar.storagenetwork.block.cable.input.TileCableIO;
-import com.lothrazar.storagenetwork.block.cable.inputfilter.TileCableImportFilter;
-import com.lothrazar.storagenetwork.block.cable.link.TileCableLink;
-import com.lothrazar.storagenetwork.block.cable.linkfilter.TileCableFilter;
-import com.lothrazar.storagenetwork.block.cable.processing.TileCableProcess;
-import com.lothrazar.storagenetwork.block.cable.TileCable;
-import com.lothrazar.storagenetwork.block.collection.TileCollection;
-import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
-import com.lothrazar.storagenetwork.block.exchange.TileExchange;
-import com.lothrazar.storagenetwork.block.expand.TileInventoryExpanded;
-import com.lothrazar.storagenetwork.block.inventory.TileInventory;
-import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.block.request.TileRequest;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExport;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityProcessing;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -29,17 +15,17 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 public class StorageNetworkCapabilities {
 
-  public static final BlockCapability<IConnectable,  Direction> CONNECTABLE =
-      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable"), IConnectable.class);
+  public static final BlockCapability<ConnectableNode,  Direction> CONNECTABLE =
+      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable"), ConnectableNode.class);
 
-  public static final BlockCapability<IConnectableLink, Direction> CONNECTABLE_ITEM_STORAGE =
-      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_item_storage"), IConnectableLink.class);
+  public static final BlockCapability<CapabilityConnectable, Direction> CONNECTABLE_ITEM_STORAGE =
+      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_item_storage"), CapabilityConnectable.class);
 
-  public static final BlockCapability<IConnectableItemAutoIO, Direction> CONNECTABLE_AUTO_IO =
-      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_auto_io"), IConnectableItemAutoIO.class);
+  public static final BlockCapability<CapabilityImportExport, Direction> CONNECTABLE_AUTO_IO =
+      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_auto_io"), CapabilityImportExport.class);
 
-  public static final BlockCapability<IConnectableItemProcessing, Direction> PROCESSING =
-      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_processing"), IConnectableItemProcessing.class);
+  public static final BlockCapability<CapabilityProcessing, Direction> PROCESSING =
+      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_processing"), CapabilityProcessing.class);
 
   @SubscribeEvent
   public static void registerCapabilities(RegisterCapabilitiesEvent event) {

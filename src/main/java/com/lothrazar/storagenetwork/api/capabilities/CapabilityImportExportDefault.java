@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.capabilities;
+package com.lothrazar.storagenetwork.api.capabilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,19 +7,14 @@ import java.util.concurrent.Callable;
 
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
-import com.lothrazar.storagenetwork.api.IConnectable;
-import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
-import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.UpgradeType;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import com.lothrazar.storagenetwork.api.OpCompareType;
-import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
-import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
-import com.lothrazar.storagenetwork.capabilities.handler.UpgradesItemStackHandler;
-import com.lothrazar.storagenetwork.registry.SsnRegistry;
+import com.lothrazar.storagenetwork.api.network.BlockEntityMainNetwork;
 import com.lothrazar.storagenetwork.api.batch.Request;
 import com.lothrazar.storagenetwork.api.batch.RequestBatch;
-import com.lothrazar.storagenetwork.util.UtilInventory;
+import com.lothrazar.storagenetwork.api.network.ConnectableNodeDefault;
+import com.lothrazar.storagenetwork.api.util.UtilInventory;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -31,21 +26,21 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag>, IConnectableItemAutoIO {
+public class CapabilityImportExportDefault implements INBTSerializable<CompoundTag>, CapabilityImportExport {
   public static final Logger LOGGER = LogManager.getLogger();
 
   public static final int DEFAULT_ITEMS_PER = 4;
   public static final int IO_DEFAULT_SPEED = 30; // TODO CONFIG
 
-  public static class Factory implements Callable<IConnectableItemAutoIO> {
+  public static class Factory implements Callable<CapabilityImportExport> {
 
     @Override
-    public IConnectableItemAutoIO call() throws Exception {
-      return new CapabilityConnectableAutoIO(EnumStorageDirection.IN);
+    public CapabilityImportExport call() throws Exception {
+      return new CapabilityImportExportDefault(EnumStorageDirection.IN);
     }
   }
 
-  public final IConnectable connectable;
+  public final ConnectableNode connectable;
   public EnumStorageDirection direction;
   public final UpgradesItemStackHandler upgrades = new UpgradesItemStackHandler();
   private final FilterItemStackHandler filters = new FilterItemStackHandler();
@@ -55,8 +50,8 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   public int operationLimit = 0;
   public int operationType = OpCompareType.LESS.ordinal();
 
-  CapabilityConnectableAutoIO(EnumStorageDirection direction) {
-    connectable = new CapabilityConnectable();
+  CapabilityImportExportDefault(EnumStorageDirection direction) {
+    connectable = new ConnectableNodeDefault();
     this.direction = direction;
   }
 
@@ -119,7 +114,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     filters.getStacks().set(value, stack);
   }
 
-  public CapabilityConnectableAutoIO(BlockEntity tile, EnumStorageDirection direction) {
+  public CapabilityImportExportDefault(BlockEntity tile, EnumStorageDirection direction) {
     connectable = (tile instanceof com.lothrazar.storagenetwork.block.TileConnectable tc)
         ? tc.getConnectable() : null;
     this.direction = direction;
@@ -299,31 +294,31 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
 
   @Override
   public boolean isStockMode() {
-    return getUpgrades().hasUpgradesOfType(SsnRegistry.Items.STOCK_UPGRADE.get());
+    return getUpgrades().hasUpgradesOfType(UpgradeType.STOCK);
   }
 
   @Override
   public boolean isOperationMode() {
-    return getUpgrades().hasUpgradesOfType(SsnRegistry.Items.OP_U.get());
+    return getUpgrades().hasUpgradesOfType(UpgradeType.OP);
   }
 
   @Override
   public int getTransferRate() {
-    if (upgrades.hasUpgradesOfType(SsnRegistry.Items.SINGLE_UPGRADE.get())) {
+    if (upgrades.hasUpgradesOfType(UpgradeType.SINGLE)) {
       return 1; //override both others
     }
-    return upgrades.hasUpgradesOfType(SsnRegistry.Items.STACK_UPGRADE.get()) ? 64 : DEFAULT_ITEMS_PER;
+    return upgrades.hasUpgradesOfType(UpgradeType.STACK) ? 64 : DEFAULT_ITEMS_PER;
   }
 
-  private boolean doesPassOperationFilterLimit(TileMain master) {
-    if (upgrades.getUpgradesOfType(SsnRegistry.Items.OP_U.get()) < 1) {
+  private boolean doesPassOperationFilterLimit(BlockEntityMainNetwork master) {
+    if (upgrades.getUpgradesOfType(UpgradeType.OP) < 1) {
       return true;
     }
     if (operationStack == null || operationStack.isEmpty()) {
       return true;
     }
     // TODO: Investigate whether the operation limiter should consider the filter toggles
-    int countYourItemInNetwork = master.getNetwork().getAmount(new DefaultItemStackMatcher(operationStack, filters.tags, filters.nbt));
+    int countYourItemInNetwork = master.getNetwork().getAmount(new ItemStackMatcherDefault(operationStack, filters.tags, filters.nbt));
     switch (OpCompareType.get(operationType)) {
       case EQUAL:
         return countYourItemInNetwork == operationLimit;
@@ -338,9 +333,9 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   }
 
   @Override
-  public boolean canRunNow(DimPos connectablePos, TileMain main) {
-    int speedUpgrades = upgrades.getUpgradesOfType(SsnRegistry.Items.SPEED_UPGRADE.get());
-    int slowUpgrades = upgrades.getUpgradesOfType(SsnRegistry.Items.SLOW_UPGRADE.get());
+  public boolean canRunNow(DimPos connectablePos, BlockEntityMainNetwork main) {
+    int speedUpgrades = upgrades.getUpgradesOfType(UpgradeType.SPEED);
+    int slowUpgrades = upgrades.getUpgradesOfType(UpgradeType.SLOW);
     int speedRatio = IO_DEFAULT_SPEED; // no upgrades
     if (speedUpgrades > 0) {
       //so 1 speed upgrade is run every 30/2=15t, two is 30/3 ticks etc
@@ -369,10 +364,10 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     return filters.getStackMatchers();
   }
 
-  @Override
-  public Direction facingInventory() {
-    return inventoryFace;
-  }
+//  @Override
+//  public Direction facingInventory() {
+//    return inventoryFace;
+//  }
 
   public UpgradesItemStackHandler getUpgrades() {
     return upgrades;
@@ -381,7 +376,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   public void extractFromSlot(int slot) {}
 
   @Override
-  public RequestBatch runExport(TileMain main) {
+  public RequestBatch runExport(BlockEntityMainNetwork main) {
     if (this.ioDirection() != EnumStorageDirection.OUT) { // TODO: redundant?
       return null;
     }
@@ -423,7 +418,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   }
 
   @Override
-  public void runImport(TileMain main) {
+  public void runImport(BlockEntityMainNetwork main) {
     if (this.ioDirection() != EnumStorageDirection.IN) { // TODO: redundant?
       return;
     }
@@ -468,7 +463,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
         int countMoved = stackToImport.getCount() - countUnmoved;
         // Void upgrade: any time the upgrade is installed and the stack passed the filter check above
         // (either allow-list match or not in the deny-list). Installing the upgrade is the opt-in.
-        boolean voidEnabled = upgrades.hasUpgradesOfType(SsnRegistry.Items.VOID_UPGRADE.get());
+        boolean voidEnabled = upgrades.hasUpgradesOfType(UpgradeType.VOID);
         if (countMoved <= 0 && !voidEnabled) {
           continue; //continue back to itemHandler
         }

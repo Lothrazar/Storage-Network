@@ -1,8 +1,8 @@
 package com.lothrazar.storagenetwork.block.cable.link;
 
-import com.lothrazar.storagenetwork.api.IConnectableLink;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectableDefault;
 import com.lothrazar.storagenetwork.block.TileCableWithFacing;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableLink;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,14 +14,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileCableLink extends TileCableWithFacing {
 
-  protected CapabilityConnectableLink itemStorage;
+  protected CapabilityConnectableDefault itemStorage;
 
   public TileCableLink(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.STORAGE_KABEL.get(), pos, state);
-    this.itemStorage = new CapabilityConnectableLink(this);
+    this.itemStorage = new CapabilityConnectableDefault(this);
   }
 
-  public IConnectableLink getItemStorage() {
+  public CapabilityConnectable getItemStorage() {
     return itemStorage;
   }
 

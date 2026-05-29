@@ -3,8 +3,8 @@ package com.lothrazar.storagenetwork.item.remote;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.block.AbstractNetworkScreen;
-import com.lothrazar.storagenetwork.gui.NetworkScreenSize;
-import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.api.gui.NetworkScreenSize;
+import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -17,14 +17,14 @@ public class ScreenNetworkRemote extends AbstractNetworkScreen<ContainerNetworkR
   private static final int HEIGHT = 256;
   private static final int WIDTH = 176;
   private static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/inventory.png");
-  private final NetworkWidget network;
+  private final DefaultNetworkWidget network;
   private final ItemStack remote;
 
   public ScreenNetworkRemote(ContainerNetworkRemote screenContainer, Inventory inv, Component titleIn) {
     super(screenContainer, inv, titleIn);
     //since the rightclick action forces only MAIN_HAND openings, is ok
     this.remote = screenContainer.getRemote();
-    network = new NetworkWidget(this, NetworkScreenSize.LARGE);
+    network = new DefaultNetworkWidget(this, NetworkScreenSize.LARGE);
     this.imageWidth = WIDTH;
     this.imageHeight = HEIGHT;
   }
@@ -37,7 +37,7 @@ public class ScreenNetworkRemote extends AbstractNetworkScreen<ContainerNetworkR
     addRenderableWidget(network.sortBtn);
     addRenderableWidget(network.focusBtn);
     if (this.getAutoFocus()) {
-      network.searchBar.setFocused(true);
+      network.getSearchBar().setFocused(true);
     }
     if (ModList.get().isLoaded("jei")) {
       addRenderableWidget(network.jeiBtn);
@@ -94,7 +94,7 @@ public class ScreenNetworkRemote extends AbstractNetworkScreen<ContainerNetworkR
   }
 
   @Override
-  public NetworkWidget getNetwork() {
+  public DefaultNetworkWidget getNetwork() {
     return network;
   }
 }

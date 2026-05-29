@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
-import com.lothrazar.storagenetwork.util.UtilInventory;
+import com.lothrazar.storagenetwork.api.util.UtilInventory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -90,7 +90,7 @@ public class RecipeMessage implements CustomPacketPayload {
           if (stackCurrent == null || stackCurrent.isEmpty()) {
             continue;
           }
-          DefaultItemStackMatcher itemStackMatcher = new DefaultItemStackMatcher(stackCurrent);
+          ItemStackMatcherDefault itemStackMatcher = new ItemStackMatcherDefault(stackCurrent);
           itemStackMatcher.setNbt(true);
           itemStackMatcher.setOre(isOreDict);
           ItemStack ex = UtilInventory.extractItem(new PlayerMainInvWrapper(player.getInventory()), itemStackMatcher, 1, true);

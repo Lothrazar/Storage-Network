@@ -1,7 +1,7 @@
 package com.lothrazar.storagenetwork.block.collection;
 
 import com.lothrazar.library.cap.ItemStackHandlerEx;
-import com.lothrazar.storagenetwork.api.IConnectable;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
@@ -46,7 +46,7 @@ public class CollectionItemStackHandler extends ItemStackHandlerEx {
       return stack;
     }
     validateSlotIndex(slot);
-    IConnectable cap = tile.getConnectable();
+    ConnectableNode cap = tile.getConnectable();
     //
     FilterItemStackHandler filter = cap.getFilter();
     if (filter != null

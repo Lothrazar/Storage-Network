@@ -1,15 +1,14 @@
-package com.lothrazar.storagenetwork.api;
+package com.lothrazar.storagenetwork.api.gui;
 
 import java.util.List;
-import com.lothrazar.storagenetwork.gui.NetworkWidget;
-import com.lothrazar.storagenetwork.network.SettingsSyncMessage;
-import net.neoforged.neoforge.network.PacketDistributor;
+
+import com.lothrazar.storagenetwork.api.EnumSortType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
-public interface IGuiNetwork extends IGuiPrivate {
+public interface GuiNetwork extends GuiPrivate {
 
-  NetworkWidget getNetwork();
+  NetworkWidget getNetwork(); // TODO: make NetworkWidget an API
 
   void setStacks(List<ItemStack> stacks);
 
@@ -27,9 +26,7 @@ public interface IGuiNetwork extends IGuiPrivate {
     return null;
   }
 
-  default void syncDataToServer() {
-    PacketDistributor.sendToServer(new SettingsSyncMessage(getPos(), getDownwards(), getSort(), isJeiSearchSynced(), getAutoFocus(), isFullStackCraft()));
-  }
+   void syncDataToServer();
 
   void setSort(EnumSortType val);
 

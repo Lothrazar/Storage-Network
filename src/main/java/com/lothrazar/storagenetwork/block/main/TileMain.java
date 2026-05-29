@@ -4,10 +4,11 @@ import java.util.List;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
-import com.lothrazar.storagenetwork.api.IConnectable;
-import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
-import com.lothrazar.storagenetwork.api.IConnectableItemProcessing;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.api.network.BlockEntityMainNetwork;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExport;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityProcessing;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import com.lothrazar.storagenetwork.api.batch.Request;
@@ -25,7 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class TileMain extends BlockEntity {
+public class TileMain extends BlockEntity implements BlockEntityMainNetwork {
   public static final Logger LOGGER = LogManager.getLogger();
 
   //currently this has one network
@@ -83,9 +84,7 @@ public class TileMain extends BlockEntity {
     loadAdditional(pkt.getTag() == null ? new CompoundTag() : pkt.getTag(), registries);
   }
 
-  /**
-   * insert into my network
-   */
+  @Override
   public int insertStack(ItemStack stack, boolean simulate) {
     int totalInserted = nw.insertStack(stack, simulate);
     if (!simulate && totalInserted > 0) {
@@ -98,7 +97,7 @@ public class TileMain extends BlockEntity {
   /**
    * request from my network
    */
-  public ItemStack request(DefaultItemStackMatcher matcher, int size, boolean simulate) {
+  public ItemStack request(ItemStackMatcherDefault matcher, int size, boolean simulate) {
     ItemStack result = nw.request(matcher, size, simulate);
     if (!simulate && !result.isEmpty()) {
       markComparatorDirty();
@@ -130,7 +129,7 @@ public class TileMain extends BlockEntity {
     tile.tick();
   }
 
-  private boolean isRunnable(IConnectable connectable) {
+  private boolean isRunnable(ConnectableNode connectable) {
     if (connectable.needsRedstone()) {
       boolean hasPower = level.hasNeighborSignal(connectable.getPos().getBlockPos());
       if (!hasPower) {
@@ -160,18 +159,18 @@ public class TileMain extends BlockEntity {
     refresh();
     RequestBatch requestBatch = new RequestBatch();
     int exportCableCount = 0;
-    for (IConnectable connectable : nw.getConnectables()) {
+    for (ConnectableNode connectable : nw.getConnectables()) {
       if (connectable == null || connectable.getPos() == null) {
         continue;
       }
       //does it have processing capability?
       //in practice it will not have both, its either IO or processing
-      IConnectableItemProcessing processingCap = connectable.getPos().getCapability(StorageNetworkCapabilities.PROCESSING, null);
+      CapabilityProcessing processingCap = connectable.getPos().getCapability(StorageNetworkCapabilities.PROCESSING, null);
       if (processingCap != null && isRunnable(connectable)) {
         processingCap.execute(this);
       }
       //now  try running all import and export capabilities, known as IO
-      IConnectableItemAutoIO ioCap = connectable.getPos().getCapability(StorageNetworkCapabilities.CONNECTABLE_AUTO_IO, null);
+      CapabilityImportExport ioCap = connectable.getPos().getCapability(StorageNetworkCapabilities.CONNECTABLE_AUTO_IO, null);
       if (ioCap != null && isRunnable(connectable)) {
         // Give the storage a chance to have a cooldown or other conditions that prevent it from running
         if (!ioCap.canRunNow(connectable.getPos(), this)) {

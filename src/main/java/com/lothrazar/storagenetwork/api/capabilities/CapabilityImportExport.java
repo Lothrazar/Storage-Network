@@ -1,23 +1,23 @@
-package com.lothrazar.storagenetwork.api;
+package com.lothrazar.storagenetwork.api.capabilities;
 
 import java.util.Collections;
 import java.util.List;
 
+import com.lothrazar.storagenetwork.api.DimPos;
+import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.batch.RequestBatch;
-import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
-import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
-import net.minecraft.core.Direction;
+import com.lothrazar.storagenetwork.api.network.BlockEntityMainNetwork;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 
 /**
- * Only expose this capability if you want your cable/block to auto-export and import blocks controlled by the networks main. You could quite as well just expose {@link IConnectable} and do the
+ * Only expose this capability if you want your cable/block to auto-export and import blocks controlled by the networks main. You could quite as well just expose {@link ConnectableNode} and do the
  * exporting/importing in your own update() method.
  * <p>
  * If you indeed want to add another exporting/importing cable in the style of the integrated ones, this might be for you. In all other cases, this is probably not what you want.
  */
-public interface IConnectableItemAutoIO {
+public interface CapabilityImportExport {
 
   void toggleNeedsRedstone();
 
@@ -78,7 +78,7 @@ public interface IConnectableItemAutoIO {
    */
   int getTransferRate();
 
-  Direction facingInventory();
+//  Direction facingInventory();
 
   /**
    * Storages with a higher priority (== lower number) are processed first. You probably want to add a way to configure the priority of your storage.
@@ -96,11 +96,11 @@ public interface IConnectableItemAutoIO {
    *          The network main. Use this to e.g. query amount of items.
    * @return Whether or not this IConnectableLink should be processed this tick.
    */
-  boolean canRunNow(DimPos connectablePos, TileMain main);
+  boolean canRunNow(DimPos connectablePos, BlockEntityMainNetwork main);
 
-  RequestBatch runExport(TileMain main);
+  RequestBatch runExport(BlockEntityMainNetwork main);
 
-  void runImport(TileMain main);
+  void runImport(BlockEntityMainNetwork main);
 
   /**
    * If this block is used with an ioDirection of OUT and has its getSupportedTransferDirection set to OUT, then this list will be consolidated by the main and available items in the network matching

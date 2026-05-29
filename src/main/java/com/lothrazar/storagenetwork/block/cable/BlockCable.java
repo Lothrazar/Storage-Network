@@ -4,15 +4,12 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.library.data.ShapeCache;
-import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumConnectType;
-import com.lothrazar.storagenetwork.api.IConnectable;
-import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableAutoIO;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExport;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExportDefault;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
-import com.lothrazar.storagenetwork.util.ShapeBuilder;
-import com.lothrazar.storagenetwork.util.UtilConnections;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -85,8 +82,8 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
         }
         worldIn.updateNeighbourForOutputSignal(pos, this);
       }
-      IConnectableItemAutoIO connectable = worldIn.getCapability(StorageNetworkCapabilities.CONNECTABLE_AUTO_IO, pos, null);
-      if (connectable instanceof CapabilityConnectableAutoIO filterCable) {
+      CapabilityImportExport connectable = worldIn.getCapability(StorageNetworkCapabilities.CONNECTABLE_AUTO_IO, pos, null);
+      if (connectable instanceof CapabilityImportExportDefault filterCable) {
         for (int i = 0; i < filterCable.upgrades.getSlots(); ++i) {
           Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), filterCable.upgrades.getStackInSlot(i));
         }
@@ -153,7 +150,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
       BlockPos posoff = pos.relative(d);
       facingState = worldIn.getBlockState(posoff);
       //      BlockEntity tileOffset = worldIn.getBlockEntity(posoff);
-      if (UtilConnections.isCableOverride(facingState)) {
+      if (CableHelpers.isCableOverride(facingState)) {
         LOGGER.debug("Main override setplacedby " + facingState);
         stateIn = stateIn.setValue(FACING_TO_PROPERTY_MAP.get(d), EnumConnectType.CABLE);
         worldIn.setBlockAndUpdate(pos, stateIn);
@@ -179,16 +176,16 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
   @Override
   public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor world, BlockPos currentPos, BlockPos facingPos) {
     EnumProperty<EnumConnectType> property = FACING_TO_PROPERTY_MAP.get(facing);
-    if (UtilConnections.isCableOverride(facingState)) {
+    if (CableHelpers.isCableOverride(facingState)) {
       return stateIn.setValue(property, EnumConnectType.CABLE);
     }
     //based on capability you have, edit connection type
     BlockEntity tileOffset = world.getBlockEntity(facingPos); //if i have zero other inventories, and this is one now, ok go invo
-    if (!hasInventoryAlready(stateIn, facing) && UtilConnections.isInventory(facing, world, facingPos)) {
+    if (!hasInventoryAlready(stateIn, facing) && CableHelpers.isInventory(facing, world, facingPos)) {
       return stateIn.setValue(property, EnumConnectType.INVENTORY);
     }
     if (tileOffset != null && world instanceof Level levelInstance) {
-      IConnectable cap = levelInstance.getCapability(StorageNetworkCapabilities.CONNECTABLE, facingPos, null);
+      ConnectableNode cap = levelInstance.getCapability(StorageNetworkCapabilities.CONNECTABLE, facingPos, null);
       if (cap != null) {
         return stateIn.setValue(property, EnumConnectType.CABLE);
       }

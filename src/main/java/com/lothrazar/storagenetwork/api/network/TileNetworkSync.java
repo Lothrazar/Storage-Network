@@ -1,5 +1,8 @@
-package com.lothrazar.storagenetwork.api;
-public interface ITileNetworkSync {
+package com.lothrazar.storagenetwork.api.network;
+
+import com.lothrazar.storagenetwork.api.EnumSortType;
+
+public interface TileNetworkSync {
 
   boolean isDownwards();
 

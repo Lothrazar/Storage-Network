@@ -1,15 +1,15 @@
 package com.lothrazar.storagenetwork.api.batch;
 
-import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
-import com.lothrazar.storagenetwork.api.IConnectableLink;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExport;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import net.minecraft.world.item.ItemStack;
 
 public class Request {
 
   private Integer count = 0;
-  private IConnectableItemAutoIO storage;
+  private CapabilityImportExport storage;
 
-  public Request(IConnectableItemAutoIO storage) {
+  public Request(CapabilityImportExport storage) {
     this.count = storage.getTransferRate();
     this.storage = storage;
   }
@@ -26,7 +26,7 @@ public class Request {
     return storage.getPriority();
   }
 
-  public Boolean insertStack(IConnectableLink providerStorage, int slot) {
+  public Boolean insertStack(CapabilityConnectable providerStorage, int slot) {
     ItemStack simulatedExtractedStack = providerStorage.extractFromSlot(slot, getCount(), true);
     if (simulatedExtractedStack.isEmpty()) {
       return false;

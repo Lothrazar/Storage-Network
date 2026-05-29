@@ -3,10 +3,10 @@ package com.lothrazar.storagenetwork.block.cradle;
 import java.util.ArrayList;
 import java.util.List;
 import com.lothrazar.storagenetwork.api.DimPos;
-import com.lothrazar.storagenetwork.api.IConnectableLink;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capabilities.CapabilityCradleLink;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectableCradle;
 import com.lothrazar.storagenetwork.registry.CradleAdapterRegistry;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
@@ -51,7 +51,7 @@ public class TileStorageCradle extends TileConnectable implements MenuProvider {
       }
     }
   };
-  private final CapabilityCradleLink linkCap = new CapabilityCradleLink(this);
+  private final CapabilityConnectableCradle linkCap = new CapabilityConnectableCradle(this);
 
   public TileStorageCradle(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.STORAGE_CRADLE.get(), pos, state);
@@ -65,15 +65,15 @@ public class TileStorageCradle extends TileConnectable implements MenuProvider {
     return holder.getStackInSlot(slot);
   }
 
-  public List<IConnectableLink> getHeldLinks() {
+  public List<CapabilityConnectable> getHeldLinks() {
     int n = holder.getSlots();
-    List<IConnectableLink> out = new ArrayList<>(n);
+    List<CapabilityConnectable> out = new ArrayList<>(n);
     for (int i = 0; i < n; i++) {
       ItemStack s = holder.getStackInSlot(i);
       if (s.isEmpty()) {
         continue;
       }
-      IConnectableLink link = CradleAdapterRegistry.wrap(s, this);
+      CapabilityConnectable link = CradleAdapterRegistry.wrap(s, this);
       if (link != null) {
         out.add(link);
       }
@@ -81,7 +81,7 @@ public class TileStorageCradle extends TileConnectable implements MenuProvider {
     return out;
   }
 
-  public IConnectableLink getLinkCapability() {
+  public CapabilityConnectable getLinkCapability() {
     return linkCap;
   }
 

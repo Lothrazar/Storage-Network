@@ -2,7 +2,7 @@ package com.lothrazar.storagenetwork.block.exchange;
 
 import com.lothrazar.library.cap.ItemStackHandlerEx;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
@@ -97,7 +97,7 @@ public class ExchangeItemStackHandler extends ItemStackHandlerEx {
       //            super.extractItem(slot, amount, simulate);
       return ItemStack.EMPTY;
     }
-    DefaultItemStackMatcher matcher = new DefaultItemStackMatcher(getStackInSlot(slot));
+    ItemStackMatcherDefault matcher = new ItemStackMatcherDefault(getStackInSlot(slot));
     //    StorageNetwork.log("extractItem " + matcher.getStack());
     ItemStack stack = tileMain.request(matcher, amount, simulate); // Stackoverflow?
     update();

@@ -1,9 +1,9 @@
 package com.lothrazar.storagenetwork.block.cable.input;
 
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
-import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExport;
 import com.lothrazar.storagenetwork.block.TileCableWithFacing;
-import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableAutoIO;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExportDefault;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,14 +15,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TileCableIO extends TileCableWithFacing {
 
-  protected CapabilityConnectableAutoIO ioStorage;
+  protected CapabilityImportExportDefault ioStorage;
 
   public TileCableIO(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.IMPORT_KABEL.get(), pos, state);
-    this.ioStorage = new CapabilityConnectableAutoIO(this, EnumStorageDirection.IN);
+    this.ioStorage = new CapabilityImportExportDefault(this, EnumStorageDirection.IN);
   }
 
-  public IConnectableItemAutoIO getIoStorage() {
+  public CapabilityImportExport getIoStorage() {
     return ioStorage;
   }
 

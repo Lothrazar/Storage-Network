@@ -3,7 +3,7 @@ package com.lothrazar.storagenetwork.network;
 import java.util.ArrayList;
 import java.util.List;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.lothrazar.storagenetwork.api.IGuiNetwork;
+import com.lothrazar.storagenetwork.api.gui.GuiNetwork;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -69,8 +69,8 @@ public class StackRefreshClientMessage implements CustomPacketPayload {
   public static void handle(StackRefreshClientMessage message, IPayloadContext ctx) {
     ctx.enqueueWork(() -> {
       Minecraft mc = Minecraft.getInstance();
-      if (mc.screen instanceof IGuiNetwork) {
-        IGuiNetwork gui = (IGuiNetwork) mc.screen;
+      if (mc.screen instanceof GuiNetwork) {
+        GuiNetwork gui = (GuiNetwork) mc.screen;
         gui.setStacks(message.stacks);
       }
     });

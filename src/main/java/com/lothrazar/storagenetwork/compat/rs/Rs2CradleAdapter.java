@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
-import com.lothrazar.storagenetwork.api.IConnectableLink;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
 import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
-import com.lothrazar.storagenetwork.api.CradleAdapter;
+import com.lothrazar.storagenetwork.compat.CradleAdapter;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import com.refinedmods.refinedstorage.api.core.Action;
@@ -41,7 +41,7 @@ public class Rs2CradleAdapter implements CradleAdapter {
   }
 
   @Override
-  public IConnectableLink wrap(ItemStack heldStack, TileStorageCradle cradle) {
+  public CapabilityConnectable wrap(ItemStack heldStack, TileStorageCradle cradle) {
     Level level = cradle.getLevel();
     if (level == null || level.isClientSide) {
       return null;
@@ -61,7 +61,7 @@ public class Rs2CradleAdapter implements CradleAdapter {
     return new Link(cradle, heldStack, sci, repo, opt.get());
   }
 
-  private static final class Link implements IConnectableLink {
+  private static final class Link implements CapabilityConnectable {
 
     private final TileStorageCradle cradle;
     private final ItemStack diskStack;

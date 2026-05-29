@@ -2,7 +2,7 @@ package com.lothrazar.storagenetwork.block.request;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
-import com.lothrazar.storagenetwork.api.ITileNetworkSync;
+import com.lothrazar.storagenetwork.api.network.TileNetworkSync;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
@@ -15,7 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileRequest extends TileConnectable implements MenuProvider, ITileNetworkSync {
+public class TileRequest extends TileConnectable implements MenuProvider, TileNetworkSync {
 
   public static final String NBT_JEI = StorageNetworkMod.MODID + "jei";
   private static final String NBT_DIR = StorageNetworkMod.MODID + "dir";

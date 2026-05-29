@@ -3,8 +3,8 @@ package com.lothrazar.storagenetwork.item.remote;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.block.AbstractNetworkScreen;
-import com.lothrazar.storagenetwork.gui.NetworkScreenSize;
-import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.api.gui.NetworkScreenSize;
+import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -17,14 +17,14 @@ public class ScreenNetworkCraftingRemote extends AbstractNetworkScreen<Container
   private static final int HEIGHT = 256;
   private static final int WIDTH = 176;
   private static final ResourceLocation textureCraft = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/request.png");
-  private final NetworkWidget network;
+  private final DefaultNetworkWidget network;
   private final ItemStack remote;
 
   public ScreenNetworkCraftingRemote(ContainerNetworkCraftingRemote screenContainer, Inventory inv, Component titleIn) {
     super(screenContainer, inv, titleIn);
     //since the rightclick action forces only MAIN_HAND openings, is ok
     remote = screenContainer.getRemote();// inv.player.getItemInHand(InteractionHand.MAIN_HAND);
-    network = new NetworkWidget(this, NetworkScreenSize.NORMAL);
+    network = new DefaultNetworkWidget(this, NetworkScreenSize.NORMAL);
     imageWidth = WIDTH;
     imageHeight = HEIGHT;
   }
@@ -41,7 +41,7 @@ public class ScreenNetworkCraftingRemote extends AbstractNetworkScreen<Container
       addRenderableWidget(network.fullStackBtn);
     }
     if (this.getAutoFocus()) {
-      network.searchBar.setFocused(true);
+      network.getSearchBar().setFocused(true);
     }
     if (ModList.get().isLoaded("jei")) {
       addRenderableWidget(network.jeiBtn);
@@ -109,7 +109,7 @@ public class ScreenNetworkCraftingRemote extends AbstractNetworkScreen<Container
   }
 
   @Override
-  public NetworkWidget getNetwork() {
+  public DefaultNetworkWidget getNetwork() {
     return network;
   }
 }

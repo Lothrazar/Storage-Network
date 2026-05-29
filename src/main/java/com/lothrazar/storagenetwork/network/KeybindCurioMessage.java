@@ -1,7 +1,7 @@
 package com.lothrazar.storagenetwork.network;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.lothrazar.storagenetwork.util.UtilRemote;
+import com.lothrazar.storagenetwork.item.remote.RemoteHelpers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -27,7 +27,7 @@ public class KeybindCurioMessage implements CustomPacketPayload {
     ctx.enqueueWork(() -> {
       ServerPlayer player = (ServerPlayer) ctx.player();
       ServerLevel serverWorld = (ServerLevel) player.level();
-      UtilRemote.searchAndOpen(player, serverWorld);
+      RemoteHelpers.searchAndOpen(player, serverWorld);
     });
   }
 }

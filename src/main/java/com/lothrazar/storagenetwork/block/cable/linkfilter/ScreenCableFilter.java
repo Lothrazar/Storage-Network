@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.lothrazar.storagenetwork.api.IGuiPrivate;
+import com.lothrazar.storagenetwork.api.gui.GuiPrivate;
 import com.lothrazar.storagenetwork.block.cable.inputfilter.ScreenCableImportFilter;
 import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest;
@@ -13,7 +13,6 @@ import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.CableDataMessage;
 import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -22,7 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
-public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFilter> implements IGuiPrivate {
+public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFilter> implements GuiPrivate {
 
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
     return supplier.get();
@@ -179,7 +178,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
       if (slot.isMouseOverSlot((int) mouseX, (int) mouseY)) {
         if (slot.getStack().isEmpty() == false) {
           //i hit non-empty slot, clear it no matter what
-          if (mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT) {
+          if (mouseButton == SsnConsts.MOUSE_BTN_RIGHT) {
             int direction = hasShiftDown() ? -1 : 1;
             int newCount = Math.min(64, slot.getStack().getCount() + direction);
             if (newCount < 1) {

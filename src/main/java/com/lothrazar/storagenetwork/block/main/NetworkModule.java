@@ -15,16 +15,16 @@ import java.util.stream.Stream;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
-import com.lothrazar.storagenetwork.api.IConnectable;
-import com.lothrazar.storagenetwork.api.IConnectableLink;
+import com.lothrazar.storagenetwork.api.network.ConnectableNode;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.RequestBatch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
-import com.lothrazar.storagenetwork.util.UtilInventory;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
+import com.lothrazar.storagenetwork.api.util.UtilInventory;
+import com.lothrazar.storagenetwork.util.CacheModName;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
@@ -58,14 +58,14 @@ public class NetworkModule {
    * 
    * @return
    */
-  public Set<IConnectable> getConnectables() {
+  public Set<ConnectableNode> getConnectables() {
     Set<DimPos> positions = new HashSet<>(connectables);
-    Set<IConnectable> result = new HashSet<>();
+    Set<ConnectableNode> result = new HashSet<>();
     for (DimPos pos : positions) {
       if (!pos.isLoaded()) {
         continue;
       }
-      IConnectable cap = pos.getCapability(StorageNetworkCapabilities.CONNECTABLE, null);
+      ConnectableNode cap = pos.getCapability(StorageNetworkCapabilities.CONNECTABLE, null);
       if (cap == null) {
         LOGGER.debug("Somehow stored a dimpos that is not connectable... Skipping " + pos);
         continue;
@@ -90,13 +90,13 @@ public class NetworkModule {
     selfValidate();
     List<ItemStack> stacks = Lists.newArrayList();
     try {
-      for (IConnectableLink storage : getConnectableStorage()) {
+      for (CapabilityConnectable storage : getConnectableStorage()) {
         //TODO: get Unsorted? 
         for (ItemStack stack : storage.getStoredStacks(isFiltered)) {
           if (stack == null || stack.isEmpty()) {
             continue;
           }
-          UtilTileEntity.addOrMergeIntoList(stacks, stack);
+          CacheModName.addOrMergeIntoList(stacks, stack);
         }
       }
     }
@@ -122,12 +122,12 @@ public class NetworkModule {
     boolean isFiltered = true;
     List<ItemStack> stacks = Lists.newArrayList();
     try {
-      for (IConnectableLink storage : getSortedConnectableStorage()) {
+      for (CapabilityConnectable storage : getSortedConnectableStorage()) {
         for (ItemStack stack : storage.getStoredStacks(isFiltered)) {
           if (stack == null || stack.isEmpty()) {
             continue;
           }
-          UtilTileEntity.addOrMergeIntoList(stacks, stack);
+          CacheModName.addOrMergeIntoList(stacks, stack);
         }
       }
     }
@@ -143,7 +143,7 @@ public class NetworkModule {
    *          for the itemstack request
    * @return totalCount of how much the network contains that match this filter
    */
-  public int getAmount(DefaultItemStackMatcher filter) {
+  public int getAmount(ItemStackMatcherDefault filter) {
     if (filter == null) {
       return 0;
     }
@@ -198,7 +198,7 @@ public class NetworkModule {
    */
   public int emptySlots() {
     int countEmpty = 0;
-    for (IConnectableLink storage : getSortedConnectableStorage()) {
+    for (CapabilityConnectable storage : getSortedConnectableStorage()) {
       countEmpty += storage.getEmptySlots();
     }
     return countEmpty;
@@ -212,7 +212,7 @@ public class NetworkModule {
   public int getComparatorSignal() {
     int filled = 0;
     int total = 0;
-    for (IConnectableLink storage : getSortedConnectableStorage()) {
+    for (CapabilityConnectable storage : getSortedConnectableStorage()) {
       filled += storage.getFilledSlots();
       total += storage.getTotalSlots();
     }
@@ -244,7 +244,7 @@ public class NetworkModule {
     String key = UtilInventory.getStackKey(stack);
     if (ch.hasCachedSlot(stack)) {
       DimPos cachedStoragePos = ch.getCachedSlot(stack);
-      IConnectableLink storage = cachedStoragePos.getCapability(StorageNetworkCapabilities.CONNECTABLE_ITEM_STORAGE, null);
+      CapabilityConnectable storage = cachedStoragePos.getCapability(StorageNetworkCapabilities.CONNECTABLE_ITEM_STORAGE, null);
       if (storage == null) {
         // The block at the cached position is not even an IConnectableLink anymore
         ch.remove(key);
@@ -267,8 +267,8 @@ public class NetworkModule {
       return 0;
     }
     // 3. Otherwise try to find a new inventory that can take the remainder of the itemstack
-    List<IConnectableLink> storages = getSortedConnectableStorage();
-    for (IConnectableLink storage : storages) {
+    List<CapabilityConnectable> storages = getSortedConnectableStorage();
+    for (CapabilityConnectable storage : storages) {
       try {
         // Ignore storages that can not import
         if (!storage.getSupportedTransferDirection().match(EnumStorageDirection.IN)) {
@@ -300,20 +300,20 @@ public class NetworkModule {
    *          true for capability simulation, false to execute transaction
    * @return stack copy if simulated, the real stack if executed
    */
-  public ItemStack request(DefaultItemStackMatcher matcher, int size, boolean simulate) {
+  public ItemStack request(ItemStackMatcherDefault matcher, int size, boolean simulate) {
     if (size == 0 || matcher == null) {
       return ItemStack.EMPTY;
     }
     ItemStackMatcher usedMatcher = matcher;
     int alreadyTransferred = 0;
-    for (IConnectableLink storage : getSortedConnectableStorage()) {
+    for (CapabilityConnectable storage : getSortedConnectableStorage()) {
       int req = size - alreadyTransferred;
       ItemStack simExtract = storage.extractStack(usedMatcher, req, simulate);
       if (simExtract.isEmpty()) {
         continue;
       }
       // Do not stack items of different types together, i.e. make the filter rules more strict for all further items
-      usedMatcher = new DefaultItemStackMatcher(simExtract, matcher.isOre(), matcher.isNbt());
+      usedMatcher = new ItemStackMatcherDefault(simExtract, matcher.isOre(), matcher.isNbt());
       alreadyTransferred += simExtract.getCount();
       if (alreadyTransferred >= size) {
         break;
@@ -330,7 +330,7 @@ public class NetworkModule {
       return;
     }
     Batch<StackProvider> availableItems = new Batch<StackProvider>();
-    for (IConnectableLink storage : getSortedConnectableStorage()) {
+    for (CapabilityConnectable storage : getSortedConnectableStorage()) {
       storage.addToStackProviderBatch(availableItems);
     }
     for (Item item : batch.keySet()) {
@@ -401,7 +401,7 @@ public class NetworkModule {
       if (tileHere == null) {
         continue;
       }
-      IConnectable capabilityConnectable = lookPos.getCapability(StorageNetworkCapabilities.CONNECTABLE, direction.getOpposite());
+      ConnectableNode capabilityConnectable = lookPos.getCapability(StorageNetworkCapabilities.CONNECTABLE, direction.getOpposite());
       if (capabilityConnectable == null) {
         continue;
       }
@@ -427,11 +427,11 @@ public class NetworkModule {
     }
   }
 
-  private List<IConnectableLink> getSortedConnectableStorage() {
+  private List<CapabilityConnectable> getSortedConnectableStorage() {
     try {
-      Set<IConnectableLink> storage = getConnectableStorage();
-      Stream<IConnectableLink> stream = storage.stream();
-      List<IConnectableLink> sorted = stream.sorted(Comparator.comparingInt(IConnectableLink::getPriority)).collect(Collectors.toList());
+      Set<CapabilityConnectable> storage = getConnectableStorage();
+      Stream<CapabilityConnectable> stream = storage.stream();
+      List<CapabilityConnectable> sorted = stream.sorted(Comparator.comparingInt(CapabilityConnectable::getPriority)).collect(Collectors.toList());
       return sorted;
     }
     catch (Exception e) {
@@ -443,18 +443,18 @@ public class NetworkModule {
     }
   }
 
-  private Set<IConnectableLink> getConnectableStorage() {
+  private Set<CapabilityConnectable> getConnectableStorage() {
     Set<DimPos> conSet = new HashSet<>(connectables);
-    Set<IConnectableLink> result = new HashSet<>();
+    Set<CapabilityConnectable> result = new HashSet<>();
     for (DimPos dimpos : conSet) {
       if (!dimpos.isLoaded()) {
         continue;
       }
-      IConnectableLink capConnect = dimpos.getCapability(StorageNetworkCapabilities.CONNECTABLE_ITEM_STORAGE, null);
+      CapabilityConnectable capConnect = dimpos.getCapability(StorageNetworkCapabilities.CONNECTABLE_ITEM_STORAGE, null);
       if (capConnect == null) {
         continue;
       }
-      IConnectable baseConn = dimpos.getCapability(StorageNetworkCapabilities.CONNECTABLE, null);
+      ConnectableNode baseConn = dimpos.getCapability(StorageNetworkCapabilities.CONNECTABLE, null);
       if (baseConn != null && baseConn.needsRedstone()
           && !dimpos.getWorld().hasNeighborSignal(dimpos.getBlockPos())) {
         continue;

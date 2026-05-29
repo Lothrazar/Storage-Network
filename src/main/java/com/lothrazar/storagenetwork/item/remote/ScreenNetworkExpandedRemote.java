@@ -2,8 +2,8 @@ package com.lothrazar.storagenetwork.item.remote;
 
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.block.AbstractNetworkScreen;
-import com.lothrazar.storagenetwork.gui.NetworkScreenSize;
-import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.api.gui.NetworkScreenSize;
+import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,17 +12,17 @@ import net.neoforged.fml.ModList;
 
 public class ScreenNetworkExpandedRemote extends AbstractNetworkScreen<ContainerNetworkExpandedRemote> {
 
-  private final NetworkWidget network;
+  private final DefaultNetworkWidget network;
   private final ItemStack remote;
 
   public ScreenNetworkExpandedRemote(ContainerNetworkExpandedRemote screenContainer, Inventory inv, Component titleIn) {
     super(screenContainer, inv, titleIn);
     //since the rightclick action forces only MAIN_HAND openings, is ok
     this.remote = screenContainer.getRemote();
-    network = new NetworkWidget(this, NetworkScreenSize.EXPANDED);
-    imageHeight = NetworkWidget.player.height() + NetworkWidget.crafting.height()
-        + NetworkWidget.row.height() * network.getSize().lines()
-        + NetworkWidget.head.height();
+    network = new DefaultNetworkWidget(this, NetworkScreenSize.EXPANDED);
+    imageHeight = DefaultNetworkWidget.player.height() + DefaultNetworkWidget.crafting.height()
+        + DefaultNetworkWidget.row.height() * network.getSize().lines()
+        + DefaultNetworkWidget.head.height();
     imageWidth = 256 + 12 * 18;//scrollWidth
   }
 
@@ -36,7 +36,7 @@ public class ScreenNetworkExpandedRemote extends AbstractNetworkScreen<Container
     if (network.clearGridBtn != null)
       addRenderableWidget(network.clearGridBtn);
     if (this.getAutoFocus()) {
-      network.searchBar.setFocused(true);
+      network.getSearchBar().setFocused(true);
     }
     if (ModList.get().isLoaded("jei")) {
       addRenderableWidget(network.jeiBtn);
@@ -47,7 +47,7 @@ public class ScreenNetworkExpandedRemote extends AbstractNetworkScreen<Container
   protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
     final int xCenter = (this.width - this.imageWidth) / 2;
     final int yCenter = (this.height - this.imageHeight) / 2;
-    network.renderBgExpanded(ms, partialTicks, mouseX, mouseY, xCenter, yCenter);
+    network.renderBgExpanded(ms, xCenter, yCenter);
     network.applySearchTextToSlots();
     //update network
     network.applySearchTextToSlots();
@@ -95,7 +95,7 @@ public class ScreenNetworkExpandedRemote extends AbstractNetworkScreen<Container
   }
 
   @Override
-  public NetworkWidget getNetwork() {
+  public DefaultNetworkWidget getNetwork() {
     return network;
   }
 }

@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.gui;
+package com.lothrazar.storagenetwork.api.gui;
 public enum NetworkScreenSize {
 
   //normal has the crafting table

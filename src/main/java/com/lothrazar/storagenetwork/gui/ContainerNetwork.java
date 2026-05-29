@@ -6,7 +6,7 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.network.StackRefreshClientMessage;
 import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
@@ -290,13 +290,13 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
       crafted += sizePerCraft;
       ItemStack stackInSlot;
       ItemStack recipeStack;
-      DefaultItemStackMatcher itemStackMatcherCurrent;
+      ItemStackMatcherDefault itemStackMatcherCurrent;
       for (int i = 0; i < matrix.getContainerSize(); i++) {
         stackInSlot = matrix.getItem(i);
         if (stackInSlot.isEmpty()) {
           recipeStack = recipeCopy.get(i);
           //////////////// booleans are meta, ore(?ignored?), nbt
-          itemStackMatcherCurrent = !recipeStack.isEmpty() ? new DefaultItemStackMatcher(recipeStack, false, false) : null;
+          itemStackMatcherCurrent = !recipeStack.isEmpty() ? new ItemStackMatcherDefault(recipeStack, false, false) : null;
           //false here means dont simulate
           ItemStack req = tile.request(itemStackMatcherCurrent, 1, false);
           matrix.setItem(i, req);

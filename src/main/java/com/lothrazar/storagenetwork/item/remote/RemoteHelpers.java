@@ -1,5 +1,7 @@
-package com.lothrazar.storagenetwork.util;
+package com.lothrazar.storagenetwork.item.remote;
 
+import com.lothrazar.library.util.ChatUtil;
+import com.lothrazar.storagenetwork.api.util.UtilInventory;
 import org.apache.commons.lang3.tuple.Triple;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
@@ -15,29 +17,28 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 
-public class UtilRemote {
+public class RemoteHelpers {
 
   public static void searchAndOpen(ServerPlayer player, ServerLevel serverWorld) {
     //TODO: search for data tag? or for a list?
     Triple<String, Integer, ItemStack> searchResult = UtilInventory.getCurioRemote(player, SsnRegistry.Items.CRAFTING_REMOTE.get());
     ItemStack curioRemote = searchResult.getRight();
     if (!curioRemote.isEmpty()) {
-      UtilRemote.openRemote(serverWorld, player, curioRemote, SsnRegistry.Items.CRAFTING_REMOTE.get());
+      RemoteHelpers.openRemote(serverWorld, player, curioRemote, SsnRegistry.Items.CRAFTING_REMOTE.get());
     }
     else { //crafting is the upgrade, so otherwise do regular 
       searchResult = UtilInventory.getCurioRemote(player, SsnRegistry.Items.INVENTORY_REMOTE.get());
       curioRemote = searchResult.getRight();
       if (!curioRemote.isEmpty()) {
-        UtilRemote.openRemote(serverWorld, player, curioRemote, SsnRegistry.Items.INVENTORY_REMOTE.get());
+        RemoteHelpers.openRemote(serverWorld, player, curioRemote, SsnRegistry.Items.INVENTORY_REMOTE.get());
       }
       else {
         //TODO: refactor this to be much smarter this nested stuff is terrible
         searchResult = UtilInventory.getCurioRemote(player, SsnRegistry.Items.EXPANDED_REMOTE.get());
         curioRemote = searchResult.getRight();
         if (!curioRemote.isEmpty()) {
-          UtilRemote.openRemote(serverWorld, player, curioRemote, SsnRegistry.Items.EXPANDED_REMOTE.get());
+          RemoteHelpers.openRemote(serverWorld, player, curioRemote, SsnRegistry.Items.EXPANDED_REMOTE.get());
         }
       }
     }
@@ -48,7 +49,7 @@ public class UtilRemote {
     DimPos dp = DimPos.getPosStored(itemStackIn);
     if (dp == null) {
       //unbound or invalid data
-      UtilTileEntity.statusMessage(player, "item.remote.notconnected");
+      ChatUtil.sendStatusMessage(player, "item.remote.notconnected");
       return false;
     }
     //assume we are in the same world
@@ -56,7 +57,7 @@ public class UtilRemote {
     if (ConfigRegistry.ITEMRANGE.get() != -1) {
       double distance = player.distanceToSqr(posTarget.getX() + 0.5D, posTarget.getY() + 0.5D, posTarget.getZ() + 0.5D);
       if (distance >= ConfigRegistry.ITEMRANGE.get()) {
-        UtilTileEntity.statusMessage(player, "item.remote.outofrange");
+        ChatUtil.sendStatusMessage(player, "item.remote.outofrange");
         return false;
       }
     }
@@ -80,8 +81,8 @@ public class UtilRemote {
     }
     //now check is the area chunk loaded
     if (!serverTargetWorld.isAreaLoaded(posTarget, 1)) {
-      UtilTileEntity.chatMessage(player, "item.remote.notloaded");
-      StorageNetworkMod.LOGGER.info(UtilTileEntity.lang("item.remote.notloaded") + posTarget);
+      ChatUtil.addChatMessage(player, "item.remote.notloaded");
+      StorageNetworkMod.LOGGER.info(ChatUtil.lang("item.remote.notloaded") + posTarget);
       return false;
     }
     BlockEntity tile = serverTargetWorld.getBlockEntity(posTarget);

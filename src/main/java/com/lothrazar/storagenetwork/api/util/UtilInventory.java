@@ -1,8 +1,8 @@
-package com.lothrazar.storagenetwork.util;
+package com.lothrazar.storagenetwork.api.util;
 
 import org.apache.commons.lang3.tuple.Triple;
 import com.lothrazar.storagenetwork.api.DimPos;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -118,7 +118,7 @@ public class UtilInventory {
     return minimumCount - found;
   }
 
-  public static ItemStack extractItem(IItemHandler inv, DefaultItemStackMatcher fil, int num, boolean simulate) {
+  public static ItemStack extractItem(IItemHandler inv, ItemStackMatcherDefault fil, int num, boolean simulate) {
     if (inv == null || fil == null) {
       return ItemStack.EMPTY;
     }

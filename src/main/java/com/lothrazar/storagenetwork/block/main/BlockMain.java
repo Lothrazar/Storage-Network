@@ -3,12 +3,11 @@ package com.lothrazar.storagenetwork.block.main;
 import java.util.List;
 import java.util.Map.Entry;
 import com.lothrazar.library.block.EntityBlockFlib;
+import com.lothrazar.library.util.ChatUtil;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -66,9 +65,9 @@ public class BlockMain extends EntityBlockFlib {
     }
     playerIn.sendSystemMessage(
         Component.translatable(ChatFormatting.LIGHT_PURPLE +
-            UtilTileEntity.lang("chat.main.emptyslots") + tileMain.getNetwork().emptySlots()));
+            ChatUtil.lang("chat.main.emptyslots") + tileMain.getNetwork().emptySlots()));
     playerIn.sendSystemMessage(Component.translatable(ChatFormatting.DARK_AQUA +
-        UtilTileEntity.lang("chat.main.connectables") + total));
+        ChatUtil.lang("chat.main.connectables") + total));
     List<Entry<String, Integer>> listDisplayStrings = tileMain.getNetwork().getDisplayStrings();
     for (Entry<String, Integer> e : listDisplayStrings) {
       playerIn.sendSystemMessage(Component.translatable(ChatFormatting.AQUA + "    " + e.getValue() + ": " + e.getKey()));

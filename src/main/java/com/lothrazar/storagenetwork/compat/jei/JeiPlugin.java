@@ -5,7 +5,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.expand.ContainerNetworkInventoryExpanded;
 import com.lothrazar.storagenetwork.block.request.ContainerNetworkCraftingTable;
 import com.lothrazar.storagenetwork.gui.ISearchHandler;
-import com.lothrazar.storagenetwork.gui.NetworkWidget;
+import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkCraftingRemote;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkExpandedRemote;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
@@ -89,7 +89,7 @@ public class JeiPlugin implements IModPlugin {
   }
 
   static {
-    NetworkWidget.searchHandlers.add(new ISearchHandler() {
+    DefaultNetworkWidget.searchHandlers.add(new ISearchHandler() {
 
       @Override
       public void setSearch(String text) {

@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.capabilities.handler;
+package com.lothrazar.storagenetwork.compat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.lothrazar.storagenetwork.api.*;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
@@ -15,7 +16,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 /** Built-in adapter  anything exposing Capabilities.ItemHandler.ITEM (vanilla shulkers, modded inventories). */
-public class ItemHandlerCradleAdapter implements CradleAdapter {
+public class CradleAdapterDefault implements CradleAdapter {
 
   @Override
   public boolean accepts(ItemStack heldStack) {
@@ -23,7 +24,7 @@ public class ItemHandlerCradleAdapter implements CradleAdapter {
   }
 
   @Override
-  public IConnectableLink wrap(ItemStack heldStack, TileStorageCradle cradle) {
+  public CapabilityConnectable wrap(ItemStack heldStack, TileStorageCradle cradle) {
     IItemHandler h = heldStack.getCapability(Capabilities.ItemHandler.ITEM);
     if (h == null) {
       return null;
@@ -31,7 +32,7 @@ public class ItemHandlerCradleAdapter implements CradleAdapter {
     return new Link(cradle, h);
   }
 
-  private static final class Link implements IConnectableLink {
+  private static final class Link implements CapabilityConnectable {
 
     private final TileStorageCradle cradle;
     private final IItemHandler handler;

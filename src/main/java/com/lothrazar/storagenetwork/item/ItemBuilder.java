@@ -2,12 +2,13 @@ package com.lothrazar.storagenetwork.item;
 
 import java.util.List;
 import com.lothrazar.library.item.ItemFlib;
+import com.lothrazar.library.util.ChatUtil;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
+import com.lothrazar.storagenetwork.util.CacheModName;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -68,7 +69,7 @@ public class ItemBuilder extends ItemFlib {
     if (world.getBlockEntity(pos) instanceof TileMain) {
       ItemStack stack = player.getItemInHand(hand);
       DimPos.putPos(stack, pos, world);
-      UtilTileEntity.statusMessage(player, "item.remote.connected");
+      ChatUtil.sendStatusMessage(player, "item.remote.connected");
       return InteractionResult.SUCCESS;
     }
     else if (world.isEmptyBlock(buildAt) || world.getBlockState(buildAt).liquid()) {
@@ -86,7 +87,7 @@ public class ItemBuilder extends ItemFlib {
         BlockState targetState = ItemBuilder.getBlockState(world, stack);
         if (tile instanceof TileMain && targetState != null) {
           TileMain network = (TileMain) tile;
-          DefaultItemStackMatcher matcher = new DefaultItemStackMatcher(new ItemStack(targetState.getBlock()), false, false);
+          ItemStackMatcherDefault matcher = new ItemStackMatcherDefault(new ItemStack(targetState.getBlock()), false, false);
           ItemStack found = network.request(matcher, 1, true);
           //SIMULATED, see if materials are available
           if (!found.isEmpty()) {
@@ -156,7 +157,7 @@ public class ItemBuilder extends ItemFlib {
       Level world = player.getCommandSenderWorld();
       BlockState target = world.getBlockState(event.getPos());
       ItemBuilder.setBlockState(held, target);
-      UtilTileEntity.statusMessage(player, target);
+      CacheModName.sendStatusMessage(player, target);
       event.setCanceled(true);
     }
   }

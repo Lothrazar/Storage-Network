@@ -1,5 +1,6 @@
-package com.lothrazar.storagenetwork.api;
+package com.lothrazar.storagenetwork.compat;
 
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
 import net.minecraft.world.item.ItemStack;
 
@@ -17,5 +18,5 @@ public interface CradleAdapter {
    * Wrap the held stack as an IConnectableLink. Called per-operation; implementations should be cheap.
    * Returning null is treated the same as accepts() returning false.
    */
-  IConnectableLink wrap(ItemStack heldStack, TileStorageCradle cradle);
+  CapabilityConnectable wrap(ItemStack heldStack, TileStorageCradle cradle);
 }

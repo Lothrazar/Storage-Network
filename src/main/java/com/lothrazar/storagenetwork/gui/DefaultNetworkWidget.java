@@ -10,16 +10,19 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSearchPrefix;
-import com.lothrazar.storagenetwork.api.IGuiNetwork;
+import com.lothrazar.storagenetwork.api.gui.GuiNetwork;
+import com.lothrazar.storagenetwork.api.gui.NetworkScreenSize;
+import com.lothrazar.storagenetwork.api.gui.NetworkWidget;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest.TextureEnum;
 import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.ClearRecipeMessage;
 import com.lothrazar.storagenetwork.network.InsertMessage;
 import com.lothrazar.storagenetwork.network.RequestMessage;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
-import com.lothrazar.storagenetwork.util.UtilTileEntity;
+import com.lothrazar.storagenetwork.util.CacheModName;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -36,16 +39,26 @@ import net.neoforged.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class NetworkWidget {
+public class DefaultNetworkWidget implements NetworkWidget {
   public static final Logger LOGGER = LogManager.getLogger();
+
+  private static final int W = 256;
+  //i know they could all be in the same png file and i pull out sprites from it, but split images is easier to work with
+  public static final TileableTexture head = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head.png"), W, 10);
+  public static final TileableTexture head_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head_right.png"), W, 10);
+  public static final TileableTexture row = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row.png"), W, SsnConsts.SQ);
+  public static final TileableTexture row_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row_right.png"), W, SsnConsts.SQ);
+  public static final TileableTexture crafting = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting.png"), W, 66);
+  public static final TileableTexture crafting_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting_right.png"), W, 66);
+  public static final TileableTexture player = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_player.png"), 176, 84);
 
   public static List<ISearchHandler> searchHandlers = new ArrayList<>();
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
     return supplier.get();
   };
-  public ItemStack stackUnderMouse = ItemStack.EMPTY;
+  private ItemStack stackUnderMouse = ItemStack.EMPTY;
   public List<ItemStack> stacks;
-  public EditBox searchBar;
+  private EditBox searchBar;
   public ButtonRequest directionBtn;
   public ButtonRequest sortBtn;
   public ButtonRequest jeiBtn;
@@ -53,7 +66,7 @@ public class NetworkWidget {
   public ButtonRequest clearGridBtn;
   public ButtonRequest fullStackBtn;
   private List<ItemSlotNetwork> slots;
-  private final IGuiNetwork gui;
+  private final GuiNetwork gui;
   private long lastClick;
   //
   private int page = 1;
@@ -61,13 +74,13 @@ public class NetworkWidget {
   private int lines = 4;
   private int columns = 9;
   public int scrollHeight = 152;
-  public int scrollWidth = 176;//defaults to WIDTH
+  private int scrollWidth = 176;//defaults to WIDTH
   //
-  public int xNetwork = 8;
-  public int yNetwork = 10;
+  private int xNetwork = 8;
+  private int yNetwork = 10;
   private final NetworkScreenSize size;
 
-  public NetworkWidget(IGuiNetwork gui, NetworkScreenSize size) {
+  public DefaultNetworkWidget(GuiNetwork gui, NetworkScreenSize size) {
     this.gui = gui;
     stacks = Lists.newArrayList();
     slots = Lists.newArrayList();
@@ -76,6 +89,30 @@ public class NetworkWidget {
     PacketDistributor.sendToServer(new RequestMessage());
     lastClick = System.currentTimeMillis();
   }
+
+  public AbstractWidget getSearchBar() {
+    return searchBar;
+  }
+
+
+  @Override
+  public int getX(){
+    return xNetwork;
+  }
+  @Override
+  public int getY(){
+    return yNetwork;
+  }
+  @Override
+  public int getScrollHeight(){
+    return scrollHeight;
+  }
+
+  @Override
+  public ItemStack getStackUnderMouse() {
+    return stackUnderMouse;
+  }
+
 
   private void setScreenSize() {
     int buffer = 0;
@@ -96,6 +133,7 @@ public class NetworkWidget {
     scrollHeight = (SsnConsts.SQ + 1) * this.getLines() + buffer;
   }
 
+  @Override
   public void init(Font font) {
     int x = gui.getGuiLeft() + 81;
     int y = gui.getGuiTop();
@@ -190,18 +228,22 @@ public class NetworkWidget {
     }
   }
 
+  @Override
   public List<ItemStack> getStacks() {
     return stacks;
   }
 
+  @Override
   public void setStacks(List<ItemStack> stacks) {
     this.stacks = stacks;
   }
 
+  @Override
   public NetworkScreenSize getSize() {
     return size;
   }
 
+  @Override
   public void applySearchTextToSlots() {
     String searchText = searchBar.getValue();
     List<ItemStack> stacksToDisplay = searchText.equals("") ? Lists.newArrayList(stacks) : Lists.newArrayList();
@@ -217,6 +259,7 @@ public class NetworkWidget {
     this.rebuildItemSlots(stacksToDisplay);
   }
 
+  @Override
   public void clearSearch() {
     if (searchBar == null) {
       return;
@@ -230,7 +273,7 @@ public class NetworkWidget {
   private boolean doesStackMatchSearch(ItemStack stack) {
     String searchText = searchBar.getValue();
     if (searchText.startsWith(EnumSearchPrefix.MOD.getPrefix())) { //  search modname 
-      String name = UtilTileEntity.getModNameForItem(stack.getItem());
+      String name = CacheModName.getModNameForItem(stack.getItem());
       return name.toLowerCase().contains(searchText.toLowerCase().substring(1));
     }
     else if (searchText.startsWith(EnumSearchPrefix.TOOLTIP.getPrefix())) { // search tooltips
@@ -255,27 +298,27 @@ public class NetworkWidget {
     }
   }
 
-  public boolean canClick() {
+  private boolean canClick() {
     return System.currentTimeMillis() > lastClick + 100L;
   }
 
-  public int getLines() {
+  private int getLines() {
     return lines;
   }
 
-  int getColumns() {
+  private int getColumns() {
     return columns;
   }
 
-  void setColumns(int c) {
+  private  void setColumns(int c) {
     this.columns = c;
   }
 
-  public void setLines(int v) {
+  private  void setLines(int v) {
     lines = v;
   }
 
-  public void applyScrollPaging(List<ItemStack> stacksToDisplay) {
+  private void applyScrollPaging(List<ItemStack> stacksToDisplay) {
     maxPage = stacksToDisplay.size() / (getColumns());
     if (stacksToDisplay.size() % (getColumns()) != 0) {
       maxPage++;
@@ -292,6 +335,7 @@ public class NetworkWidget {
     }
   }
 
+  @Override
   public void mouseScrolled(double mouseButton) {
     // < 0 going down
     // > 0 going up
@@ -303,7 +347,7 @@ public class NetworkWidget {
     }
   }
 
-  public void rebuildItemSlots(List<ItemStack> stacksToDisplay) {
+  private void rebuildItemSlots(List<ItemStack> stacksToDisplay) {
     slots = Lists.newArrayList();
     int index = (page - 1) * (getColumns());
     for (int row = 0; row < getLines(); row++) {
@@ -322,7 +366,7 @@ public class NetworkWidget {
     }
   }
 
-  public boolean inSearchBar(double mouseX, double mouseY) {
+  private boolean inSearchBar(double mouseX, double mouseY) {
     return gui.isInRegion(
         searchBar.getX() - gui.getGuiLeft(), searchBar.getY() - gui.getGuiTop(), // x, y
         searchBar.getWidth(), searchBar.getHeight(), // width, height
@@ -341,12 +385,14 @@ public class NetworkWidget {
     }
   }
 
+  @Override
   public void syncTextToJei() {
     if (ModList.get().isLoaded("jei") && gui.isJeiSearchSynced()) {
       searchHandlers.forEach((handler) -> handler.setSearch(searchBar.getValue()));
     }
   }
 
+  @Override
   public void drawGuiContainerForegroundLayer(GuiGraphics ms, int mouseX, int mouseY, Font font) {
     for (ItemSlotNetwork slot : slots) {
       if (slot != null && slot.isMouseOverSlot(mouseX, mouseY)) {
@@ -395,6 +441,7 @@ public class NetworkWidget {
     }
   }
 
+  @Override
   public void renderItemSlots(GuiGraphics ms, int mouseX, int mouseY, Font font) {
     stackUnderMouse = ItemStack.EMPTY;
     for (ItemSlotNetwork slot : slots) {
@@ -421,7 +468,7 @@ public class NetworkWidget {
     searchBar.setFocused(false);
     if (inSearchBar(mouseX, mouseY)) {
       searchBar.setFocused(true);
-      if (mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT) {
+      if (mouseButton == SsnConsts.MOUSE_BTN_RIGHT) {
         clearSearch();
         return;
       }
@@ -432,7 +479,7 @@ public class NetworkWidget {
     }
     ItemStack stackCarriedByMouse = player.containerMenu.getCarried();
     if (!stackUnderMouse.isEmpty()
-        && (mouseButton == UtilTileEntity.MOUSE_BTN_LEFT || mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT)
+        && (mouseButton == SsnConsts.MOUSE_BTN_LEFT || mouseButton == SsnConsts.MOUSE_BTN_RIGHT)
         && stackCarriedByMouse.isEmpty()) {
       // Request an item (from the network) if we are in the upper section of the GUI 
       PacketDistributor.sendToServer(new RequestMessage(mouseButton, this.stackUnderMouse.copy(), Screen.hasShiftDown(),
@@ -464,7 +511,7 @@ public class NetworkWidget {
     return inField;
   }
 
-  public void sortStackWrappers(List<ItemStack> stacksToDisplay) {
+  private void sortStackWrappers(List<ItemStack> stacksToDisplay) {
     Collections.sort(stacksToDisplay, new Comparator<ItemStack>() {
 
       final int mul = gui.getDownwards() ? -1 : 1;
@@ -477,13 +524,18 @@ public class NetworkWidget {
           case NAME:
             return o2.getHoverName().getString().compareToIgnoreCase(o1.getHoverName().getString()) * mul;
           case MOD:
-            return UtilTileEntity.getModNameForItem(o2.getItem()).compareToIgnoreCase(UtilTileEntity.getModNameForItem(o1.getItem())) * mul;
+            return CacheModName.getModNameForItem(o2.getItem()).compareToIgnoreCase(CacheModName.getModNameForItem(o1.getItem())) * mul;
         }
         return 0;
       }
     });
   }
+  @Override
+  public void renderSearchBar(GuiGraphics ms, int mouseX, int mouseY, float partialTicks) {
+    searchBar.render(ms, mouseX, mouseY, partialTicks);
+  }
 
+  @Override
   public void render() {
     switch (gui.getSort()) {
       case AMOUNT:
@@ -507,21 +559,12 @@ public class NetworkWidget {
     }
   }
 
-  protected static final int W = 256;
-  //i know they could all be in the same png file and i pull out sprites from it, but split images is easier to work with
-  public static final TileableTexture head = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head.png"), W, 10);
-  public static final TileableTexture head_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head_right.png"), W, 10);
-  public static final TileableTexture row = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row.png"), W, SsnConsts.SQ);
-  public static final TileableTexture row_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row_right.png"), W, SsnConsts.SQ);
-  public static final TileableTexture crafting = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting.png"), W, 66);
-  public static final TileableTexture crafting_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting_right.png"), W, 66);
-  public static final TileableTexture player = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_player.png"), 176, 84);
-
-  protected void blitSegment(GuiGraphics ms, TileableTexture tt, int xpos, int ypos) {
+  private void blitSegment(GuiGraphics ms, TileableTexture tt, int xpos, int ypos) {
     ms.blit(tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height());
   }
 
-  public void renderBgExpanded(GuiGraphics ms, float partialTicks, int mouseX, int mouseY, int xCenter, int yCenter) {
+  @Override
+  public void renderBgExpanded(GuiGraphics ms, int xCenter, int yCenter) {
     //render the top
     int xpos = xCenter;
     int ypos = yCenter;
@@ -538,5 +581,10 @@ public class NetworkWidget {
     blitSegment(ms, crafting_right, xpos + W, ypos);
     ypos += crafting.height() - 4;
     blitSegment(ms, player, xpos, ypos);
+  }
+
+  @Override
+  public void keyPressed(int keyCode, int scanCode, int b) {
+     searchBar.keyPressed(keyCode, scanCode, b);
   }
 }
