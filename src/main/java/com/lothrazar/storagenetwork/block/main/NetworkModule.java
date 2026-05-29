@@ -433,6 +433,11 @@ public class NetworkModule {
       if (capConnect == null) {
         continue;
       }
+      IConnectable baseConn = dimpos.getCapability(StorageNetworkCapabilities.CONNECTABLE, null);
+      if (baseConn != null && baseConn.needsRedstone()
+          && !dimpos.getWorld().hasNeighborSignal(dimpos.getBlockPos())) {
+        continue;
+      }
       result.add(capConnect);
     }
     return result;

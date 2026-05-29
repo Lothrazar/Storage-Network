@@ -25,7 +25,7 @@ public class CableDataMessage implements CustomPacketPayload {
   );
 
   public enum CableMessageType {
-    SYNC_DATA, IMPORT_FILTER, SAVE_FITLER;
+    SYNC_DATA, IMPORT_FILTER, SAVE_FITLER, REDSTONE;
   }
 
   private final boolean isAllowlist;
@@ -118,6 +118,11 @@ public class CableDataMessage implements CustomPacketPayload {
         break;
         case SAVE_FITLER:
           link.setFilter(message.value, message.stack.copy());
+        break;
+        case REDSTONE:
+          if (link.connectable != null) {
+            link.connectable.toggleNeedsRedstone();
+          }
         break;
       }
       container.tile.setChanged();

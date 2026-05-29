@@ -48,7 +48,6 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   private final FilterItemStackHandler filters = new FilterItemStackHandler();
   private int priority = 0;
   private Direction inventoryFace;
-  private boolean needsRedstone = false;
   public ItemStack operationStack = ItemStack.EMPTY;
   public int operationLimit = 0;
   public int operationType = OpCompareType.LESS.ordinal();
@@ -60,17 +59,21 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
 
   @Override
   public void toggleNeedsRedstone() {
-    needsRedstone = !needsRedstone;
+    if (connectable != null) {
+      connectable.toggleNeedsRedstone();
+    }
   }
 
   @Override
   public boolean needsRedstone() {
-    return this.needsRedstone;
+    return connectable != null && connectable.needsRedstone();
   }
 
   @Override
   public void needsRedstone(boolean in) {
-    this.needsRedstone = in;
+    if (connectable != null) {
+      connectable.needsRedstone(in);
+    }
   }
 
   public FilterItemStackHandler getFilter() {
@@ -139,7 +142,6 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     if (inventoryFace != null) {
       result.putString("inventoryFace", inventoryFace.toString());
     }
-    result.putBoolean("needsRedstone", this.needsRedstone());
     CompoundTag operation = new CompoundTag();
     if (!operationStack.isEmpty()) {
       operation.put("stack", (CompoundTag) operationStack.save(registries));
@@ -164,7 +166,9 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
     if (nbt.contains("inventoryFace")) {
       inventoryFace = Direction.byName(nbt.getString("inventoryFace"));
     }
-    this.needsRedstone(nbt.getBoolean("needsRedstone"));
+    if (nbt.contains("needsRedstone") && nbt.getBoolean("needsRedstone")) {
+      this.needsRedstone(true);
+    }
     CompoundTag operation = nbt.getCompound("operation");
     this.operationLimit = operation.getInt("limit");
     this.operationType = operation.getInt("operationType");

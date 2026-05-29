@@ -4,7 +4,7 @@
 		"1.21.1-latest": "1.13.0"
 	},
 	"1.21.1": {
-		"1.13.0": "Improved look and feel of the plain Network Cable intersections.  Merge pull request #593 from KishCom/trunk/1.20.1, Fix multiple export cables not working fixing #581\n  Merge pull request #586 from ArtByteFilip/trunk/1.20.1 added the option to turn the network collector remote on and off .  New crafting button to allow player to slow down shift-crafting, so you can get one result instead of a full stack at once."
+		"1.13.0": "Improved look and feel of the plain Network Cable intersections.  Add redstone control to Filtered Link Cable.  Merge pull request #593 from KishCom/trunk/1.20.1, Fix multiple export cables not working fixing #581\n  Merge pull request #586 from ArtByteFilip/trunk/1.20.1 added the option to turn the network collector remote on and off .  New crafting button to allow player to slow down shift-crafting, so you can get one result instead of a full stack at once."
 
 	}
 }

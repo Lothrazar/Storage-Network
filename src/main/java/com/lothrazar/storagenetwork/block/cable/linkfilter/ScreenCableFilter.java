@@ -46,6 +46,9 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
   public void init() {
     super.init();
     this.isAllowlist = containerCableLink.cap.getFilter().isAllowList;
+    btnRedstone = addRenderableWidget(new ButtonRequest(leftPos + 4, topPos + 4, "", (p) -> {
+      PacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.REDSTONE.ordinal()));
+    }, DEFAULT_NARRATION));
     btnMinus = addRenderableWidget(new ButtonRequest(leftPos + 28, topPos + 4, "", (p) -> {
       this.syncData(-1);
     }, DEFAULT_NARRATION));
@@ -84,7 +87,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
     if (containerCableLink == null || containerCableLink.cap == null || containerCableLink.cap.connectable == null) {
       return;
     }
-    //   btnRedstone.setTextureId(containerCableLink.cap.connectable.needsRedstone() ? TextureEnum.ALLOWLIST : TextureEnum.IGNORELIST);
+    btnRedstone.setTextureId(containerCableLink.cap.connectable.needsRedstone() ? TextureEnum.REDSTONETRUE : TextureEnum.REDSTONEFALSE);
   }
 
   @Override
@@ -119,7 +122,8 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
           mouseX - leftPos, mouseY - topPos);
     }
     if (btnRedstone != null && btnRedstone.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.redstone")), Optional.empty(),
+      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.redstone."
+          + containerCableLink.cap.connectable.needsRedstone())), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
   }
