@@ -43,7 +43,7 @@ public class StorageNetworkCapabilities {
 
   @SubscribeEvent
   public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    // CONNECTABLE — all network tile entities provide this (master is the hub, not a node)
+    // CONNECTABLE - all network tile entities provide this (master is the hub, not a node)
     event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.INVENTORY.get(), (be, side) -> be.getConnectable());
     event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.REQUEST_EXPANDED.get(), (be, side) -> be.getConnectable());
     event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.REQUEST.get(), (be, side) -> be.getConnectable());
@@ -58,20 +58,20 @@ public class StorageNetworkCapabilities {
     event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.PROCESS_KABEL.get(), (be, side) -> be.getConnectable());
     event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.STORAGE_CRADLE.get(), (be, side) -> be.getConnectable());
 
-    // CONNECTABLE_ITEM_STORAGE — storage cable and filter cable
+    // CONNECTABLE_ITEM_STORAGE - storage cable and filter cable
     event.registerBlockEntity(CONNECTABLE_ITEM_STORAGE, SsnRegistry.Tiles.STORAGE_KABEL.get(), (be, side) -> be.getItemStorage());
     event.registerBlockEntity(CONNECTABLE_ITEM_STORAGE, SsnRegistry.Tiles.FILTER_KABEL.get(), (be, side) -> be.getCapabilityLink());
     event.registerBlockEntity(CONNECTABLE_ITEM_STORAGE, SsnRegistry.Tiles.STORAGE_CRADLE.get(), (be, side) -> be.getLinkCapability());
 
-    // CONNECTABLE_AUTO_IO — import and export cables
+    // CONNECTABLE_AUTO_IO - import and export cables
     event.registerBlockEntity(CONNECTABLE_AUTO_IO, SsnRegistry.Tiles.IMPORT_KABEL.get(), (be, side) -> be.getIoStorage());
     event.registerBlockEntity(CONNECTABLE_AUTO_IO, SsnRegistry.Tiles.IMPORT_FILTER_KABEL.get(), (be, side) -> be.getIoStorage());
     event.registerBlockEntity(CONNECTABLE_AUTO_IO, SsnRegistry.Tiles.EXPORT_KABEL.get(), (be, side) -> be.getIoStorage());
 
-    // PROCESSING — processing cable
+    // PROCESSING - processing cable
     event.registerBlockEntity(PROCESSING, SsnRegistry.Tiles.PROCESS_KABEL.get(), (be, side) -> be.getItemStorage());
 
-    // ITEM_HANDLER — exchange and collector blocks proxy item access into the network
+    // ITEM_HANDLER - exchange and collector blocks proxy item access into the network
     event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SsnRegistry.Tiles.EXCHANGE.get(), (be, side) -> be.getItemHandler());
     event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SsnRegistry.Tiles.COLLECTOR.get(), (be, side) -> be.getItemHandler());
   }

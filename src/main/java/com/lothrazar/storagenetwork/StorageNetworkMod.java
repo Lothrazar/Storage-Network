@@ -9,7 +9,11 @@ import com.lothrazar.storagenetwork.block.cable.inputfilter.ScreenCableImportFil
 import com.lothrazar.storagenetwork.block.cable.processing.ScreenCableProcess;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.ScreenCableFilter;
 import com.lothrazar.storagenetwork.block.collection.ScreenCollectionFilter;
+import com.lothrazar.storagenetwork.block.cradle.CradleAdapterRegistry;
 import com.lothrazar.storagenetwork.block.cradle.ScreenStorageCradle;
+import com.lothrazar.storagenetwork.block.cradle.adapter.ItemHandlerCradleAdapter;
+import com.lothrazar.storagenetwork.compat.ae2.Ae2CradleBootstrap;
+import net.neoforged.fml.ModList;
 import com.lothrazar.storagenetwork.block.expand.ScreenNetworkInventoryExpanded;
 import com.lothrazar.storagenetwork.block.inventory.ScreenNetworkInventory;
 import com.lothrazar.storagenetwork.block.request.ScreenNetworkTable;
@@ -65,6 +69,12 @@ public class StorageNetworkMod {
 
   private static void setup(FMLCommonSetupEvent event) {
     CONFIG = new ConfigRegistry();
+    // Built-in cradle adapter (vanilla shulkers + any block/item exposing IItemHandler)
+    CradleAdapterRegistry.register(new ItemHandlerCradleAdapter());
+    // Optional compat - classloaded only if the host mod is present
+    if (ModList.get().isLoaded("ae2")) {
+      Ae2CradleBootstrap.register();
+    }
   }
 
   private void setupClient(final FMLClientSetupEvent event) {

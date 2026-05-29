@@ -31,7 +31,7 @@ public class ScreenStorageCradle extends AbstractContainerScreen<ContainerStorag
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
     ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
-    // slot frames behind the held-item row (slots start at 8,34 — draw 18x18 frame around each)
+    // slot frames behind the held-item row (slots start at 8,34 - draw 18x18 frame around each)
     for (int i = 0; i < ContainerStorageCradle.HELD_ROW_X_COUNT; i++) {
       ms.blit(ClientEventRegistry.SLOT, leftPos + ContainerStorageCradle.HELD_ROW_X - 1 + i * 18, topPos + ContainerStorageCradle.HELD_ROW_Y - 1, 0, 0, 18, 18, 18, 18);
     }

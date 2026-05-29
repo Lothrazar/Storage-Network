@@ -8,7 +8,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class ContainerStorageCradle extends AbstractContainerMenu {
@@ -31,8 +30,7 @@ public class ContainerStorageCradle extends AbstractContainerMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-          return !stack.isEmpty()
-              && stack.getCapability(Capabilities.ItemHandler.ITEM) != null;
+          return CradleAdapterRegistry.accepts(stack);
         }
       });
     }
@@ -66,7 +64,7 @@ public class ContainerStorageCradle extends AbstractContainerMenu {
     }
     else {
       // FROM inventory TO cradle (only if compatible)
-      if (stackInSlot.getCapability(Capabilities.ItemHandler.ITEM) == null) {
+      if (!CradleAdapterRegistry.accepts(stackInSlot)) {
         return ItemStack.EMPTY;
       }
       if (!this.moveItemStackTo(stackInSlot, 0, holderEnd, false)) {

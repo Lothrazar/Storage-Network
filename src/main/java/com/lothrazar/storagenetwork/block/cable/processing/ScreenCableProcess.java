@@ -139,7 +139,7 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
   protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
-    // background sheet (200x176 — see textures/gui/cable_process.png)
+    // background sheet (200x176 - see textures/gui/cable_process.png)
     ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
     // slot frames behind ghost items
     drawSlotFrames(ms, INPUT_X);

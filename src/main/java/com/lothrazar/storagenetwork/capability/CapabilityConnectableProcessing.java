@@ -243,7 +243,7 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
 
   /**
    * Robust extract: walks every slot, accumulates what comes out of extractItem().
-   * Does NOT rely on the post-extract value of getStackInSlot — vanilla containers
+   * Does NOT rely on the post-extract value of getStackInSlot - vanilla containers
    * (e.g. furnace) mutate the stack reference in-place, so reading the slot after
    * the extract is unreliable.
    */

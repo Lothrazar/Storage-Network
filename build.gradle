@@ -165,15 +165,15 @@ dependencies {
 
   compileOnly "com.blamejared.crafttweaker:CraftTweaker-neoforge-${minecraft_version}:${crafttweaker_version}"
 
-  // AE2 + Refined Storage — compileOnly for the cradle compat module.
+  // AE2 + Refined Storage  compileOnly for the cradle compat module.
   // Flip these to localRuntime if you want to test the compat in-game (may pull in worldgen/config side effects).
-//  compileOnly "curse.maven:applied-energistics-2-223794:${ae2_id}"
-//  compileOnly "curse.maven:refined-storage-243076:${rs_id}"
-//
-//  //for testing
-//   localRuntime "curse.maven:guideme-1173950:8129788"
-//   localRuntime "curse.maven:applied-energistics-2-223794:${ae2_id}"
-//   localRuntime "curse.maven:refined-storage-243076:${rs_id}"
+  compileOnly "curse.maven:applied-energistics-2-223794:${ae2_id}"
+  compileOnly "curse.maven:refined-storage-243076:${rs_id}"
+
+  //for testing
+   localRuntime "curse.maven:guideme-1173950:8129788"
+   localRuntime "curse.maven:applied-energistics-2-223794:${ae2_id}"
+   localRuntime "curse.maven:refined-storage-243076:${rs_id}"
 
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository

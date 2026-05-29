@@ -12,12 +12,11 @@ import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
 import com.lothrazar.storagenetwork.util.Batch;
 import com.lothrazar.storagenetwork.util.StackProvider;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 /**
- * Link capability backed by the union of IItemHandlers from each ItemStack held by the cradle.
- * Each slot's handler is queried independently — empty/incompatible held slots are skipped.
+ * Facade IConnectableLink for a Storage Cradle. Aggregates one wrapped IConnectableLink per held
+ * slot (via CradleAdapterRegistry), so vanilla shulkers, AE2 cells, and RS disks all flow through
+ * the same path. Empty / incompatible held slots are skipped.
  */
 public class CapabilityCradleLink implements IConnectableLink {
 
@@ -28,8 +27,8 @@ public class CapabilityCradleLink implements IConnectableLink {
     this.tile = tile;
   }
 
-  private List<IItemHandler> handlers() {
-    return tile.getHeldHandlers();
+  private List<IConnectableLink> links() {
+    return tile.getHeldLinks();
   }
 
   @Override
@@ -39,33 +38,26 @@ public class CapabilityCradleLink implements IConnectableLink {
 
   @Override
   public List<ItemStack> getStoredStacks(boolean isFiltered) {
-    List<IItemHandler> hs = handlers();
-    if (hs.isEmpty()) {
+    List<IConnectableLink> ls = links();
+    if (ls.isEmpty()) {
       return Collections.emptyList();
     }
     List<ItemStack> result = new ArrayList<>();
-    for (IItemHandler h : hs) {
-      for (int slot = 0; slot < h.getSlots(); slot++) {
-        ItemStack stack = h.getStackInSlot(slot);
-        if (stack == null || stack.isEmpty()) {
-          continue;
-        }
-        result.add(stack.copy());
-      }
+    for (IConnectableLink l : ls) {
+      result.addAll(l.getStoredStacks(isFiltered));
     }
     return result;
   }
 
   @Override
   public ItemStack insertStack(ItemStack stack, boolean simulate) {
-    List<IItemHandler> hs = handlers();
-    if (hs.isEmpty() || stack.isEmpty()) {
+    if (stack.isEmpty()) {
       return stack;
     }
     ItemStack remaining = stack;
     try {
-      for (IItemHandler h : hs) {
-        remaining = ItemHandlerHelper.insertItemStacked(h, remaining, simulate);
+      for (IConnectableLink l : links()) {
+        remaining = l.insertStack(remaining, simulate);
         if (remaining.isEmpty()) {
           return ItemStack.EMPTY;
         }
@@ -83,57 +75,36 @@ public class CapabilityCradleLink implements IConnectableLink {
     if (size <= 0) {
       return ItemStack.EMPTY;
     }
-    List<IItemHandler> hs = handlers();
-    if (hs.isEmpty()) {
-      return ItemStack.EMPTY;
-    }
-    ItemStack firstMatchedStack = ItemStack.EMPTY;
+    ItemStack first = ItemStack.EMPTY;
     int remaining = size;
-    for (IItemHandler h : hs) {
-      for (int slot = 0; slot < h.getSlots(); slot++) {
-        ItemStack stack = h.extractItem(slot, remaining, true);
-        if (stack == null || stack.isEmpty()) {
-          continue;
-        }
-        if (firstMatchedStack.isEmpty()) {
-          if (!matcher.match(stack)) {
-            continue;
-          }
-          firstMatchedStack = stack.copy();
-        }
-        else {
-          if (!ItemStack.isSameItemSameComponents(firstMatchedStack, stack)) {
-            continue;
-          }
-        }
-        int toExtract = Math.min(stack.getCount(), remaining);
-        ItemStack extractedStack = h.extractItem(slot, toExtract, simulate);
-        remaining -= extractedStack.getCount();
-        if (remaining <= 0) {
-          break;
-        }
+    for (IConnectableLink l : links()) {
+      ItemStack got = l.extractStack(matcher, remaining, simulate);
+      if (got.isEmpty()) {
+        continue;
       }
+      if (first.isEmpty()) {
+        first = got;
+      }
+      else if (ItemStack.isSameItemSameComponents(first, got)) {
+        first.grow(got.getCount());
+      }
+      else {
+        // Different item came back from another held storage; ignore and keep first.
+        continue;
+      }
+      remaining = size - first.getCount();
       if (remaining <= 0) {
         break;
       }
     }
-    int extractCount = size - remaining;
-    if (!firstMatchedStack.isEmpty() && extractCount > 0) {
-      firstMatchedStack.setCount(extractCount);
-    }
-    return firstMatchedStack;
+    return first;
   }
 
   @Override
   public int getEmptySlots() {
     int empty = 0;
-    for (IItemHandler h : handlers()) {
-      for (int slot = 0; slot < h.getSlots(); slot++) {
-        ItemStack stack = h.getStackInSlot(slot);
-        if (stack == null || stack.isEmpty()) {
-          empty++;
-        }
-      }
+    for (IConnectableLink l : links()) {
+      empty += l.getEmptySlots();
     }
     return empty;
   }
@@ -141,13 +112,8 @@ public class CapabilityCradleLink implements IConnectableLink {
   @Override
   public int getFilledSlots() {
     int filled = 0;
-    for (IItemHandler h : handlers()) {
-      for (int slot = 0; slot < h.getSlots(); slot++) {
-        ItemStack stack = h.getStackInSlot(slot);
-        if (stack != null && !stack.isEmpty()) {
-          filled++;
-        }
-      }
+    for (IConnectableLink l : links()) {
+      filled += l.getFilledSlots();
     }
     return filled;
   }
@@ -155,8 +121,8 @@ public class CapabilityCradleLink implements IConnectableLink {
   @Override
   public int getTotalSlots() {
     int total = 0;
-    for (IItemHandler h : handlers()) {
-      total += h.getSlots();
+    for (IConnectableLink l : links()) {
+      total += l.getTotalSlots();
     }
     return total;
   }
@@ -181,12 +147,12 @@ public class CapabilityCradleLink implements IConnectableLink {
 
   @Override
   public ItemStack extractFromSlot(int slot, int amount, boolean simulate) {
-    // slot here is a flat index across all held handlers
+    // Flat index across all held links' slot spaces.
     int cursor = slot;
-    for (IItemHandler h : handlers()) {
-      int n = h.getSlots();
+    for (IConnectableLink l : links()) {
+      int n = l.getTotalSlots();
       if (cursor < n) {
-        return h.extractItem(cursor, amount, simulate);
+        return l.extractFromSlot(cursor, amount, simulate);
       }
       cursor -= n;
     }
@@ -195,15 +161,9 @@ public class CapabilityCradleLink implements IConnectableLink {
 
   @Override
   public void addToStackProviderBatch(Batch<StackProvider> availableItems) {
-    int flatIndex = 0;
-    for (IItemHandler h : handlers()) {
-      for (int slot = 0; slot < h.getSlots(); slot++) {
-        ItemStack stack = h.extractItem(slot, 1, true);
-        if (stack != null && !stack.isEmpty()) {
-          availableItems.put(stack.getItem(), new StackProvider(this, flatIndex));
-        }
-        flatIndex++;
-      }
+    // Each held link contributes its own StackProviders; they're already wired to the right child IConnectableLink.
+    for (IConnectableLink l : links()) {
+      l.addToStackProviderBatch(availableItems);
     }
   }
 }

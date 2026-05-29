@@ -21,7 +21,7 @@ public class ContainerCableProcess extends ContainerCable {
     this.cap = tile.getCap();
     this.player = playerInv.player;
     this.world = this.player.level();
-    // player inventory (rows) — pushed down to make room for the recipe grids
+    // player inventory (rows) - pushed down to make room for the recipe grids
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 9; ++j) {
         addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 118 + i * 18));

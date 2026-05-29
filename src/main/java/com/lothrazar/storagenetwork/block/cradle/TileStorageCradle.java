@@ -18,8 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class TileStorageCradle extends TileConnectable implements MenuProvider {
@@ -29,8 +27,7 @@ public class TileStorageCradle extends TileConnectable implements MenuProvider {
 
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
-      return !stack.isEmpty()
-          && stack.getCapability(Capabilities.ItemHandler.ITEM) != null;
+      return CradleAdapterRegistry.accepts(stack);
     }
 
     @Override
@@ -67,16 +64,17 @@ public class TileStorageCradle extends TileConnectable implements MenuProvider {
     return holder.getStackInSlot(slot);
   }
 
-  public List<IItemHandler> getHeldHandlers() {
-    List<IItemHandler> out = new ArrayList<>(HOLDER_SIZE);
-    for (int i = 0; i < HOLDER_SIZE; i++) {
+  public List<IConnectableLink> getHeldLinks() {
+    int n = holder.getSlots();
+    List<IConnectableLink> out = new ArrayList<>(n);
+    for (int i = 0; i < n; i++) {
       ItemStack s = holder.getStackInSlot(i);
       if (s.isEmpty()) {
         continue;
       }
-      IItemHandler h = s.getCapability(Capabilities.ItemHandler.ITEM);
-      if (h != null) {
-        out.add(h);
+      IConnectableLink link = CradleAdapterRegistry.wrap(s, this);
+      if (link != null) {
+        out.add(link);
       }
     }
     return out;
@@ -90,7 +88,11 @@ public class TileStorageCradle extends TileConnectable implements MenuProvider {
   protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
     super.loadAdditional(compound, registries);
     if (compound.contains("holder")) {
-      holder.deserializeNBT(registries, compound.getCompound("holder"));
+      // Force the saved Size up to HOLDER_SIZE so old worlds (which saved Size=1) still load
+      // and we don't end up with a 1-slot handler at runtime.
+      CompoundTag holderTag = compound.getCompound("holder").copy();
+      holderTag.putInt("Size", HOLDER_SIZE);
+      holder.deserializeNBT(registries, holderTag);
     }
   }
 
