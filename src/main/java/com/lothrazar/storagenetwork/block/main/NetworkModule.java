@@ -27,6 +27,7 @@ import com.lothrazar.storagenetwork.util.StackProvider;
 import com.lothrazar.storagenetwork.util.UtilInventory;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -199,6 +200,24 @@ public class NetworkModule {
       countEmpty += storage.getEmptySlots();
     }
     return countEmpty;
+  }
+
+  /**
+   * Vanilla-chest-style comparator signal: 0 when empty, otherwise
+   * floor(filled / total * 14) + 1, where filled/total are counted across all
+   * linked inventories that expose the storage-link capability.
+   */
+  public int getComparatorSignal() {
+    int filled = 0;
+    int total = 0;
+    for (IConnectableLink storage : getSortedConnectableStorage()) {
+      filled += storage.getFilledSlots();
+      total += storage.getTotalSlots();
+    }
+    if (total == 0 || filled == 0) {
+      return 0;
+    }
+    return Mth.floor((float) filled / (float) total * 14f) + 1;
   }
 
   /**

@@ -213,6 +213,39 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
   }
 
   @Override
+  public int getFilledSlots() {
+    if (inventoryFace == null || connectable == null || connectable.getPos() == null) {
+      return 0;
+    }
+    DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
+    IItemHandler itemHandler = inventoryPos.getItemHandler(inventoryFace.getOpposite());
+    if (itemHandler == null) {
+      return 0;
+    }
+    int filled = 0;
+    for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
+      ItemStack stack = itemHandler.getStackInSlot(slot);
+      if (stack != null && !stack.isEmpty()) {
+        filled++;
+      }
+    }
+    return filled;
+  }
+
+  @Override
+  public int getTotalSlots() {
+    if (inventoryFace == null || connectable == null || connectable.getPos() == null) {
+      return 0;
+    }
+    DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
+    IItemHandler itemHandler = inventoryPos.getItemHandler(inventoryFace.getOpposite());
+    if (itemHandler == null) {
+      return 0;
+    }
+    return itemHandler.getSlots();
+  }
+
+  @Override
   public void setPriority(int value) {
     this.priority = value;
   }

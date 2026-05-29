@@ -89,4 +89,17 @@ public class BlockMain extends EntityBlockFlib {
   public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
     return new TileMain(pos, state);
   }
+
+  @Override
+  public boolean hasAnalogOutputSignal(BlockState state) {
+    return true;
+  }
+
+  @Override
+  public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    if (level.getBlockEntity(pos) instanceof TileMain tile) {
+      return tile.getComparatorSignal();
+    }
+    return 0;
+  }
 }

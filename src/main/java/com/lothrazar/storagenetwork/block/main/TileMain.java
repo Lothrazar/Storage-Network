@@ -27,6 +27,9 @@ public class TileMain extends BlockEntity {
 
   //currently this has one network
   private NetworkModule nw = new NetworkModule();
+  // -1 forces a notify on the first computation, so the comparator picks up the initial state.
+  private int lastComparatorSignal = -1;
+  private boolean comparatorDirty = true;
 
   public TileMain(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.MASTER.get(), pos, state);
@@ -34,6 +37,30 @@ public class TileMain extends BlockEntity {
 
   public NetworkModule getNetwork() {
     return nw;
+  }
+
+  public int getComparatorSignal() {
+    return nw.getComparatorSignal();
+  }
+
+  /**
+   * Flag the network contents as changed. Coalesced and resolved at the end of the next server tick,
+   * so a burst of inserts/extracts only triggers at most one comparator recompute per tick.
+   */
+  public void markComparatorDirty() {
+    comparatorDirty = true;
+  }
+
+  private void updateComparatorIfDirty() {
+    if (!comparatorDirty || level == null) {
+      return;
+    }
+    comparatorDirty = false;
+    int signal = nw.getComparatorSignal();
+    if (signal != lastComparatorSignal) {
+      lastComparatorSignal = signal;
+      level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
+    }
   }
 
   @Override
@@ -58,6 +85,9 @@ public class TileMain extends BlockEntity {
    */
   public int insertStack(ItemStack stack, boolean simulate) {
     int totalInserted = nw.insertStack(stack, simulate);
+    if (!simulate && totalInserted > 0) {
+      markComparatorDirty();
+    }
     //subnetwork ?
     return totalInserted;
   }
@@ -67,16 +97,20 @@ public class TileMain extends BlockEntity {
    */
   public ItemStack request(ItemStackMatcher matcher, int size, boolean simulate) {
     ItemStack result = nw.request(matcher, size, simulate);
+    if (!simulate && !result.isEmpty()) {
+      markComparatorDirty();
+    }
     //if not found then ? check other wireless / remote networks goes here?
     return result;
   }
 
   public void executeRequestBatch(RequestBatch batch) {
-    if (batch == null) {
+    if (batch == null || batch.isEmpty()) {
       return;
     }
     batch.sort();
     nw.executeRequestBatch(batch);
+    markComparatorDirty();
   }
 
   private DimPos getDimPos() {
@@ -167,6 +201,7 @@ public class TileMain extends BlockEntity {
       StorageNetworkMod.log("Executing accumulated batch with " + requestBatch.size() + " item types from " + exportCableCount + " cables");
     }
     executeRequestBatch(requestBatch);
+    updateComparatorIfDirty();
   }
 
   private void refresh() {
@@ -175,6 +210,9 @@ public class TileMain extends BlockEntity {
     if ((level.getGameTime() % StorageNetworkMod.CONFIG.refreshTicks() == 0)
         || nw.shouldRefresh()) {
       nw.doRefresh(this.getDimPos());
+      // Connectable add/remove + the periodic re-scan are the two events that can
+      // change the comparator signal without going through insert/extract.
+      markComparatorDirty();
     }
   }
 }

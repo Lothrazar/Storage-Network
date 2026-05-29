@@ -79,6 +79,24 @@ public interface IConnectableLink {
    */
   int getEmptySlots();
 
+  /**
+   * Count of slots in the attached inventory that currently hold a non-empty stack.
+   * Used to compute the comparator output on the Storage Network Root.
+   * Default 0 keeps third-party implementors compiling without contributing to the signal.
+   */
+  default int getFilledSlots() {
+    return 0;
+  }
+
+  /**
+   * Total slot count in the attached inventory (filled + empty). Used to compute the
+   * comparator output on the Storage Network Root. Default 0 keeps third-party
+   * implementors compiling without contributing to the signal.
+   */
+  default int getTotalSlots() {
+    return 0;
+  }
+
   void setPriority(int value);
 
   void setFilter(int value, ItemStack copy);

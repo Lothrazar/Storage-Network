@@ -38,7 +38,7 @@
  		"page.storagenetwork.gs_chunks.right":"$(li)Spread Example: so its possible for a network to have 20 link cables but 5 are in an unloaded chunk.  Network screens/remotes will still open since the root is loaded, any contents from those unloaded cables are not seen. $(li)Remote example: I build my storage network far away from $(t:which are always loaded)spawn chunks$(/t), in a distant ocean base.  When I go to the nether, the overworld chunks with the Root block are unloaded, so my $(l:inventory_remote)Remotes$(/l) cannot connect",
  	
     "block.storagenetwork.master": "Storage Network Root",
-    "block.storagenetwork.master.tooltip": "Use only one per network",
+    "block.storagenetwork.master.tooltip": "Use only one per network. Emits a comparator signal proportional to how full the linked storage is.",
     "block.storagenetwork.master.guide": "The main heart of the network. Only ONE per network, Placing more will cause one of them to break, and may cause network connection issues for remotes and cables.  Moving the root node to a new place will break the network, interrupting imports, exports, and remotes.  Multiple networks per world and dimension are fine as long as they are not connected to each other",
     
     "block.storagenetwork.request": "Storage Request Table",
