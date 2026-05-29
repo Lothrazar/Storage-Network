@@ -68,6 +68,9 @@
     "block.storagenetwork.exchange.guide": "This exposes the network as an inventory interface.  For example, the AE2 mod has a ME Storage Bus that will connect to this, so the entire simple storage network can be accessed through your AE2 system.  A Hopper below will export arbitrary items.  Try this with other storage mods!  ",
     "block.storagenetwork.exchange.tooltip": "Endpoint of the network for inventory connections",
 
+    "block.storagenetwork.storage_cradle": "Network Storage Cradle",
+    "block.storagenetwork.storage_cradle.tooltip": "Stores items inside items. Try a shulker box.",
+    "block.storagenetwork.storage_cradle.guide": "Holds a single item and exposes that item's internal storage to the network. Drop in a shulker box (or anything that exposes item-handler capability) and its slots become part of network storage. Break the cradle to retrieve both the cradle and the held item with its contents intact.",
     "block.storagenetwork.collector": "Network Collection Interface",
     "block.storagenetwork.collector.guide":  "This exposes the network and acts as an insert-only controller for other automation systems or storage solutions.  For example, a normal Hopper will insert items similar to the  $(l:import_kabel)Import Cable$(/l).  Does not allow any item extraction.  Try this with other storage mods!  ",
     "block.storagenetwork.collector.tooltip": "Items inserted enter the network",

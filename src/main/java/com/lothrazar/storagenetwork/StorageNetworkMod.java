@@ -9,6 +9,7 @@ import com.lothrazar.storagenetwork.block.cable.inputfilter.ScreenCableImportFil
 import com.lothrazar.storagenetwork.block.cable.processing.ScreenCableProcess;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.ScreenCableFilter;
 import com.lothrazar.storagenetwork.block.collection.ScreenCollectionFilter;
+import com.lothrazar.storagenetwork.block.cradle.ScreenStorageCradle;
 import com.lothrazar.storagenetwork.block.expand.ScreenNetworkInventoryExpanded;
 import com.lothrazar.storagenetwork.block.inventory.ScreenNetworkInventory;
 import com.lothrazar.storagenetwork.block.request.ScreenNetworkTable;
@@ -81,6 +82,7 @@ public class StorageNetworkMod {
     event.register(SsnRegistry.Menus.COLLECTOR.get(), ScreenCollectionFilter::new);
     event.register(SsnRegistry.Menus.REQUEST_EXPANDED.get(), ScreenNetworkInventoryExpanded::new);
     event.register(SsnRegistry.Menus.EXPANDED_REMOTE.get(), ScreenNetworkExpandedRemote::new);
+    event.register(SsnRegistry.Menus.STORAGE_CRADLE.get(), ScreenStorageCradle::new);
   }
 
   private void registerMapping(final RegisterKeyMappingsEvent event) {

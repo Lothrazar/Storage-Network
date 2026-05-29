@@ -35,7 +35,8 @@ public class UtilConnections {
         || facingState.is(SsnRegistry.Blocks.INVENTORY.get())
         || facingState.is(SsnRegistry.Blocks.REQUEST.get())
         || facingState.is(SsnRegistry.Blocks.REQUEST_EXPANDED.get())
-        || facingState.is(SsnRegistry.Blocks.KABEL.get());
+        || facingState.is(SsnRegistry.Blocks.KABEL.get())
+        || facingState.is(SsnRegistry.Blocks.STORAGE_CRADLE.get());
   }
 
   public static boolean isInventory(Direction facing, LevelAccessor world, BlockPos facingPos) {

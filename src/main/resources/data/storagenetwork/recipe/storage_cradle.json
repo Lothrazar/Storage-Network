@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iki",
+    "kck",
+    "iki"
+  ],
+  "key": {
+    "k": {
+      "item": "storagenetwork:kabel"
+    },
+    "c": {
+      "tag": "c:chests/wooden"
+    },
+    "i": {
+      "tag": "c:nuggets/iron"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:storage_cradle"
+  }
+}

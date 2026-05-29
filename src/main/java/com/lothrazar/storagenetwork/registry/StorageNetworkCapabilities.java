@@ -14,6 +14,7 @@ import com.lothrazar.storagenetwork.block.cable.linkfilter.TileCableFilter;
 import com.lothrazar.storagenetwork.block.cable.processing.TileCableProcess;
 import com.lothrazar.storagenetwork.block.cable.TileCable;
 import com.lothrazar.storagenetwork.block.collection.TileCollection;
+import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
 import com.lothrazar.storagenetwork.block.exchange.TileExchange;
 import com.lothrazar.storagenetwork.block.expand.TileInventoryExpanded;
 import com.lothrazar.storagenetwork.block.inventory.TileInventory;
@@ -55,10 +56,12 @@ public class StorageNetworkCapabilities {
     event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.EXCHANGE.get(), (be, side) -> be.getConnectable());
     event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.COLLECTOR.get(), (be, side) -> be.getConnectable());
     event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.PROCESS_KABEL.get(), (be, side) -> be.getConnectable());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.STORAGE_CRADLE.get(), (be, side) -> be.getConnectable());
 
     // CONNECTABLE_ITEM_STORAGE — storage cable and filter cable
     event.registerBlockEntity(CONNECTABLE_ITEM_STORAGE, SsnRegistry.Tiles.STORAGE_KABEL.get(), (be, side) -> be.getItemStorage());
     event.registerBlockEntity(CONNECTABLE_ITEM_STORAGE, SsnRegistry.Tiles.FILTER_KABEL.get(), (be, side) -> be.getCapabilityLink());
+    event.registerBlockEntity(CONNECTABLE_ITEM_STORAGE, SsnRegistry.Tiles.STORAGE_CRADLE.get(), (be, side) -> be.getLinkCapability());
 
     // CONNECTABLE_AUTO_IO — import and export cables
     event.registerBlockEntity(CONNECTABLE_AUTO_IO, SsnRegistry.Tiles.IMPORT_KABEL.get(), (be, side) -> be.getIoStorage());

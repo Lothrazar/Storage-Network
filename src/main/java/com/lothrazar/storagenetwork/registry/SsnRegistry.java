@@ -22,6 +22,9 @@ import com.lothrazar.storagenetwork.block.cable.processing.TileCableProcess;
 import com.lothrazar.storagenetwork.block.collection.BlockCollection;
 import com.lothrazar.storagenetwork.block.collection.ContainerCollectionFilter;
 import com.lothrazar.storagenetwork.block.collection.TileCollection;
+import com.lothrazar.storagenetwork.block.cradle.BlockStorageCradle;
+import com.lothrazar.storagenetwork.block.cradle.ContainerStorageCradle;
+import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
 import com.lothrazar.storagenetwork.block.exchange.BlockExchange;
 import com.lothrazar.storagenetwork.block.exchange.TileExchange;
 import com.lothrazar.storagenetwork.block.expand.BlockInventoryExpanded;
@@ -79,6 +82,7 @@ public class SsnRegistry {
     public static final DeferredBlock<Block> REQUEST_EXPANDED = BLOCKS.register("request_expanded", () -> new BlockInventoryExpanded());
     public static final DeferredBlock<Block> EXCHANGE = BLOCKS.register("exchange", () -> new BlockExchange());
     public static final DeferredBlock<Block> COLLECTOR = BLOCKS.register("collector", () -> new BlockCollection());
+    public static final DeferredBlock<Block> STORAGE_CRADLE = BLOCKS.register("storage_cradle", () -> new BlockStorageCradle());
   }
 
   public static class Items {
@@ -98,6 +102,7 @@ public class SsnRegistry {
     public static final DeferredItem<Item> PK = ITEMS.register("process_kabel", () -> new BlockItem(Blocks.PROCESS_KABEL.get(), new Item.Properties()));
     public static final DeferredItem<Item> EXCHANGE = ITEMS.register("exchange", () -> new BlockItem(Blocks.EXCHANGE.get(), new Item.Properties()));
     public static final DeferredItem<Item> COL = ITEMS.register("collector", () -> new BlockItem(Blocks.COLLECTOR.get(), new Item.Properties()));
+    public static final DeferredItem<Item> STORAGE_CRADLE = ITEMS.register("storage_cradle", () -> new BlockItem(Blocks.STORAGE_CRADLE.get(), new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> STACK_UPGRADE = ITEMS.register("stack_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> SPEED_UPGRADE = ITEMS.register("speed_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> SLOW_UPGRADE = ITEMS.register("slow_upgrade", () -> new ItemUpgrade(new Item.Properties()));
@@ -130,6 +135,7 @@ public class SsnRegistry {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileExchange>> EXCHANGE = TILES.register("exchange", () -> BlockEntityType.Builder.of(TileExchange::new, Blocks.EXCHANGE.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCollection>> COLLECTOR = TILES.register("collector", () -> BlockEntityType.Builder.of(TileCollection::new, Blocks.COLLECTOR.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableProcess>> PROCESS_KABEL = TILES.register("process_kabel", () -> BlockEntityType.Builder.of(TileCableProcess::new, Blocks.PROCESS_KABEL.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileStorageCradle>> STORAGE_CRADLE = TILES.register("storage_cradle", () -> BlockEntityType.Builder.of(TileStorageCradle::new, Blocks.STORAGE_CRADLE.get()).build(null));
   }
 
   public static class Menus {
@@ -168,6 +174,9 @@ public class SsnRegistry {
     }));
     public static final DeferredHolder<MenuType<?>, MenuType<ContainerNetworkExpandedRemote>> EXPANDED_REMOTE = CONTAINERS.register("expanded_remote", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
       return new ContainerNetworkExpandedRemote(windowId, inv.player.getInventory());
+    }));
+    public static final DeferredHolder<MenuType<?>, MenuType<ContainerStorageCradle>> STORAGE_CRADLE = CONTAINERS.register("storage_cradle", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
+      return new ContainerStorageCradle(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);
     }));
   }
 }
