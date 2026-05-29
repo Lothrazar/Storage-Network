@@ -103,6 +103,7 @@ public class SsnRegistry {
     public static final DeferredItem<ItemUpgrade> STOCK_UPGRADE = ITEMS.register("stock_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> OP_U = ITEMS.register("operation_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> SINGLE_UPGRADE = ITEMS.register("single_upgrade", () -> new ItemUpgrade(new Item.Properties()));
+    public static final DeferredItem<ItemUpgrade> VOID_UPGRADE = ITEMS.register("void_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemRemote> INVENTORY_REMOTE = ITEMS.register("inventory_remote", () -> new ItemRemote(new Item.Properties()));
     public static final DeferredItem<ItemRemote> CRAFTING_REMOTE = ITEMS.register("crafting_remote", () -> new ItemRemote(new Item.Properties()));
     public static final DeferredItem<Item> PICKER_REMOTE = ITEMS.register("picker_remote", () -> new ItemPicker(new Item.Properties()));

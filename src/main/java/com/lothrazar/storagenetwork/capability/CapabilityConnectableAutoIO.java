@@ -467,14 +467,24 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
         int countUnmoved = main.insertStack(stackToImport, true);
         // Calculate how many items in the stack actually got moved
         int countMoved = stackToImport.getCount() - countUnmoved;
-        if (countMoved <= 0) {
+        // Void upgrade: any time the upgrade is installed and the stack passed the filter check above
+        // (either allow-list match or not in the deny-list). Installing the upgrade is the opt-in.
+        boolean voidEnabled = upgrades.hasUpgradesOfType(SsnRegistry.Items.VOID_UPGRADE.get());
+        if (countMoved <= 0 && !voidEnabled) {
           continue; //continue back to itemHandler
         }
-        // Alright, simulation says we're good, let's do it!
-        // First extract from the storage
-        ItemStack actuallyExtracted = itemHandler.extractItem(slot, countMoved, false);
-        // Then insert into our network
-        main.insertStack(actuallyExtracted, false);
+        // Void mode pulls the full extractSize so the surplus is destroyed; normal mode pulls only what fits.
+        int amountToExtract = voidEnabled ? extractSize : countMoved;
+        ItemStack actuallyExtracted = itemHandler.extractItem(slot, amountToExtract, false);
+        if (!actuallyExtracted.isEmpty()) {
+          // Insert what the network accepts; any remainder in actuallyExtracted is silently discarded
+          // when the local goes out of scope (this is the void behavior).
+          int leftover = main.insertStack(actuallyExtracted, false);
+          if (voidEnabled && leftover > 0) {
+            StorageNetworkMod.LOGGER.debug("Void upgrade destroyed {} x {} at {}",
+                leftover, actuallyExtracted.getItem(), connectable.getPos());
+          }
+        }
         break; // break out of itemHandler loop, done processing this cable, so move to next
       } //end of checking on filter for this stack
     }

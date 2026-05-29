@@ -92,6 +92,10 @@
     "item.storagenetwork.stock_upgrade.tooltip": "Keeps a a consistent stock of items in the attached inventory",
     "item.storagenetwork.stock_upgrade.guide": "If this is in an export cable, then for each unique item in the filter, it will only export until the target inventory has less then the stack size of the filter to fill it up to the target size from the filter.  In the opposite way, Import cables with a stock upgrade will keep a consistent stock in the linked chest based, reducing it down and stopping at the filter stack sizes. ",
 
+    "item.storagenetwork.void_upgrade": "Void Upgrade",
+    "item.storagenetwork.void_upgrade.tooltip": "Silently destroys items that pass the filter but cannot fit in the network",
+    "item.storagenetwork.void_upgrade.guide": "Placed in an import filter cable. Whenever the network cannot accept an item that has passed the filter (works in both Allow-List and Ignore-List modes), the surplus is silently voided from the source inventory instead of being left behind. Use with care: if you do not want items destroyed, remove this upgrade, disconnect the cable, or empty the source chest.",
+
     "item.storagenetwork.builder_remote": "Network Builder Remote",
     "item.storagenetwork.builder_remote.tooltip": "Bind to a network and a block to build",
     "item.storagenetwork.builder_remote.guide": "This remote binds as normal but does not have a screen.  Instead, it searches for the block you clicked on, and tries to build a copy of it using a matching item in the network",
