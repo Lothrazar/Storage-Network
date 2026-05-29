@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.capability;
+package com.lothrazar.storagenetwork.capabilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,13 +6,14 @@ import java.util.concurrent.Callable;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.api.IConnectableItemProcessing;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.block.cable.processing.ProcessRequestModel;
 import com.lothrazar.storagenetwork.block.cable.processing.ProcessRequestModel.ProcessStatus;
 import com.lothrazar.storagenetwork.block.cable.processing.TileCableProcess;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
-import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
-import com.lothrazar.storagenetwork.capability.handler.UpgradesItemStackHandler;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
+import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.capabilities.handler.UpgradesItemStackHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -170,7 +171,7 @@ public class CapabilityConnectableProcessing implements INBTSerializable<Compoun
     boolean exportedAll = true;
     for (int idx = start; idx < ingredients.size(); idx++) {
       ItemStack ingred = ingredients.get(idx);
-      ItemStackMatcher matcher = new ItemStackMatcher(ingred.copy(), filters.tags, filters.nbt);
+      DefaultItemStackMatcher matcher = new DefaultItemStackMatcher(ingred.copy(), filters.tags, filters.nbt);
       // simulate pull from network
       ItemStack simulated = main.request(matcher, ingred.getCount(), true);
       if (simulated.getCount() < ingred.getCount()) {

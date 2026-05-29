@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.capability.handler;
+package com.lothrazar.storagenetwork.capabilities.handler;
 
 import com.lothrazar.library.cap.ItemStackHandlerEx;
 import com.lothrazar.storagenetwork.item.ItemUpgrade;

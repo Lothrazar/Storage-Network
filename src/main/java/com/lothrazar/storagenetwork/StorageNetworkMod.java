@@ -9,10 +9,11 @@ import com.lothrazar.storagenetwork.block.cable.inputfilter.ScreenCableImportFil
 import com.lothrazar.storagenetwork.block.cable.processing.ScreenCableProcess;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.ScreenCableFilter;
 import com.lothrazar.storagenetwork.block.collection.ScreenCollectionFilter;
-import com.lothrazar.storagenetwork.block.cradle.CradleAdapterRegistry;
+import com.lothrazar.storagenetwork.registry.CradleAdapterRegistry;
 import com.lothrazar.storagenetwork.block.cradle.ScreenStorageCradle;
-import com.lothrazar.storagenetwork.block.cradle.adapter.ItemHandlerCradleAdapter;
+import com.lothrazar.storagenetwork.capabilities.handler.ItemHandlerCradleAdapter;
 import com.lothrazar.storagenetwork.compat.ae2.Ae2CradleBootstrap;
+import com.lothrazar.storagenetwork.compat.rs.Rs2CradleBootstrap;
 import net.neoforged.fml.ModList;
 import com.lothrazar.storagenetwork.block.expand.ScreenNetworkInventoryExpanded;
 import com.lothrazar.storagenetwork.block.inventory.ScreenNetworkInventory;
@@ -39,9 +40,10 @@ import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(StorageNetworkMod.MODID)
 public class StorageNetworkMod {
+  //TODO: @deprecated this, each use own logger
+  public static final Logger LOGGER = LogManager.getLogger();
 
   public static final String MODID = "storagenetwork";
-  public static final Logger LOGGER = LogManager.getLogger();
   public static ConfigRegistry CONFIG;
 
   public StorageNetworkMod(IEventBus modEventBus, ModContainer modContainer) {
@@ -75,6 +77,9 @@ public class StorageNetworkMod {
     if (ModList.get().isLoaded("ae2")) {
       Ae2CradleBootstrap.register();
     }
+    if (ModList.get().isLoaded("refinedstorage")) {
+      Rs2CradleBootstrap.register();
+    }
   }
 
   private void setupClient(final FMLClientSetupEvent event) {
@@ -100,9 +105,4 @@ public class StorageNetworkMod {
     event.register(ClientEventRegistry.COLLECTOR_TOGGLE_KEY);
   }
 
-  public static void log(String s) {
-    if (CONFIG.logspam()) {
-      LOGGER.info(s);
-    }
-  }
 }

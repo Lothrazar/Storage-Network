@@ -1,7 +1,7 @@
 package com.lothrazar.storagenetwork.block.cable.export;
 
 import com.lothrazar.storagenetwork.block.cable.ContainerCable;
-import com.lothrazar.storagenetwork.capability.CapabilityConnectableAutoIO;
+import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableAutoIO;
 import com.lothrazar.storagenetwork.item.ItemUpgrade;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;

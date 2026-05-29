@@ -33,8 +33,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.fml.ModList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class NetworkWidget {
+  public static final Logger LOGGER = LogManager.getLogger();
 
   public static List<ISearchHandler> searchHandlers = new ArrayList<>();
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
@@ -334,7 +337,7 @@ public class NetworkWidget {
       }
     }
     catch (Exception e) {
-      StorageNetworkMod.LOGGER.error("Search bar error ", e);
+      LOGGER.error("Search bar error ", e);
     }
   }
 

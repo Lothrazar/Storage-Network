@@ -1,6 +1,6 @@
 package com.lothrazar.storagenetwork.api;
 
-import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -37,7 +37,7 @@ public interface IConnectable {
   DimPos getPos();
 
   /**
-   * When your block is placed and a connected network updates, it calls this method to tell your capability where the {@link INetworkmain} is. Store this value and return it in getmainPos().
+   * When your block is placed and a connected network updates, it calls this method to tell your capability where the {@link com.lothrazar.storagenetwork.block.main.TileMain} is. Store this value and return it in getmainPos().
    *
    * @param mainPos
    */

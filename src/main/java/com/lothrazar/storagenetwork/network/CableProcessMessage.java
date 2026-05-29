@@ -4,7 +4,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.cable.processing.ContainerCableProcess;
 import com.lothrazar.storagenetwork.block.cable.processing.ProcessRequestModel;
 import com.lothrazar.storagenetwork.block.cable.processing.TileCableProcess;
-import com.lothrazar.storagenetwork.capability.CapabilityConnectableProcessing;
+import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableProcessing;
 import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

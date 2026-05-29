@@ -7,11 +7,11 @@ import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
 import com.lothrazar.storagenetwork.api.IConnectableItemProcessing;
-import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
-import com.lothrazar.storagenetwork.util.Request;
-import com.lothrazar.storagenetwork.util.RequestBatch;
+import com.lothrazar.storagenetwork.api.batch.Request;
+import com.lothrazar.storagenetwork.api.batch.RequestBatch;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -22,8 +22,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class TileMain extends BlockEntity {
+  public static final Logger LOGGER = LogManager.getLogger();
 
   //currently this has one network
   private NetworkModule nw = new NetworkModule();
@@ -95,7 +98,7 @@ public class TileMain extends BlockEntity {
   /**
    * request from my network
    */
-  public ItemStack request(ItemStackMatcher matcher, int size, boolean simulate) {
+  public ItemStack request(DefaultItemStackMatcher matcher, int size, boolean simulate) {
     ItemStack result = nw.request(matcher, size, simulate);
     if (!simulate && !result.isEmpty()) {
       markComparatorDirty();
@@ -181,7 +184,7 @@ public class TileMain extends BlockEntity {
         if (ioCap.ioDirection() == EnumStorageDirection.OUT) {
           exportCableCount++;
           RequestBatch cableBatch = ioCap.runExport(this);
-          StorageNetworkMod.log("Export cable #" + exportCableCount + " at " + connectable.getPos().getBlockPos() + " created batch with " + (cableBatch == null ? "0" : cableBatch.size()) + " item types");
+          LOGGER.debug("Export cable #" + exportCableCount + " at " + connectable.getPos().getBlockPos() + " created batch with " + (cableBatch == null ? "0" : cableBatch.size()) + " item types");
           if (cableBatch != null) {
             // Merge this cable's requests into the accumulated batch
             for (Item item : cableBatch.keySet()) {
@@ -198,7 +201,7 @@ public class TileMain extends BlockEntity {
     }
     // Execute all accumulated export requests at once, properly sorted by priority
     if (!requestBatch.isEmpty()) {
-      StorageNetworkMod.log("Executing accumulated batch with " + requestBatch.size() + " item types from " + exportCableCount + " cables");
+      LOGGER.debug("Executing accumulated batch with " + requestBatch.size() + " item types from " + exportCableCount + " cables");
     }
     executeRequestBatch(requestBatch);
     updateComparatorIfDirty();

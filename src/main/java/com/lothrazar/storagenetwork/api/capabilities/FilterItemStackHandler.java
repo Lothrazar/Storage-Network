@@ -1,9 +1,8 @@
-package com.lothrazar.storagenetwork.capability.handler;
+package com.lothrazar.storagenetwork.api.capabilities;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import com.lothrazar.library.cap.ItemStackHandlerEx;
-import com.lothrazar.storagenetwork.api.IItemStackMatcher;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -40,8 +39,8 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
     return 1;
   }
 
-  public List<IItemStackMatcher> getStackMatchers() {
-    return getStacks().stream().map(stack -> new ItemStackMatcher(stack, tags, nbt)).collect(Collectors.toList());
+  public List<ItemStackMatcher> getStackMatchers() {
+    return getStacks().stream().map(stack -> new DefaultItemStackMatcher(stack, tags, nbt)).collect(Collectors.toList());
   }
 
   public void clear() {
@@ -56,8 +55,8 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
     return getStackMatchers().stream().anyMatch(matcher -> matcher.match(stack));
   }
 
-  public IItemStackMatcher getFirstMatcher(ItemStack stack) {
-    for (IItemStackMatcher m : getStackMatchers()) {
+  public ItemStackMatcher getFirstMatcher(ItemStack stack) {
+    for (ItemStackMatcher m : getStackMatchers()) {
       if (m.match(stack)) {
         return m;
       }
@@ -105,7 +104,7 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
 
   public int getStackCount(ItemStack stackCurrent) {
     int s = 0;
-    for (IItemStackMatcher m : getStackMatchers()) {
+    for (ItemStackMatcher m : getStackMatchers()) {
       if (ItemStack.isSameItemSameComponents(stackCurrent, m.getStack())) {
         return s += m.getStack().getCount();
       }

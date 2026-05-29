@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.util;
+package com.lothrazar.storagenetwork.api.batch;
 
 import com.lothrazar.storagenetwork.api.IConnectableLink;
 

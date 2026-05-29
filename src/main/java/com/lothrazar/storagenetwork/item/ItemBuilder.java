@@ -5,7 +5,7 @@ import com.lothrazar.library.item.ItemFlib;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.ChatFormatting;
@@ -86,7 +86,7 @@ public class ItemBuilder extends ItemFlib {
         BlockState targetState = ItemBuilder.getBlockState(world, stack);
         if (tile instanceof TileMain && targetState != null) {
           TileMain network = (TileMain) tile;
-          ItemStackMatcher matcher = new ItemStackMatcher(new ItemStack(targetState.getBlock()), false, false);
+          DefaultItemStackMatcher matcher = new DefaultItemStackMatcher(new ItemStack(targetState.getBlock()), false, false);
           ItemStack found = network.request(matcher, 1, true);
           //SIMULATED, see if materials are available
           if (!found.isEmpty()) {

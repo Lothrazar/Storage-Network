@@ -1,6 +1,7 @@
-package com.lothrazar.storagenetwork.capability;
+package com.lothrazar.storagenetwork.api.capabilities;
 
 import com.lothrazar.storagenetwork.api.DimPos;
+import com.lothrazar.storagenetwork.capabilities.DefaultConnectable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -8,7 +9,7 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 public class CapabilityConnectable extends DefaultConnectable implements INBTSerializable<CompoundTag> {
 
   public CapabilityConnectable() {
-    filters.setIsAllowlist(true);
+    getFilter().setIsAllowlist(true);
   }
 
   @Override
@@ -21,7 +22,7 @@ public class CapabilityConnectable extends DefaultConnectable implements INBTSer
     if (getPos() != null) {
       result.put("self", getPos().serializeNBT(registries));
     }
-    CompoundTag filters = this.filters.serializeNBT(registries);
+    CompoundTag filters = this.getFilter().serializeNBT(registries);
     result.put("filters", filters);
     result.putBoolean("needsRedstone", this.needsRedstone());
     return result;
@@ -35,7 +36,7 @@ public class CapabilityConnectable extends DefaultConnectable implements INBTSer
     }
     if (nbt.contains("filters")) {
       CompoundTag filters = nbt.getCompound("filters");
-      this.filters.deserializeNBT(registries, filters);
+      this.getFilter().deserializeNBT(registries, filters);
     }
     this.needsRedstone(nbt.getBoolean("needsRedstone"));
   }

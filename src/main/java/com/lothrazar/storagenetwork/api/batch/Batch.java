@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.util;
+package com.lothrazar.storagenetwork.api.batch;
 
 import java.util.ArrayList;
 import java.util.HashMap;

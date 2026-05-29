@@ -11,8 +11,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class TileExchange extends TileConnectable {
+  public static final Logger LOGGER = LogManager.getLogger();
 
   private ExchangeItemStackHandler itemHandler;
 
@@ -33,7 +36,7 @@ public class TileExchange extends TileConnectable {
       return itemHandler;
     }
     catch (Exception e) {
-      StorageNetworkMod.LOGGER.error("Exchange caught error from a mod", e);
+      LOGGER.error("Exchange caught error from a mod", e);
       return null;
     }
   }

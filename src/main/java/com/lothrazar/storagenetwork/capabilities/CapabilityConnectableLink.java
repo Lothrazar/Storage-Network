@@ -1,18 +1,18 @@
-package com.lothrazar.storagenetwork.capability;
+package com.lothrazar.storagenetwork.capabilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.lothrazar.storagenetwork.StorageNetworkMod;
+
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.api.IConnectableLink;
-import com.lothrazar.storagenetwork.api.IItemStackMatcher;
-import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
-import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
-import com.lothrazar.storagenetwork.util.Batch;
-import com.lothrazar.storagenetwork.util.StackProvider;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
+import com.lothrazar.storagenetwork.api.batch.Batch;
+import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -22,8 +22,11 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CapabilityConnectableLink implements IConnectableLink, INBTSerializable<CompoundTag> {
+  public static final Logger LOGGER = LogManager.getLogger();
 
   public final IConnectable connectable;
   private boolean operationMustBeSmaller = true;
@@ -118,13 +121,13 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
       return ItemHandlerHelper.insertItemStacked(itemHandler, stack, simulate);
     }
     catch (Exception e) {
-      StorageNetworkMod.LOGGER.error("Insert stack error from other block ", e);
+      LOGGER.error("Insert stack error from other block ", e);
       return stack;
     }
   }
 
   @Override
-  public ItemStack extractStack(IItemStackMatcher matcher, int size, boolean simulate) {
+  public ItemStack extractStack(ItemStackMatcher matcher, int size, boolean simulate) {
     // If nothing is actually being requested, abort immediately
     if (size <= 0) {
       return ItemStack.EMPTY;

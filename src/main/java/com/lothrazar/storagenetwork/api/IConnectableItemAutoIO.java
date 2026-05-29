@@ -2,9 +2,11 @@ package com.lothrazar.storagenetwork.api;
 
 import java.util.Collections;
 import java.util.List;
+
+import com.lothrazar.storagenetwork.api.batch.RequestBatch;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
-import com.lothrazar.storagenetwork.util.RequestBatch;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -102,13 +104,13 @@ public interface IConnectableItemAutoIO {
 
   /**
    * If this block is used with an ioDirection of OUT and has its getSupportedTransferDirection set to OUT, then this list will be consolidated by the main and available items in the network matching
-   * the {@link IItemStackMatcher}s in the list will be exported via the canTransfer() and transfer() methods above.
+   * the {@link ItemStackMatcher}s in the list will be exported via the canTransfer() and transfer() methods above.
    * <p>
    * In other words: - Only implement this if you are making a main-controlled export cable (you shouldnt)
    *
    * @return
    */
-  default List<IItemStackMatcher> getAutoExportList() {
+  default List<ItemStackMatcher> getAutoExportList() {
     return Collections.emptyList();
   }
 }

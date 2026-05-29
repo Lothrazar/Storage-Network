@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumConnectType;
 import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
-import com.lothrazar.storagenetwork.capability.CapabilityConnectableAutoIO;
+import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableAutoIO;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import com.lothrazar.storagenetwork.util.ShapeBuilder;
@@ -39,8 +39,11 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBlock {
+  public static final Logger LOGGER = LogManager.getLogger();
 
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
@@ -151,7 +154,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
       facingState = worldIn.getBlockState(posoff);
       //      BlockEntity tileOffset = worldIn.getBlockEntity(posoff);
       if (UtilConnections.isCableOverride(facingState)) {
-        StorageNetworkMod.log("Main override setplacedby " + facingState);
+        LOGGER.debug("Main override setplacedby " + facingState);
         stateIn = stateIn.setValue(FACING_TO_PROPERTY_MAP.get(d), EnumConnectType.CABLE);
         worldIn.setBlockAndUpdate(pos, stateIn);
       }
@@ -177,19 +180,16 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
   public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor world, BlockPos currentPos, BlockPos facingPos) {
     EnumProperty<EnumConnectType> property = FACING_TO_PROPERTY_MAP.get(facing);
     if (UtilConnections.isCableOverride(facingState)) {
-      StorageNetworkMod.log("isCableOverride override " + facingState);
       return stateIn.setValue(property, EnumConnectType.CABLE);
     }
     //based on capability you have, edit connection type
     BlockEntity tileOffset = world.getBlockEntity(facingPos); //if i have zero other inventories, and this is one now, ok go invo
     if (!hasInventoryAlready(stateIn, facing) && UtilConnections.isInventory(facing, world, facingPos)) {
-      StorageNetworkMod.log("new Inventory from updateShape " + facingState);
       return stateIn.setValue(property, EnumConnectType.INVENTORY);
     }
     if (tileOffset != null && world instanceof Level levelInstance) {
       IConnectable cap = levelInstance.getCapability(StorageNetworkCapabilities.CONNECTABLE, facingPos, null);
       if (cap != null) {
-        StorageNetworkMod.log("Normal network item  " + facingState);
         return stateIn.setValue(property, EnumConnectType.CABLE);
       }
     }

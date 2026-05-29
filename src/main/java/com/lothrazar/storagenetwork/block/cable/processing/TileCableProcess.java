@@ -2,8 +2,9 @@ package com.lothrazar.storagenetwork.block.cable.processing;
 
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.IConnectableItemProcessing;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.block.TileCableWithFacing;
-import com.lothrazar.storagenetwork.capability.CapabilityConnectableProcessing;
+import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableProcessing;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -114,7 +115,7 @@ public class TileCableProcess extends TileCableWithFacing implements MenuProvide
     this.setChanged();
   }
 
-  private static void clearFilters(com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler handler) {
+  private static void clearFilters(FilterItemStackHandler handler) {
     for (int i = 0; i < handler.getSlots(); i++) {
       handler.setStackInSlot(i, ItemStack.EMPTY);
     }

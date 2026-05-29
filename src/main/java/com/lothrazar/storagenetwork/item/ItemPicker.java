@@ -5,7 +5,7 @@ import com.lothrazar.library.item.ItemFlib;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -58,7 +58,7 @@ public class ItemPicker extends ItemFlib {
         if (tile instanceof TileMain) {
           TileMain network = (TileMain) tile;
           BlockState bs = world.getBlockState(pos);
-          ItemStackMatcher matcher = new ItemStackMatcher(new ItemStack(bs.getBlock()), false, false);
+          DefaultItemStackMatcher matcher = new DefaultItemStackMatcher(new ItemStack(bs.getBlock()), false, false);
           int size = player.isCrouching() ? 1 : 64;
           ItemStack found = network.request(matcher, size, false);
           if (!found.isEmpty()) {

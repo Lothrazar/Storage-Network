@@ -7,7 +7,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.IGuiPrivate;
 import com.lothrazar.storagenetwork.api.OpCompareType;
 import com.lothrazar.storagenetwork.block.cable.inputfilter.ScreenCableImportFilter;
-import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest.TextureEnum;
 import com.lothrazar.storagenetwork.gui.components.TextboxInteger;
@@ -52,10 +52,6 @@ public class ScreenCableExportFilter extends AbstractContainerScreen<ContainerCa
     ms.renderTooltip(font, stack, mousex, mousey);
   }
 
-  @Override
-  public void drawGradient(GuiGraphics ms, int x, int y, int x2, int y2, int u, int v) {
-    ms.fillGradient(x, y, x2, y2, u, v);
-  }
 
   @Override
   public void init() {

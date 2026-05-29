@@ -70,7 +70,9 @@
 
     "block.storagenetwork.storage_cradle": "Network Storage Cradle",
     "block.storagenetwork.storage_cradle.tooltip": "Stores items inside items. Try a shulker box.",
-    "block.storagenetwork.storage_cradle.guide": "Holds a single item and exposes that item's internal storage to the network. Drop in a shulker box (or anything that exposes item-handler capability) and its slots become part of network storage. Break the cradle to retrieve both the cradle and the held item with its contents intact.",
+    "block.storagenetwork.storage_cradle.guide": "Holds up to 9 storage-bearing items at once and exposes their internal storage to the network. Drop in shulker boxes (or anything else that holds items) and their slots become part of the network's pool. Each held item contributes its own capacity.",
+    "block.storagenetwork.storage_cradle.guide2": "$(l:storage_kabel)Link Cables$(/) and the cradle are siblings - both are network-storage providers. You don't need a Link Cable touching the cradle; the cradle wires itself into the network through any adjacent $(l:kabel)cable$(/) or network block.",
+    "block.storagenetwork.storage_cradle.guide3": "Compatible storage items:$(br)- Vanilla shulker boxes$(br)- Anything exposing the item-handler capability$(br)- Applied Energistics 2 storage cells$(br)- Refined Storage disks$(br2)Break the cradle to retrieve every held item with its contents intact.",
     "block.storagenetwork.collector": "Network Collection Interface",
     "block.storagenetwork.collector.guide":  "This exposes the network and acts as an insert-only controller for other automation systems or storage solutions.  For example, a normal Hopper will insert items similar to the  $(l:import_kabel)Import Cable$(/l).  Does not allow any item extraction.  Try this with other storage mods!  ",
     "block.storagenetwork.collector.tooltip": "Items inserted enter the network",

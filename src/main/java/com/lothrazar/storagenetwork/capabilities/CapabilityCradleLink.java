@@ -1,17 +1,19 @@
-package com.lothrazar.storagenetwork.capability;
+package com.lothrazar.storagenetwork.capabilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.lothrazar.storagenetwork.StorageNetworkMod;
+
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.IConnectableLink;
-import com.lothrazar.storagenetwork.api.IItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
 import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
-import com.lothrazar.storagenetwork.util.Batch;
-import com.lothrazar.storagenetwork.util.StackProvider;
+import com.lothrazar.storagenetwork.api.batch.Batch;
+import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import net.minecraft.world.item.ItemStack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Facade IConnectableLink for a Storage Cradle. Aggregates one wrapped IConnectableLink per held
@@ -19,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
  * the same path. Empty / incompatible held slots are skipped.
  */
 public class CapabilityCradleLink implements IConnectableLink {
+  public static final Logger LOGGER = LogManager.getLogger();
 
   private final TileStorageCradle tile;
   private int priority;
@@ -64,14 +67,14 @@ public class CapabilityCradleLink implements IConnectableLink {
       }
     }
     catch (Exception e) {
-      StorageNetworkMod.LOGGER.error("Cradle insert error ", e);
+      LOGGER.error("Cradle insert error ", e);
       return stack;
     }
     return remaining;
   }
 
   @Override
-  public ItemStack extractStack(IItemStackMatcher matcher, int size, boolean simulate) {
+  public ItemStack extractStack(ItemStackMatcher matcher, int size, boolean simulate) {
     if (size <= 0) {
       return ItemStack.EMPTY;
     }

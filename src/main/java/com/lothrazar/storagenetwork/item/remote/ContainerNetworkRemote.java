@@ -30,10 +30,7 @@ public class ContainerNetworkRemote extends ContainerNetwork {
     else {
       this.root = dp.getTileEntity(TileMain.class, level);
     }
-    if (root == null) {
-      //maybe the table broke after doing this, rare case
-      StorageNetworkMod.log("CONTAINER NETWORK REMOTE null tile");
-    }
+
     this.playerInv = pInv;
     bindPlayerInvo(this.playerInv);
     bindHotbar();

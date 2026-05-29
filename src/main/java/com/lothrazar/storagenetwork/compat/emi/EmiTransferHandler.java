@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.emi;
+package com.lothrazar.storagenetwork.compat.emi;
 
 import java.util.ArrayList;
 import java.util.List;

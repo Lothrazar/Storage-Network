@@ -1,8 +1,9 @@
-package com.lothrazar.storagenetwork.util;
+package com.lothrazar.storagenetwork.api.batch;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import com.lothrazar.storagenetwork.api.IConnectableLink;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -82,13 +82,12 @@ public class RequestMessage implements CustomPacketPayload {
         root = ctr.getTileMain();
       }
       else {
-        StorageNetworkMod.log("Bad container");
       }
       if (root == null) {
-        StorageNetworkMod.log("Request message cancelled, null tile");
+        StorageNetworkMod.LOGGER.debug("Request message cancelled, null tile");
         return;
       }
-      int in = root.getNetwork().getAmount(new ItemStackMatcher(message.stack, false, true));
+      int in = root.getNetwork().getAmount(new DefaultItemStackMatcher(message.stack, false, true));
       ItemStack stack;
       boolean isLeftClick = message.mouseButton == UtilTileEntity.MOUSE_BTN_LEFT;
       boolean isRightClick = message.mouseButton == UtilTileEntity.MOUSE_BTN_RIGHT;
@@ -103,9 +102,9 @@ public class RequestMessage implements CustomPacketPayload {
         sizeRequested = Math.min(message.stack.getMaxStackSize() / 2, in / 2);
       }
       sizeRequested = Math.max(sizeRequested, 1);
-      stack = root.request(new ItemStackMatcher(message.stack, false, true), sizeRequested, false);
+      stack = root.request(new DefaultItemStackMatcher(message.stack, false, true), sizeRequested, false);
       if (stack.isEmpty()) {
-        stack = root.request(new ItemStackMatcher(message.stack, false, false), sizeRequested, false);
+        stack = root.request(new DefaultItemStackMatcher(message.stack, false, false), sizeRequested, false);
       }
       if (!stack.isEmpty()) {
         if (message.shift) {

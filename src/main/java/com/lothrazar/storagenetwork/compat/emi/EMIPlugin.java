@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.emi;
+package com.lothrazar.storagenetwork.compat.emi;
 
 import com.lothrazar.storagenetwork.block.expand.ContainerNetworkInventoryExpanded;
 import com.lothrazar.storagenetwork.block.expand.ScreenNetworkInventoryExpanded;

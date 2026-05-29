@@ -1,7 +1,7 @@
 package com.lothrazar.storagenetwork.block.cable.processing;
 
 import com.lothrazar.storagenetwork.block.cable.ContainerCable;
-import com.lothrazar.storagenetwork.capability.CapabilityConnectableProcessing;
+import com.lothrazar.storagenetwork.capabilities.CapabilityConnectableProcessing;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;

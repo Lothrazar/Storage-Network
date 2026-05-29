@@ -1,14 +1,11 @@
 package com.lothrazar.storagenetwork.api;
 
-import javax.annotation.Nullable;
 import com.google.common.base.Objects;
-import com.lothrazar.storagenetwork.StorageNetworkMod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -25,9 +22,12 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
+  public static final Logger LOGGER = LogManager.getLogger();
   private String dimension;
   private BlockPos pos = new BlockPos(0, 0, 0);
   private Level world;
@@ -49,10 +49,10 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
   public static DimPos getPosStored(ItemStack itemStackIn) {
     CustomData data = itemStackIn.get(DataComponents.CUSTOM_DATA);
-    if (data == null || !data.getUnsafe().getBoolean(NBT_BOUND)) {
+    if (data == null || !data.copyTag().getBoolean(NBT_BOUND)) {
       return null;
     }
-    return new DimPos(data.getUnsafe());
+    return new DimPos(data.copyTag());
   }
 
   public Level getWorld() {
@@ -94,7 +94,7 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
   public static String getDim(ItemStack stack) {
     CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-    return data != null ? data.getUnsafe().getString(NBT_DIM) : "";
+    return data != null ? data.copyTag().getString(NBT_DIM) : "";
   }
 
   public static void putDim(ItemStack stack, Level world) {
@@ -115,7 +115,6 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
   }
 
   @SuppressWarnings("unchecked")
-  @Nullable
   public <V> V getTileEntity(Class<V> tileEntityClassOrInterface, Level world) {
     BlockPos tilePos = getBlockPos();
     if (world == null || tilePos == null) {
@@ -130,7 +129,7 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
         world = dimWorld.getLevel();
       }
       else {
-        StorageNetworkMod.LOGGER.error(" Dimworld NOT FOUND for " + dimension);
+        LOGGER.error(" Dimworld NOT FOUND for " + dimension);
       }
     }
     //end refresh srever world
@@ -223,7 +222,7 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
   public DimPos offset(Direction direction) {
     if (pos == null || direction == null || pos == null) {
-      StorageNetworkMod.LOGGER.info("Error: null offset in DimPos " + direction);
+      LOGGER.info("Error: null offset in DimPos " + direction);
       return null;
     }
     return new DimPos(world, pos.relative(direction));

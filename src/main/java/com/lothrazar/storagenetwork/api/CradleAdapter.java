@@ -1,6 +1,6 @@
-package com.lothrazar.storagenetwork.block.cradle;
+package com.lothrazar.storagenetwork.api;
 
-import com.lothrazar.storagenetwork.api.IConnectableLink;
+import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
 import net.minecraft.world.item.ItemStack;
 
 /**

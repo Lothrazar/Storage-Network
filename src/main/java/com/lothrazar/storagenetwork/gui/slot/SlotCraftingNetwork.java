@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import com.lothrazar.storagenetwork.network.StackRefreshClientMessage;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,7 +39,7 @@ public class SlotCraftingNetwork extends ResultSlot {
     for (int i = 0; i < parent.getCraftMatrix().getContainerSize(); i++) {
       if (parent.getCraftMatrix().getItem(i).isEmpty() && getTileMain() != null) {
         ItemStack req = getTileMain().request(
-            !lis.get(i).isEmpty() ? new ItemStackMatcher(lis.get(i), false, false) : null, 1, false);
+            !lis.get(i).isEmpty() ? new DefaultItemStackMatcher(lis.get(i), false, false) : null, 1, false);
         if (!req.isEmpty()) {
           parent.getCraftMatrix().setItem(i, req);
         }

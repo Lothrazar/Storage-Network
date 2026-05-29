@@ -5,7 +5,7 @@ import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.CapabilityConnectable;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -15,12 +15,15 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Base class for Cable, Control, Request
  */
 public abstract class TileConnectable extends BlockEntity {
 
+  public static final Logger LOGGER = LogManager.getLogger();
   private final CapabilityConnectable connectable;
 
   public TileConnectable(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
@@ -88,7 +91,7 @@ public abstract class TileConnectable extends BlockEntity {
         }
       }
       catch (Exception e) {
-        StorageNetworkMod.LOGGER.info("Error on chunk unload " + e);
+        LOGGER.info("Error on chunk unload " + e);
       }
     }
   }

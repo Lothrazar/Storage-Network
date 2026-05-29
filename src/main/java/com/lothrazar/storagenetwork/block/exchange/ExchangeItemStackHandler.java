@@ -1,11 +1,12 @@
 package com.lothrazar.storagenetwork.block.exchange;
 
 import com.lothrazar.library.cap.ItemStackHandlerEx;
-import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import net.minecraft.world.item.ItemStack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author ajsnarr98 Created MasterItemStackHandler
@@ -23,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public class ExchangeItemStackHandler extends ItemStackHandlerEx {
 
+  public static final Logger LOGGER = LogManager.getLogger();
   TileMain tileMain;
 
   public ExchangeItemStackHandler() {
@@ -56,7 +58,7 @@ public class ExchangeItemStackHandler extends ItemStackHandlerEx {
       //      StorageNetwork.log("exchange updated " + i);
     }
     catch (Exception e) {
-      StorageNetworkMod.LOGGER.error("Exchange update error ", e);
+      LOGGER.error("Exchange update error ", e);
     }
   }
 
@@ -83,7 +85,7 @@ public class ExchangeItemStackHandler extends ItemStackHandlerEx {
       }
     }
     catch (Exception e) {
-      StorageNetworkMod.LOGGER.error("insertStack error ", e);
+      LOGGER.error("insertStack error ", e);
     }
     update();
     return ItemStack.EMPTY;
@@ -95,7 +97,7 @@ public class ExchangeItemStackHandler extends ItemStackHandlerEx {
       //            super.extractItem(slot, amount, simulate);
       return ItemStack.EMPTY;
     }
-    ItemStackMatcher matcher = new ItemStackMatcher(getStackInSlot(slot));
+    DefaultItemStackMatcher matcher = new DefaultItemStackMatcher(getStackInSlot(slot));
     //    StorageNetwork.log("extractItem " + matcher.getStack());
     ItemStack stack = tileMain.request(matcher, amount, simulate); // Stackoverflow?
     update();

@@ -6,11 +6,11 @@ import java.util.List;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.IConnectableLink;
-import com.lothrazar.storagenetwork.api.IItemStackMatcher;
-import com.lothrazar.storagenetwork.block.cradle.CradleAdapter;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
 import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
-import com.lothrazar.storagenetwork.util.Batch;
-import com.lothrazar.storagenetwork.util.StackProvider;
+import com.lothrazar.storagenetwork.api.CradleAdapter;
+import com.lothrazar.storagenetwork.api.batch.Batch;
+import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import appeng.api.config.Actionable;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.stacks.AEItemKey;
@@ -121,7 +121,7 @@ public class Ae2CradleAdapter implements CradleAdapter {
     }
 
     @Override
-    public ItemStack extractStack(IItemStackMatcher matcher, int size, boolean simulate) {
+    public ItemStack extractStack(ItemStackMatcher matcher, int size, boolean simulate) {
       if (size <= 0) {
         return ItemStack.EMPTY;
       }

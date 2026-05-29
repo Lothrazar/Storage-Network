@@ -1,7 +1,7 @@
 package com.lothrazar.storagenetwork.compat.ae2;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.lothrazar.storagenetwork.block.cradle.CradleAdapterRegistry;
+import com.lothrazar.storagenetwork.registry.CradleAdapterRegistry;
 
 /**
  * Class-loaded only when AE2 is present (guarded at the call site in StorageNetworkMod#setup).

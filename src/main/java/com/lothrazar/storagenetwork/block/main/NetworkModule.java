@@ -13,17 +13,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.google.common.collect.Lists;
-import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.api.IConnectableLink;
-import com.lothrazar.storagenetwork.api.IItemStackMatcher;
-import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
-import com.lothrazar.storagenetwork.util.Batch;
-import com.lothrazar.storagenetwork.util.RequestBatch;
-import com.lothrazar.storagenetwork.util.StackProvider;
+import com.lothrazar.storagenetwork.api.batch.Batch;
+import com.lothrazar.storagenetwork.api.batch.RequestBatch;
+import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import com.lothrazar.storagenetwork.util.UtilInventory;
 import com.lothrazar.storagenetwork.util.UtilTileEntity;
 import net.minecraft.core.Direction;
@@ -34,6 +33,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Responsible for network connection list, cache, requests and single inserts.
@@ -44,6 +45,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
  *
  */
 public class NetworkModule {
+  public static final Logger LOGGER = LogManager.getLogger();
 
   NetworkCache ch = new NetworkCache();
   private Set<DimPos> connectables = new HashSet<>();
@@ -65,7 +67,7 @@ public class NetworkModule {
       }
       IConnectable cap = pos.getCapability(StorageNetworkCapabilities.CONNECTABLE, null);
       if (cap == null) {
-        StorageNetworkMod.LOGGER.debug("Somehow stored a dimpos that is not connectable... Skipping " + pos);
+        LOGGER.debug("Somehow stored a dimpos that is not connectable... Skipping " + pos);
         continue;
       }
       result.add(cap);
@@ -99,7 +101,7 @@ public class NetworkModule {
       }
     }
     catch (Exception e) {
-      StorageNetworkMod.LOGGER.info("3rd party storage mod has an error", e);
+      LOGGER.info("3rd party storage mod has an error", e);
     }
     return stacks;
   }
@@ -130,7 +132,7 @@ public class NetworkModule {
       }
     }
     catch (Exception e) {
-      StorageNetworkMod.LOGGER.info("3rd party storage mod has an error", e);
+      LOGGER.info("3rd party storage mod has an error", e);
     }
     return stacks;
   }
@@ -141,7 +143,7 @@ public class NetworkModule {
    *          for the itemstack request
    * @return totalCount of how much the network contains that match this filter
    */
-  public int getAmount(ItemStackMatcher filter) {
+  public int getAmount(DefaultItemStackMatcher filter) {
     if (filter == null) {
       return 0;
     }
@@ -167,7 +169,7 @@ public class NetworkModule {
       masterPos.getWorld().getChunk(masterPos.getBlockPos()).setUnsaved(true);
     }
     catch (Throwable e) {
-      StorageNetworkMod.LOGGER.info("Refresh network error ", e);
+       LOGGER.info("Refresh network error ", e);
     }
   }
 
@@ -253,7 +255,7 @@ public class NetworkModule {
         if (canStillImport &&
             storage.insertStack(stack, true).getCount() < stack.getCount()) {
           stack = storage.insertStack(stack, simulate);
-          StorageNetworkMod.log("cache success used on a insertStack " + key);
+          LOGGER.debug("cache success used on a insertStack " + key);
         }
         else {
           ch.remove(key);
@@ -281,7 +283,7 @@ public class NetworkModule {
         ch.put(key, storage.getPos());
       }
       catch (Exception e) {
-        StorageNetworkMod.LOGGER.error("insertStack container issue", e);
+        LOGGER.error("insertStack container issue", e);
       }
     }
     return stack.getCount();
@@ -298,11 +300,11 @@ public class NetworkModule {
    *          true for capability simulation, false to execute transaction
    * @return stack copy if simulated, the real stack if executed
    */
-  public ItemStack request(ItemStackMatcher matcher, int size, boolean simulate) {
+  public ItemStack request(DefaultItemStackMatcher matcher, int size, boolean simulate) {
     if (size == 0 || matcher == null) {
       return ItemStack.EMPTY;
     }
-    IItemStackMatcher usedMatcher = matcher;
+    ItemStackMatcher usedMatcher = matcher;
     int alreadyTransferred = 0;
     for (IConnectableLink storage : getSortedConnectableStorage()) {
       int req = size - alreadyTransferred;
@@ -311,7 +313,7 @@ public class NetworkModule {
         continue;
       }
       // Do not stack items of different types together, i.e. make the filter rules more strict for all further items
-      usedMatcher = new ItemStackMatcher(simExtract, matcher.isOre(), matcher.isNbt());
+      usedMatcher = new DefaultItemStackMatcher(simExtract, matcher.isOre(), matcher.isNbt());
       alreadyTransferred += simExtract.getCount();
       if (alreadyTransferred >= size) {
         break;
@@ -436,7 +438,7 @@ public class NetworkModule {
       //trying to avoid 
       //java.lang.StackOverflowError: Ticking block entity
       //and similar issues
-      StorageNetworkMod.LOGGER.error("Error: network get sorted by priority error, some network components are disconnected ", e);
+      LOGGER.error("Error: network get sorted by priority error, some network components are disconnected ", e);
       return new ArrayList<>();
     }
   }
@@ -467,7 +469,7 @@ public class NetworkModule {
    *
    * used by refresh
    *
-   * @param sourcePos
+   * @param masterPos
    *          of main tile
    */
   private Set<DimPos> getConnectables(DimPos masterPos) {

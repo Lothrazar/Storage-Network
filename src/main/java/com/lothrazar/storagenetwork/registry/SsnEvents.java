@@ -57,7 +57,7 @@ public class SsnEvents {
           return;
         }
         if (!ConfigRegistry.isFacadeAllowed(held)) {
-          StorageNetworkMod.log("not allowed as a facade from config file: " + held.getItem());
+          StorageNetworkMod.LOGGER.debug("not allowed as a facade from config file: " + held.getItem());
           return;
         }
         //pick the block, write to tags, and send to server

@@ -1,5 +1,6 @@
 package com.lothrazar.storagenetwork.block.cradle;
 
+import com.lothrazar.storagenetwork.registry.CradleAdapterRegistry;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;

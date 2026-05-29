@@ -1,24 +1,24 @@
-package com.lothrazar.storagenetwork.capability;
+package com.lothrazar.storagenetwork.capabilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
-import com.lothrazar.storagenetwork.StorageNetworkMod;
+
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.api.IConnectableItemAutoIO;
-import com.lothrazar.storagenetwork.api.IItemStackMatcher;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
 import com.lothrazar.storagenetwork.api.OpCompareType;
+import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
-import com.lothrazar.storagenetwork.capability.handler.ItemStackMatcher;
-import com.lothrazar.storagenetwork.capability.handler.UpgradesItemStackHandler;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
+import com.lothrazar.storagenetwork.api.capabilities.DefaultItemStackMatcher;
+import com.lothrazar.storagenetwork.capabilities.handler.UpgradesItemStackHandler;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
-import com.lothrazar.storagenetwork.util.Request;
-import com.lothrazar.storagenetwork.util.RequestBatch;
+import com.lothrazar.storagenetwork.api.batch.Request;
+import com.lothrazar.storagenetwork.api.batch.RequestBatch;
 import com.lothrazar.storagenetwork.util.UtilInventory;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -28,8 +28,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag>, IConnectableItemAutoIO {
+  public static final Logger LOGGER = LogManager.getLogger();
 
   public static final int DEFAULT_ITEMS_PER = 4;
   public static final int IO_DEFAULT_SPEED = 30; // TODO CONFIG
@@ -320,7 +323,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
       return true;
     }
     // TODO: Investigate whether the operation limiter should consider the filter toggles
-    int countYourItemInNetwork = master.getNetwork().getAmount(new ItemStackMatcher(operationStack, filters.tags, filters.nbt));
+    int countYourItemInNetwork = master.getNetwork().getAmount(new DefaultItemStackMatcher(operationStack, filters.tags, filters.nbt));
     switch (OpCompareType.get(operationType)) {
       case EQUAL:
         return countYourItemInNetwork == operationLimit;
@@ -362,7 +365,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
   }
 
   @Override
-  public List<IItemStackMatcher> getAutoExportList() {
+  public List<ItemStackMatcher> getAutoExportList() {
     return filters.getStackMatchers();
   }
 
@@ -383,7 +386,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
       return null;
     }
     RequestBatch requestBatch = new RequestBatch();
-    for (IItemStackMatcher matcher : this.getAutoExportList()) {
+    for (ItemStackMatcher matcher : this.getAutoExportList()) {
       if (matcher.getStack().isEmpty()) {
         continue;
       }
@@ -392,7 +395,6 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
       // check operations upgrade for export
       boolean stockMode = this.isStockMode();
       if (stockMode) {
-        StorageNetworkMod.log("stockMode == TRUE ; updateExports: attempt " + matcher.getStack());
         // STOCK upgrade means
         try {
           DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
@@ -402,14 +404,12 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
               matcher.getStack().getCount());
           if (stillNeeds == 0) {
             // they dont need any more, they have the stock they need
-            StorageNetworkMod.log("stockMode upgrade finishing transaction");
             continue;
           }
           request.setCount(Math.min(stillNeeds, request.getCount()));
-          StorageNetworkMod.log("updateExports stock mode edited value: amtToRequest = " + request.getCount());
         }
         catch (Throwable e) {
-          StorageNetworkMod.LOGGER.error("Error thrown from a connected block" + e);
+          LOGGER.error("Error thrown from a connected block" + e);
         }
       }
       if (matcher.getStack().isEmpty() || request.getCount() == 0) {
@@ -450,11 +450,10 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
           //as we want the STOCK of the chest to not go less than the filter number , just down to it
           if (chestHowMany > filterSize) {
             int realSize = Math.min(chestHowMany - filterSize, 64);
-            StorageNetworkMod.log(" : stock mode import  realSize = " + realSize);
             stackCurrent.setCount(realSize);
           }
           else {
-            StorageNetworkMod.log(" : stock mode CANCEL: ITS NOT ENOUGH chestHowMany <= filter size ");
+            LOGGER.debug(" -> stock mode CANCEL: ITS NOT ENOUGH chestHowMany <= filter size ");
             continue;
           }
         }
@@ -481,7 +480,7 @@ public class CapabilityConnectableAutoIO implements INBTSerializable<CompoundTag
           // when the local goes out of scope (this is the void behavior).
           int leftover = main.insertStack(actuallyExtracted, false);
           if (voidEnabled && leftover > 0) {
-            StorageNetworkMod.LOGGER.debug("Void upgrade destroyed {} x {} at {}",
+             LOGGER.debug("Void upgrade destroyed {} x {} at {}",
                 leftover, actuallyExtracted.getItem(), connectable.getPos());
           }
         }

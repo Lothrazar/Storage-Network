@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.api;
+package com.lothrazar.storagenetwork.api.capabilities;
 
 import net.minecraft.world.item.ItemStack;
 
@@ -7,7 +7,7 @@ import net.minecraft.world.item.ItemStack;
  *
  * You also should usually not need to call any of the given methods, since you are usually just passing instances of this to other api methods.
  */
-public interface IItemStackMatcher {
+public interface ItemStackMatcher {
 
   /**
    * Returns the stack stored in the matcher.
@@ -24,5 +24,5 @@ public interface IItemStackMatcher {
    */
   boolean match(ItemStack stack);
 
-  boolean match(IItemStackMatcher matcher);
+  boolean match(ItemStackMatcher matcher);
 }

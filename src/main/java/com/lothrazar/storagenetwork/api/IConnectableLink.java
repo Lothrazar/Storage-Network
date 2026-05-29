@@ -1,8 +1,10 @@
 package com.lothrazar.storagenetwork.api;
 
 import java.util.List;
-import com.lothrazar.storagenetwork.util.Batch;
-import com.lothrazar.storagenetwork.util.StackProvider;
+
+import com.lothrazar.storagenetwork.api.batch.Batch;
+import com.lothrazar.storagenetwork.api.batch.StackProvider;
+import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -56,7 +58,7 @@ public interface IConnectableLink {
    *          Whether or not this is just a simulation
    * @return The stack that has been requested, if you have it
    */
-  ItemStack extractStack(IItemStackMatcher matcher, final int size, boolean simulate);
+  ItemStack extractStack(ItemStackMatcher matcher, final int size, boolean simulate);
 
   /**
    * Storages with a higher priority (== lower number) are processed first. You probably want to add a way to configure the priority of your storage.

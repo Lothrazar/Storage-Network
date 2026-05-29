@@ -1,12 +1,13 @@
 package com.lothrazar.storagenetwork.block.collection;
 
 import com.lothrazar.library.cap.ItemStackHandlerEx;
-import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.IConnectable;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
-import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import net.minecraft.world.item.ItemStack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author ajsnarr98 Created MasterItemStackHandler * ItemStackHandler used for interfacing with TileMain like a chest. https://github.com/ajsnarr98/Storage-Network/tree/ajsnarr98-inventory
@@ -14,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public class CollectionItemStackHandler extends ItemStackHandlerEx {
 
+  public static final Logger LOGGER = LogManager.getLogger();
   private TileMain tileMain;
   TileConnectable tile;
 
@@ -64,7 +66,7 @@ public class CollectionItemStackHandler extends ItemStackHandlerEx {
       }
     }
     catch (Exception e) {
-      StorageNetworkMod.LOGGER.error("insertStack error ", e);
+      LOGGER.error("insertStack error ", e);
     }
     // if succesful, update internal list
     //      super.insertItem(slot, stack, simulate);

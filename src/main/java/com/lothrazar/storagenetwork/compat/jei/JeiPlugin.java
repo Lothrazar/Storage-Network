@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.jei;
+package com.lothrazar.storagenetwork.compat.jei;
 
 import java.util.Optional;
 import com.lothrazar.storagenetwork.StorageNetworkMod;

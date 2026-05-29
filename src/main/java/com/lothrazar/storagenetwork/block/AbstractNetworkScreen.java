@@ -5,7 +5,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.IGuiNetwork;
 import com.lothrazar.storagenetwork.gui.TileableTexture;
 import com.lothrazar.storagenetwork.gui.components.TextboxInteger;
-import com.lothrazar.storagenetwork.jei.JeiHooks;
+import com.lothrazar.storagenetwork.compat.jei.JeiHooks;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -13,9 +13,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> implements IGuiNetwork {
 
+  public static final Logger LOGGER = LogManager.getLogger();
   public AbstractNetworkScreen(T container, Inventory inv, Component name) {
     super(container, inv, name);
   }
@@ -25,10 +28,10 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
     getNetwork().setStacks(stacks);
   }
 
-  @Override
-  public void drawGradient(GuiGraphics ms, int x, int y, int x2, int y2, int u, int v) {
-    ms.fillGradient(x, y, x2, y2, u, v);
-  }
+//  @Override
+//  public void drawGradient(GuiGraphics ms, int x, int y, int x2, int y2, int u, int v) {
+//    ms.fillGradient(x, y, x2, y2, u, v);
+//  }
 
   @Override
   public boolean charTyped(char typedChar, int keyCode) {
@@ -57,7 +60,7 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
         JeiHooks.testJeiKeybind(mouseKey, getNetwork().stackUnderMouse);
       }
       catch (Throwable e) {
-        StorageNetworkMod.LOGGER.error("Error thrown from JEI API ", e);
+        LOGGER.error("Error thrown from JEI API ", e);
       }
     }
     //Regardless of above branch, also check this

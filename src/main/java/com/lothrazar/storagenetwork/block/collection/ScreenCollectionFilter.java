@@ -4,7 +4,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.IGuiPrivate;
-import com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.CableIOMessage;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -33,10 +33,6 @@ public class ScreenCollectionFilter extends AbstractContainerScreen<ContainerCol
     ms.renderTooltip(font, stack, mousex, mousey);
   }
 
-  @Override
-  public void drawGradient(GuiGraphics ms, int x, int y, int x2, int y2, int u, int v) {
-    ms.fillGradient(x, y, x2, y2, u, v);
-  }
 
   @Override
   public void init() {

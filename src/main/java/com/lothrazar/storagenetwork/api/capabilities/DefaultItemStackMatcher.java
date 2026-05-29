@@ -1,27 +1,26 @@
-package com.lothrazar.storagenetwork.capability.handler;
+package com.lothrazar.storagenetwork.api.capabilities;
 
-import com.lothrazar.storagenetwork.api.IItemStackMatcher;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
-public class ItemStackMatcher implements IItemStackMatcher {
+public class DefaultItemStackMatcher implements ItemStackMatcher {
 
   private ItemStack stack;
   private boolean ore;
   private boolean nbt;
 
-  public ItemStackMatcher(ItemStack stack) {
+  public DefaultItemStackMatcher(ItemStack stack) {
     this(stack, false, false);
   }
 
-  public ItemStackMatcher(ItemStack stack, boolean ore, boolean nbt) {
+  public DefaultItemStackMatcher(ItemStack stack, boolean ore, boolean nbt) {
     this.stack = stack;
     this.ore = ore;
     this.nbt = nbt;
   }
 
-  private ItemStackMatcher() {}
+  private DefaultItemStackMatcher() {}
 
   public void readFromNBT(HolderLookup.Provider registries, CompoundTag compound) {
     CompoundTag c = (CompoundTag) compound.get("stack");
@@ -69,8 +68,8 @@ public class ItemStackMatcher implements IItemStackMatcher {
     this.nbt = nbt;
   }
 
-  public static ItemStackMatcher loadFilterItemFromNBT(HolderLookup.Provider registries, CompoundTag nbt) {
-    ItemStackMatcher fil = new ItemStackMatcher();
+  public static DefaultItemStackMatcher loadFilterItemFromNBT(HolderLookup.Provider registries, CompoundTag nbt) {
+    DefaultItemStackMatcher fil = new DefaultItemStackMatcher();
     fil.readFromNBT(registries, nbt);
     return fil.getStack() != null && fil.getStack().getItem() != null ? fil : null;
   }
@@ -86,7 +85,7 @@ public class ItemStackMatcher implements IItemStackMatcher {
     return stackIn.getItem() == stack.getItem();
   }
 
-  public boolean match(IItemStackMatcher matcher) {
+  public boolean match(ItemStackMatcher matcher) {
     ItemStack stack = matcher.getStack();
     return match(stack);
   }

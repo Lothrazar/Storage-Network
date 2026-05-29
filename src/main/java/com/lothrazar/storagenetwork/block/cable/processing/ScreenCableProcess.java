@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.IGuiPrivate;
+import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest.TextureEnum;
 import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
@@ -159,7 +160,7 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
     }
   }
 
-  private List<ItemSlotNetwork> buildGhostGrid(GuiGraphics ms, com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler handler, int x0, int mouseX, int mouseY) {
+  private List<ItemSlotNetwork> buildGhostGrid(GuiGraphics ms, FilterItemStackHandler handler, int x0, int mouseX, int mouseY) {
     List<ItemSlotNetwork> list = new ArrayList<>();
     int index = 0;
     for (int row = 0; row < 3; row++) {
@@ -233,7 +234,7 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
   }
 
   private boolean handleGridClick(List<ItemSlotNetwork> slots,
-      com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler handler,
+      FilterItemStackHandler handler,
       ProcessMessageType saveType, double mouseX, double mouseY, int mouseButton, ItemStack carried) {
     if (slots == null) {
       return false;
@@ -290,7 +291,7 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
   }
 
   private boolean scrollGrid(List<ItemSlotNetwork> slots,
-      com.lothrazar.storagenetwork.capability.handler.FilterItemStackHandler handler,
+      FilterItemStackHandler handler,
       ProcessMessageType saveType, double mouseX, double mouseY, double scrollY) {
     if (slots == null) {
       return false;
@@ -323,10 +324,6 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
     ms.renderTooltip(font, stack, mouseX, mouseY);
   }
 
-  @Override
-  public void drawGradient(GuiGraphics ms, int x, int y, int x2, int y2, int u, int v) {
-    ms.fillGradient(x, y, x2, y2, u, v);
-  }
 
   @Override
   public boolean isInRegion(int x, int y, int width, int height, double mouseX, double mouseY) {
