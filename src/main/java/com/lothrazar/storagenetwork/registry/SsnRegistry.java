@@ -17,6 +17,7 @@ import com.lothrazar.storagenetwork.block.cable.linkfilter.BlockCableFilter;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.ContainerCableFilter;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.TileCableFilter;
 import com.lothrazar.storagenetwork.block.cable.processing.BlockCableProcess;
+import com.lothrazar.storagenetwork.block.cable.processing.ContainerCableProcess;
 import com.lothrazar.storagenetwork.block.cable.processing.TileCableProcess;
 import com.lothrazar.storagenetwork.block.collection.BlockCollection;
 import com.lothrazar.storagenetwork.block.collection.ContainerCollectionFilter;
@@ -94,7 +95,7 @@ public class SsnRegistry {
     public static final DeferredItem<Item> IFK = ITEMS.register("import_filter_kabel", () -> new BlockItem(Blocks.IMPORT_FILTER_KABEL.get(), new Item.Properties()));
     public static final DeferredItem<Item> FK = ITEMS.register("filter_kabel", () -> new BlockItem(Blocks.FILTER_KABEL.get(), new Item.Properties()));
     public static final DeferredItem<Item> EK = ITEMS.register("export_kabel", () -> new BlockItem(Blocks.EXPORT_KABEL.get(), new Item.Properties()));
-    // public static final DeferredItem<Item> PK = ITEMS.register("process_kabel", () -> new BlockItem(Blocks.PROCESS_KABEL.get(), new Item.Properties()));
+    public static final DeferredItem<Item> PK = ITEMS.register("process_kabel", () -> new BlockItem(Blocks.PROCESS_KABEL.get(), new Item.Properties()));
     public static final DeferredItem<Item> EXCHANGE = ITEMS.register("exchange", () -> new BlockItem(Blocks.EXCHANGE.get(), new Item.Properties()));
     public static final DeferredItem<Item> COL = ITEMS.register("collector", () -> new BlockItem(Blocks.COLLECTOR.get(), new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> STACK_UPGRADE = ITEMS.register("stack_upgrade", () -> new ItemUpgrade(new Item.Properties()));
@@ -149,6 +150,9 @@ public class SsnRegistry {
     }));
     public static final DeferredHolder<MenuType<?>, MenuType<ContainerCableExportFilter>> EXPORT_KABEL = CONTAINERS.register("export_kabel", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
       return new ContainerCableExportFilter(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);
+    }));
+    public static final DeferredHolder<MenuType<?>, MenuType<ContainerCableProcess>> PROCESS_KABEL = CONTAINERS.register("process_kabel", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
+      return new ContainerCableProcess(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);
     }));
     public static final DeferredHolder<MenuType<?>, MenuType<ContainerNetworkInventory>> INVENTORY = CONTAINERS.register("inventory", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
       return new ContainerNetworkInventory(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);

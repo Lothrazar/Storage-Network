@@ -15,6 +15,10 @@
     "block.storagenetwork.import_filter_kabel.guide": "These constantly import from the connected inventory into the network.  They can be customized with upgrades, an item filter, and redstone controls in the GUI control screen.  Item Filter Allow means only items matching the filter will pass, Ignore mode means pull anything but ignore what is in the list.  Importing the filter wipes and replaces it with inventory contents",
     "block.storagenetwork.filter_kabel": "Filtered Link Cable",
     "block.storagenetwork.filter_kabel.guide": "Each Link Cable connects one inventory to the network.  Has priority settings for sort order among other export cables, and accepts upgrades.  ",
+    "block.storagenetwork.process_kabel": "Processing Cable",
+    "block.storagenetwork.process_kabel.tooltip": "Can automate simple crafting transactions",
+
+    "block.storagenetwork.process_kabel.guide": "Automates a processing machine such as a furnace.  Each cycle, the network sends configured ingredients into the target block on the input face, then waits for the recipe results and pulls them back into the network from the output face.  Configure ingredients (left grid) and outputs (right grid), the request count, the input/output faces, and the redstone toggle in the GUI.",
     
     "page.storagenetwork.gs_chunks":"Chunks",
     "page.storagenetwork.gs_setup":"Network Setup",
@@ -180,8 +184,7 @@
     "block.storagenetwork.filter_kabel.tooltip": "Inventory link with filtering options",
     "block.storagenetwork.import_filter_kabel.tooltip": "Imports items with filtering options",
     
-    
-    "tooltip.storagenetwork.kabel_P": "Can automate simple processing transactions",
+
          
     "block.storagenetwork.controller": "Controller",
     "block.storagenetwork.controller.tooltip": "Manage all Processing Cables in the network",
@@ -204,6 +207,7 @@
     "processing.buttons.plus": "Increase requested",
     "processing.empty.ingredients": "Empty Ingredients",
 
+    "gui.storagenetwork.processing.import": "Snapshot the adjacent block's recipe slots into the input and output filters",
     "gui.storagenetwork.processing.recipe": "Ingredients for each cycle will be sent as if coming from this block-side",
     "gui.storagenetwork.processing.extract": "When pulling processing results it will be taken as if from this block-side"
 }

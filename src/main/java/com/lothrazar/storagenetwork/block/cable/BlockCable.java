@@ -182,7 +182,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
     }
     //based on capability you have, edit connection type
     BlockEntity tileOffset = world.getBlockEntity(facingPos); //if i have zero other inventories, and this is one now, ok go invo
-    if (!hasInventoryAlready(stateIn) && UtilConnections.isInventory(facing, world, facingPos)) {
+    if (!hasInventoryAlready(stateIn, facing) && UtilConnections.isInventory(facing, world, facingPos)) {
       StorageNetworkMod.log("new Inventory from updateShape " + facingState);
       return stateIn.setValue(property, EnumConnectType.INVENTORY);
     }
@@ -197,8 +197,11 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
   }
 
   //only one inventory allowed per link cable eh
-  private static boolean hasInventoryAlready(BlockState stateIn) {
+  private static boolean hasInventoryAlready(BlockState stateIn, Direction exclude) {
     for (Direction d : Direction.values()) {
+      if (d == exclude) {
+        continue;  // !! important visual only fix
+      }
       if (stateIn.getValue(FACING_TO_PROPERTY_MAP.get(d)).isInventory()) {
         return true;
       }

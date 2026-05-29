@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.lothrazar.storagenetwork.block.cable.export.ScreenCableExportFilter;
 import com.lothrazar.storagenetwork.block.cable.inputfilter.ScreenCableImportFilter;
+import com.lothrazar.storagenetwork.block.cable.processing.ScreenCableProcess;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.ScreenCableFilter;
 import com.lothrazar.storagenetwork.block.collection.ScreenCollectionFilter;
 import com.lothrazar.storagenetwork.block.expand.ScreenNetworkInventoryExpanded;
@@ -73,6 +74,7 @@ public class StorageNetworkMod {
     event.register(SsnRegistry.Menus.FILTER_KABEL.get(), ScreenCableFilter::new);
     event.register(SsnRegistry.Menus.IMPORT_FILTER_KABEL.get(), ScreenCableImportFilter::new);
     event.register(SsnRegistry.Menus.EXPORT_KABEL.get(), ScreenCableExportFilter::new);
+    event.register(SsnRegistry.Menus.PROCESS_KABEL.get(), ScreenCableProcess::new);
     event.register(SsnRegistry.Menus.INVENTORY_REMOTE.get(), ScreenNetworkRemote::new);
     event.register(SsnRegistry.Menus.CRAFTING_REMOTE.get(), ScreenNetworkCraftingRemote::new);
     event.register(SsnRegistry.Menus.INVENTORY.get(), ScreenNetworkInventory::new);

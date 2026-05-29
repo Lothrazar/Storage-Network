@@ -11,6 +11,7 @@ public class PacketRegistry {
     PayloadRegistrar reg = event.registrar(StorageNetworkMod.MODID);
     reg.playToServer(CableDataMessage.TYPE, CableDataMessage.STREAM_CODEC, CableDataMessage::handle);
     reg.playToServer(CableIOMessage.TYPE, CableIOMessage.STREAM_CODEC, CableIOMessage::handle);
+    reg.playToServer(CableProcessMessage.TYPE, CableProcessMessage.STREAM_CODEC, CableProcessMessage::handle);
     reg.playToServer(InsertMessage.TYPE, InsertMessage.STREAM_CODEC, InsertMessage::handle);
     reg.playToServer(RequestMessage.TYPE, RequestMessage.STREAM_CODEC, RequestMessage::handle);
     reg.playToServer(ClearRecipeMessage.TYPE, ClearRecipeMessage.STREAM_CODEC, ClearRecipeMessage::handle);

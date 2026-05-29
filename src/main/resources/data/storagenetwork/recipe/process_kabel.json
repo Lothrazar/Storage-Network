@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " k ",
+    "kpk",
+    " k "
+  ],
+  "key": {
+    "k": {
+      "item": "storagenetwork:export_kabel"
+    },
+    "p": {
+      "item": "minecraft:furnace"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:process_kabel",
+    "count": 4
+  }
+}
