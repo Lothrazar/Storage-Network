@@ -38,7 +38,7 @@ public interface ConnectableNode {
   DimPos getPos();
 
   /**
-   * When your block is placed and a connected network updates, it calls this method to tell your capability where the {@link com.lothrazar.storagenetwork.block.main.TileMain} is. Store this value and return it in getmainPos().
+   * When your block is placed and a connected network updates, it calls this method to tell your capability where the main tile is. Store this value and return it in getmainPos().
    *
    * @param mainPos
    */

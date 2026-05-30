@@ -9,7 +9,6 @@ import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityProcessing;
 import com.lothrazar.storagenetwork.api.network.ConnectableNodeDefault;
 import com.lothrazar.storagenetwork.block.cable.processing.ProcessRequestModel.ProcessStatus;
-import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.api.capabilities.UpgradesItemStackHandler;
@@ -46,7 +45,7 @@ public class CapabilityProcessingDefault implements INBTSerializable<CompoundTag
 
   public CapabilityProcessingDefault(TileCableProcess tile) {
     this.tile = tile;
-    this.connectable = tile != null ? tile.getConnectable() : null;
+    this.connectable = tile != null ? tile.getConnectableNode() : null;
   }
 
   public void setInventoryFace(Direction inventoryFace) {

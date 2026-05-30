@@ -46,7 +46,7 @@ public class CollectionItemStackHandler extends ItemStackHandlerEx {
       return stack;
     }
     validateSlotIndex(slot);
-    ConnectableNode cap = tile.getConnectable();
+    ConnectableNode cap = tile.getConnectableNode();
     //
     FilterItemStackHandler filter = cap.getFilter();
     if (filter != null

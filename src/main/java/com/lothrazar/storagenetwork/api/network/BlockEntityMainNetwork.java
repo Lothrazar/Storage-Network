@@ -1,11 +1,9 @@
 package com.lothrazar.storagenetwork.api.network;
 
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
-import com.lothrazar.storagenetwork.block.main.NetworkModule;
 import net.minecraft.world.item.ItemStack;
 
 public interface BlockEntityMainNetwork {
-
 
   NetworkModule getNetwork();
 
@@ -13,6 +11,7 @@ public interface BlockEntityMainNetwork {
    * Request to extract from my network
    */
   ItemStack request(ItemStackMatcherDefault matcher, int count, boolean b);
+
   /**
    * insert into my network
    */

@@ -9,6 +9,7 @@ import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import com.lothrazar.storagenetwork.api.network.ConnectableNode;
+import com.lothrazar.storagenetwork.api.network.BlockEntityConnectableNode;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -39,8 +40,8 @@ public class CapabilityConnectableDefault implements CapabilityConnectable, INBT
 //  }
 
   public CapabilityConnectableDefault(BlockEntity tile) {
-    connectable = (tile instanceof com.lothrazar.storagenetwork.block.TileConnectable tc)
-        ? tc.getConnectable() : null;
+    connectable = (tile instanceof BlockEntityConnectableNode tc)
+        ? tc.getConnectableNode() : null;
     filters.setIsAllowlist(false);
   }
 

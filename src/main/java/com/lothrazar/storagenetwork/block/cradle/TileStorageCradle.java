@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
+import com.lothrazar.storagenetwork.api.network.BlockEntityCradle;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectableCradle;
@@ -21,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class TileStorageCradle extends TileConnectable implements MenuProvider {
+public class TileStorageCradle extends TileConnectable implements MenuProvider, BlockEntityCradle {
 
   public static final int HOLDER_SIZE = 9;
   private final ItemStackHandler holder = new ItemStackHandler(HOLDER_SIZE) {
@@ -65,6 +66,7 @@ public class TileStorageCradle extends TileConnectable implements MenuProvider {
     return holder.getStackInSlot(slot);
   }
 
+  @Override
   public List<CapabilityConnectable> getHeldLinks() {
     int n = holder.getSlots();
     List<CapabilityConnectable> out = new ArrayList<>(n);

@@ -2,9 +2,8 @@ package com.lothrazar.storagenetwork.block;
 
 import java.util.List;
 
-import com.lothrazar.storagenetwork.api.gui.NetworkWidget;
 import com.lothrazar.storagenetwork.gui.DefaultGuiNetwork;
-import com.lothrazar.storagenetwork.gui.TileableTexture;
+import com.lothrazar.storagenetwork.api.gui.TileableTexture;
 import com.lothrazar.storagenetwork.gui.components.TextboxInteger;
 import com.lothrazar.storagenetwork.compat.jei.JeiHooks;
 import com.mojang.blaze3d.platform.InputConstants;

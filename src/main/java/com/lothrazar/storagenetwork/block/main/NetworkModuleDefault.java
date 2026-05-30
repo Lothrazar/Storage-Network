@@ -19,6 +19,7 @@ import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
+import com.lothrazar.storagenetwork.api.network.NetworkModule;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.RequestBatch;
@@ -44,7 +45,7 @@ import org.apache.logging.log4j.Logger;
  * @author lothr
  *
  */
-public class NetworkModule {
+public class NetworkModuleDefault implements NetworkModule {
   public static final Logger LOGGER = LogManager.getLogger();
 
   NetworkCache ch = new NetworkCache();

@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.UpgradeType;
+import com.lothrazar.storagenetwork.api.network.BlockEntityConnectableNode;
 import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import com.lothrazar.storagenetwork.api.OpCompareType;
 import com.lothrazar.storagenetwork.api.network.BlockEntityMainNetwork;
@@ -115,8 +116,8 @@ public class CapabilityImportExportDefault implements INBTSerializable<CompoundT
   }
 
   public CapabilityImportExportDefault(BlockEntity tile, EnumStorageDirection direction) {
-    connectable = (tile instanceof com.lothrazar.storagenetwork.block.TileConnectable tc)
-        ? tc.getConnectable() : null;
+    connectable = (tile instanceof BlockEntityConnectableNode tc)
+        ? tc.getConnectableNode() : null;
     this.direction = direction;
     // Set some defaults
     if (direction == EnumStorageDirection.OUT) {

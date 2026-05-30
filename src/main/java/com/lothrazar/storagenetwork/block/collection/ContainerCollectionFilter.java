@@ -20,7 +20,7 @@ public class ContainerCollectionFilter extends ContainerCable {
   public ContainerCollectionFilter(int windowId, Level world, BlockPos pos, Inventory playerInv, Player player) {
     super(SsnRegistry.Menus.COLLECTOR.get(), windowId);
     tile = (TileCollection) world.getBlockEntity(pos);
-    ConnectableNode connectable = tile.getConnectable();
+    ConnectableNode connectable = tile.getConnectableNode();
     if (connectable instanceof ConnectableNodeDefault pc) {
       this.cap = pc;
     }

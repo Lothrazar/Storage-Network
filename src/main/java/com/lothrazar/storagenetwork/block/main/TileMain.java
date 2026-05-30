@@ -30,7 +30,7 @@ public class TileMain extends BlockEntity implements BlockEntityMainNetwork {
   public static final Logger LOGGER = LogManager.getLogger();
 
   //currently this has one network
-  private NetworkModule nw = new NetworkModule();
+  private NetworkModuleDefault nw = new NetworkModuleDefault();
   // -1 forces a notify on the first computation, so the comparator picks up the initial state.
   private int lastComparatorSignal = -1;
   private boolean comparatorDirty = true;
@@ -39,7 +39,7 @@ public class TileMain extends BlockEntity implements BlockEntityMainNetwork {
     super(SsnRegistry.Tiles.MASTER.get(), pos, state);
   }
 
-  public NetworkModule getNetwork() {
+  public NetworkModuleDefault getNetwork() {
     return nw;
   }
 

@@ -1,4 +1,4 @@
-package com.lothrazar.storagenetwork.gui;
+package com.lothrazar.storagenetwork.api.gui;
 public interface ISearchHandler {
 
   public abstract void setSearch(String set);

@@ -30,19 +30,19 @@ public class StorageNetworkCapabilities {
   @SubscribeEvent
   public static void registerCapabilities(RegisterCapabilitiesEvent event) {
     // CONNECTABLE - all network tile entities provide this (master is the hub, not a node)
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.INVENTORY.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.REQUEST_EXPANDED.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.REQUEST.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.KABEL.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.STORAGE_KABEL.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.IMPORT_KABEL.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.IMPORT_FILTER_KABEL.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.FILTER_KABEL.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.EXPORT_KABEL.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.EXCHANGE.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.COLLECTOR.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.PROCESS_KABEL.get(), (be, side) -> be.getConnectable());
-    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.STORAGE_CRADLE.get(), (be, side) -> be.getConnectable());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.INVENTORY.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.REQUEST_EXPANDED.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.REQUEST.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.KABEL.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.STORAGE_KABEL.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.IMPORT_KABEL.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.IMPORT_FILTER_KABEL.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.FILTER_KABEL.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.EXPORT_KABEL.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.EXCHANGE.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.COLLECTOR.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.PROCESS_KABEL.get(), (be, side) -> be.getConnectableNode());
+    event.registerBlockEntity(CONNECTABLE, SsnRegistry.Tiles.STORAGE_CRADLE.get(), (be, side) -> be.getConnectableNode());
 
     // CONNECTABLE_ITEM_STORAGE - storage cable and filter cable
     event.registerBlockEntity(CONNECTABLE_ITEM_STORAGE, SsnRegistry.Tiles.STORAGE_KABEL.get(), (be, side) -> be.getItemStorage());

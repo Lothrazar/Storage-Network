@@ -3,6 +3,7 @@ package com.lothrazar.storagenetwork.block;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumSortType;
+import com.lothrazar.storagenetwork.api.network.BlockEntityConnectableNode;
 import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import com.lothrazar.storagenetwork.api.network.ConnectableNodeDefault;
 import com.lothrazar.storagenetwork.block.cable.CableHelpers;
@@ -21,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * Base class for Cable, Control, Request
  */
-public abstract class TileConnectable extends BlockEntity {
+public abstract class TileConnectable extends BlockEntity implements BlockEntityConnectableNode {
 
   public static final Logger LOGGER = LogManager.getLogger();
   private final ConnectableNodeDefault connectable;
@@ -31,7 +32,8 @@ public abstract class TileConnectable extends BlockEntity {
     connectable = new ConnectableNodeDefault();
   }
 
-  public ConnectableNode getConnectable() {
+  @Override
+  public ConnectableNode getConnectableNode() {
     return connectable;
   }
 

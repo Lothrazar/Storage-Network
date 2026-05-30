@@ -4,7 +4,7 @@ import java.util.Optional;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.expand.ContainerNetworkInventoryExpanded;
 import com.lothrazar.storagenetwork.block.request.ContainerNetworkCraftingTable;
-import com.lothrazar.storagenetwork.gui.ISearchHandler;
+import com.lothrazar.storagenetwork.api.gui.ISearchHandler;
 import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkCraftingRemote;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkExpandedRemote;

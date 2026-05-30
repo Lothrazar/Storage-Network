@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
-import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
+import com.lothrazar.storagenetwork.api.network.BlockEntityCradle;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import net.minecraft.world.item.ItemStack;
@@ -21,10 +21,10 @@ import org.apache.logging.log4j.Logger;
 public class CapabilityConnectableCradle implements CapabilityConnectable {
   public static final Logger LOGGER = LogManager.getLogger();
 
-  private final TileStorageCradle tile;
+  private final BlockEntityCradle tile;
   private int priority;
 
-  public CapabilityConnectableCradle(TileStorageCradle tile) {
+  public CapabilityConnectableCradle(BlockEntityCradle tile) {
     this.tile = tile;
   }
 
