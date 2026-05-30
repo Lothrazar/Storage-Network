@@ -171,9 +171,9 @@ dependencies {
   compileOnly "curse.maven:refined-storage-243076:${rs_id}"
 
   //for testing
-   localRuntime "curse.maven:guideme-1173950:8129788"
-   localRuntime "curse.maven:applied-energistics-2-223794:${ae2_id}"
-   localRuntime "curse.maven:refined-storage-243076:${rs_id}"
+//   localRuntime "curse.maven:guideme-1173950:8129788"
+//   localRuntime "curse.maven:applied-energistics-2-223794:${ae2_id}"
+//  localRuntime "curse.maven:refined-storage-243076:${rs_id}"
 
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository

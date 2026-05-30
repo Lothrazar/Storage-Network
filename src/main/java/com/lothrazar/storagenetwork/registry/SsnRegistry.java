@@ -35,6 +35,9 @@ import com.lothrazar.storagenetwork.block.inventory.ContainerNetworkInventory;
 import com.lothrazar.storagenetwork.block.inventory.TileInventory;
 import com.lothrazar.storagenetwork.block.main.BlockMain;
 import com.lothrazar.storagenetwork.block.main.TileMain;
+import com.lothrazar.storagenetwork.block.receiver.BlockNetworkReceiver;
+import com.lothrazar.storagenetwork.block.receiver.ContainerNetworkReceiver;
+import com.lothrazar.storagenetwork.block.receiver.TileNetworkReceiver;
 import com.lothrazar.storagenetwork.block.request.BlockRequest;
 import com.lothrazar.storagenetwork.block.request.ContainerNetworkCraftingTable;
 import com.lothrazar.storagenetwork.block.request.TileRequest;
@@ -83,6 +86,7 @@ public class SsnRegistry {
     public static final DeferredBlock<Block> EXCHANGE = BLOCKS.register("exchange", () -> new BlockExchange());
     public static final DeferredBlock<Block> COLLECTOR = BLOCKS.register("collector", () -> new BlockCollection());
     public static final DeferredBlock<Block> STORAGE_CRADLE = BLOCKS.register("storage_cradle", () -> new BlockStorageCradle());
+    public static final DeferredBlock<Block> RECEIVER = BLOCKS.register("receiver", () -> new BlockNetworkReceiver());
   }
 
   public static class Items {
@@ -116,6 +120,8 @@ public class SsnRegistry {
     public static final DeferredItem<ItemCollector> COLLECTOR_REMOTE = ITEMS.register("collector_remote", () -> new ItemCollector(new Item.Properties()));
     public static final DeferredItem<Item> BUILDER_REMOTE = ITEMS.register("builder_remote", () -> new ItemBuilder(new Item.Properties()));
     public static final DeferredItem<ItemRemote> EXPANDED_REMOTE = ITEMS.register("expanded_remote", () -> new ItemRemote(new Item.Properties()));
+    public static final DeferredItem<Item> RECEIVER = ITEMS.register("receiver", () -> new BlockItem(Blocks.RECEIVER.get(), new Item.Properties()));
+    public static final DeferredItem<ItemUpgrade> CHUNKLOAD_UPGRADE = ITEMS.register("chunkload_upgrade", () -> new ItemUpgrade(new Item.Properties()));
   }
 
   public static class Tiles {
@@ -136,6 +142,7 @@ public class SsnRegistry {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCollection>> COLLECTOR = TILES.register("collector", () -> BlockEntityType.Builder.of(TileCollection::new, Blocks.COLLECTOR.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableProcess>> PROCESS_KABEL = TILES.register("process_kabel", () -> BlockEntityType.Builder.of(TileCableProcess::new, Blocks.PROCESS_KABEL.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileStorageCradle>> STORAGE_CRADLE = TILES.register("storage_cradle", () -> BlockEntityType.Builder.of(TileStorageCradle::new, Blocks.STORAGE_CRADLE.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileNetworkReceiver>> RECEIVER = TILES.register("receiver", () -> BlockEntityType.Builder.of(TileNetworkReceiver::new, Blocks.RECEIVER.get()).build(null));
   }
 
   public static class Menus {
@@ -177,6 +184,9 @@ public class SsnRegistry {
     }));
     public static final DeferredHolder<MenuType<?>, MenuType<ContainerStorageCradle>> STORAGE_CRADLE = CONTAINERS.register("storage_cradle", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
       return new ContainerStorageCradle(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);
+    }));
+    public static final DeferredHolder<MenuType<?>, MenuType<ContainerNetworkReceiver>> RECEIVER = CONTAINERS.register("receiver", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
+      return new ContainerNetworkReceiver(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);
     }));
   }
 }

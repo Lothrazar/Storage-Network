@@ -1,0 +1,15 @@
+{
+  "name": "item.storagenetwork.void_upgrade",
+  "icon": "storagenetwork:void_upgrade",
+  "category": "storagenetwork:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "item.storagenetwork.void_upgrade.guide"
+    },
+    {
+      "type": "crafting",
+      "recipe": "storagenetwork:void_upgrade"
+    }
+  ]
+}

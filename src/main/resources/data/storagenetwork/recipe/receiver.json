@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iki",
+    "kek",
+    "iki"
+  ],
+  "key": {
+    "k": {
+      "item": "storagenetwork:kabel"
+    },
+    "e": {
+      "item": "minecraft:ender_eye"
+    },
+    "i": {
+      "tag": "c:ingots/copper"
+    }
+  },
+  "result": {
+    "id": "storagenetwork:receiver"
+  }
+}

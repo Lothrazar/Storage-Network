@@ -1,6 +1,10 @@
 package com.lothrazar.storagenetwork.block.main;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
@@ -34,6 +38,10 @@ public class TileMain extends BlockEntity implements BlockEntityMainNetwork {
   // -1 forces a notify on the first computation, so the comparator picks up the initial state.
   private int lastComparatorSignal = -1;
   private boolean comparatorDirty = true;
+  // Receivers (possibly cross-dim) that have been bound to this master.
+  // Persisted; receivers themselves call register/unregister on tile-load and removal.
+  private final Set<DimPos> boundReceivers = new HashSet<>();
+  private static final String NBT_RECEIVERS = "boundReceivers";
 
   public TileMain(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.MASTER.get(), pos, state);
@@ -117,6 +125,53 @@ public class TileMain extends BlockEntity implements BlockEntityMainNetwork {
 
   private DimPos getDimPos() {
     return new DimPos(level, worldPosition);
+  }
+
+  public void registerReceiver(DimPos receiverPos) {
+    if (receiverPos == null) {
+      return;
+    }
+    if (boundReceivers.add(receiverPos)) {
+      nw.setShouldRefresh();
+      setChanged();
+    }
+  }
+
+  public void unregisterReceiver(DimPos receiverPos) {
+    if (receiverPos == null) {
+      return;
+    }
+    if (boundReceivers.remove(receiverPos)) {
+      nw.setShouldRefresh();
+      setChanged();
+    }
+  }
+
+  public Set<DimPos> getBoundReceivers() {
+    return boundReceivers;
+  }
+
+  @Override
+  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.loadAdditional(compound, registries);
+    boundReceivers.clear();
+    if (compound.contains(NBT_RECEIVERS)) {
+      ListTag list = compound.getList(NBT_RECEIVERS, Tag.TAG_COMPOUND);
+      for (int i = 0; i < list.size(); i++) {
+        DimPos dp = new DimPos(list.getCompound(i));
+        boundReceivers.add(dp);
+      }
+    }
+  }
+
+  @Override
+  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+    super.saveAdditional(compound, registries);
+    ListTag list = new ListTag();
+    for (DimPos dp : boundReceivers) {
+      list.add(dp.serializeNBT(registries));
+    }
+    compound.put(NBT_RECEIVERS, list);
   }
 
   public void clearCache() {
@@ -211,7 +266,7 @@ public class TileMain extends BlockEntity implements BlockEntityMainNetwork {
     //refresh time in config, default 200 ticks aka 10 seconds
     if ((level.getGameTime() % StorageNetworkMod.CONFIG.refreshTicks() == 0)
         || nw.shouldRefresh()) {
-      nw.doRefresh(this.getDimPos());
+      nw.doRefresh(this.getDimPos(), boundReceivers);
       // Connectable add/remove + the periodic re-scan are the two events that can
       // change the comparator signal without going through insert/extract.
       markComparatorDirty();

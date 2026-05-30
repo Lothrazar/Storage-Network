@@ -4,10 +4,13 @@ import java.util.List;
 import java.util.Map.Entry;
 import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.library.util.ChatUtil;
+import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -37,6 +40,30 @@ public class BlockMain extends EntityBlockFlib {
         main.getNetwork().setShouldRefresh();
       }
     }
+  }
+
+  @Override
+  protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn,
+      BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
+    if (worldIn.isClientSide) {
+      return ItemInteractionResult.SUCCESS;
+    }
+    if (stack.getItem() == SsnRegistry.Items.RECEIVER.get()) {
+      BlockEntity be = worldIn.getBlockEntity(pos);
+      if (be instanceof TileMain) {
+        if (DimPos.getPosStored(stack) != null) {
+          playerIn.sendSystemMessage(Component.translatable("chat.storagenetwork.receiver.alreadybound").withStyle(ChatFormatting.YELLOW));
+          return ItemInteractionResult.CONSUME;
+        }
+        DimPos.putPos(stack, pos, worldIn);
+        playerIn.sendSystemMessage(Component.translatable("chat.storagenetwork.receiver.bound")
+            .append(Component.literal(" "))
+            .append(new DimPos(worldIn, pos).makeTooltip())
+            .withStyle(ChatFormatting.GREEN));
+        return ItemInteractionResult.CONSUME;
+      }
+    }
+    return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
   }
 
   @Override

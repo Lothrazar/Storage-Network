@@ -144,8 +144,23 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
     return (V) tileEntity;
   }
 
-  public <V> V getCapability(BlockCapability<V, Direction> capability, Direction side) {
+  /**
+   * Resolve the actual Level for this DimPos's stored dimension string when possible.
+   * Falls back to the cached `world` field if no server is available (eg. on the client).
+   */
+  public Level resolveLevel() {
     Level world = getWorld();
+    if (world != null && world.getServer() != null && dimension != null && !dimension.isEmpty()) {
+      ServerLevel dimWorld = stringDimensionLookup(this.dimension, world.getServer());
+      if (dimWorld != null) {
+        return dimWorld;
+      }
+    }
+    return world;
+  }
+
+  public <V> V getCapability(BlockCapability<V, Direction> capability, Direction side) {
+    Level world = resolveLevel();
     if (world == null || getBlockPos() == null) {
       return null;
     }
@@ -153,7 +168,7 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
   }
 
   public IItemHandler getItemHandler(Direction side) {
-    Level world = getWorld();
+    Level world = resolveLevel();
     if (world == null || getBlockPos() == null) {
       return null;
     }
@@ -162,7 +177,8 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
   @SuppressWarnings("deprecation")
   public boolean isLoaded() {
-    return world == null ? false : world.hasChunkAt(pos);
+    Level resolved = resolveLevel();
+    return resolved == null ? false : resolved.hasChunkAt(pos);
   }
 
   public boolean equals(Level world, BlockPos pos) {

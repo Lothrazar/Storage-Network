@@ -214,5 +214,23 @@
 
     "gui.storagenetwork.processing.import": "Snapshot the adjacent block's recipe slots into the input and output filters",
     "gui.storagenetwork.processing.recipe": "Ingredients for each cycle will be sent as if coming from this block-side",
-    "gui.storagenetwork.processing.extract": "When pulling processing results it will be taken as if from this block-side"
+    "gui.storagenetwork.processing.extract": "When pulling processing results it will be taken as if from this block-side",
+
+    "block.storagenetwork.receiver": "Network Receiver",
+    "block.storagenetwork.receiver.tooltip": "Right-click a Master to bind, then place anywhere - even across dimensions - to extend that network's storage pool",
+    "block.storagenetwork.receiver.guide": "$(item)Network Receivers$(/) are remote access points for a Master. Right-click an existing $(l:master)Master$(/l) with an unbound receiver in hand to stamp the master's coordinates and dimension into the item. Place the bound receiver anywhere - including in other dimensions - and attach cables to it as you would to the Master itself.  Items in storage attached on the receiver side join the same network pool as the Master's local storage.",
+    "block.storagenetwork.receiver.guide2": "A receiver only acts as a bridge while its bound Master is loaded. If the Master's chunk unloads, the receiver-side cables go dormant. The receiver GUI shows the current state: $(bold)Active$(/), $(bold)Dormant$(/) (master unloaded), or $(bold)Unbound$(/).",
+    "block.storagenetwork.receiver.guide3": "To keep both the receiver and the Master loaded while you're away, slot a $(l:chunkload_upgrade)Chunkload Upgrade$(/l) into the receiver's GUI. No fuel cost.  To rebind a receiver to a different Master, break it and place a new bound copy.",
+    "item.storagenetwork.chunkload_upgrade": "Chunkload Upgrade",
+    "item.storagenetwork.chunkload_upgrade.tooltip": "Keeps the current chunk loaded for AFK operation",
+    "item.storagenetwork.chunkload_upgrade.guide": "The $(item)Chunkload Upgrade$(/) keeps the holding cable's chunk loaded so it continues working while you're away. It can be slotted into any cable with an upgrade slot - $(l:import_kabel)Import$(/l), $(l:import_filter_kabel)Filtered Import$(/l), $(l:export_kabel)Export$(/l), and $(l:process_kabel)Processing$(/l) cables - as well as a $(l:receiver)Network Receiver$(/l).",
+    "item.storagenetwork.chunkload_upgrade.guide2": "In a Receiver, this upgrade is special: it force-loads $(bold)both$(/) the receiver's chunk and the bound Master's chunk, so a cross-dim or distant subnetwork keeps running while you're elsewhere.  Removing the upgrade or breaking the block releases the load.",
+    "block.storagenetwork.receiver.bound": "Bound to master:",
+    "block.storagenetwork.receiver.unbound": "Unbound - right-click a master to bind",
+    "screen.storagenetwork.receiver.unbound": "Unbound",
+    "screen.storagenetwork.receiver.active": "Active",
+    "screen.storagenetwork.receiver.dormant": "Dormant (master unloaded)",
+    "screen.storagenetwork.receiver.slothint": "Insert a Chunkload Upgrade to keep this receiver and its master loaded",
+    "chat.storagenetwork.receiver.bound": "Receiver bound to master at",
+    "chat.storagenetwork.receiver.alreadybound": "This receiver is already bound. Break it to rebind."
 }

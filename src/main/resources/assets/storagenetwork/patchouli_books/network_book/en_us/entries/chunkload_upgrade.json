@@ -1,0 +1,19 @@
+{
+  "name": "item.storagenetwork.chunkload_upgrade",
+  "icon": "storagenetwork:chunkload_upgrade",
+  "category": "storagenetwork:upgrades",
+  "pages": [
+    {
+      "type": "text",
+      "text": "item.storagenetwork.chunkload_upgrade.guide"
+    },
+    {
+      "type": "text",
+      "text": "item.storagenetwork.chunkload_upgrade.guide2"
+    },
+    {
+      "type": "crafting",
+      "recipe": "storagenetwork:chunkload_upgrade"
+    }
+  ]
+}

@@ -124,5 +124,8 @@ public class TileCableProcess extends TileCableWithFacing implements MenuProvide
 
   public static <E extends BlockEntity> void serverTick(Level level, BlockPos blockPos, BlockState blockState, TileCableProcess tile) {
     tile.refreshInventoryDirection();
+    if (level.getGameTime() % 20L == 0L) {
+      tile.tickChunkloadFor(tile.itemStorage.upgrades);
+    }
   }
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public enum UpgradeType {
 
-  STACK, SPEED, SLOW, STOCK, OP, SINGLE, VOID;
+  STACK, SPEED, SLOW, STOCK, OP, SINGLE, VOID, CHUNKLOAD;
 
 
 

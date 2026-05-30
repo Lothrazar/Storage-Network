@@ -11,6 +11,7 @@ import com.lothrazar.storagenetwork.block.cable.linkfilter.ScreenCableFilter;
 import com.lothrazar.storagenetwork.block.collection.ScreenCollectionFilter;
 import com.lothrazar.storagenetwork.registry.CradleAdapterRegistry;
 import com.lothrazar.storagenetwork.block.cradle.ScreenStorageCradle;
+import com.lothrazar.storagenetwork.block.receiver.ScreenNetworkReceiver;
 import com.lothrazar.storagenetwork.compat.CradleAdapterDefault;
 import com.lothrazar.storagenetwork.compat.ae2.Ae2CradleBootstrap;
 import com.lothrazar.storagenetwork.compat.rs.Rs2CradleBootstrap;
@@ -81,6 +82,7 @@ public class StorageNetworkMod {
       UpgradeType.register(SsnRegistry.Items.SINGLE_UPGRADE.get(), UpgradeType.SINGLE);
       UpgradeType.register(SsnRegistry.Items.VOID_UPGRADE.get(), UpgradeType.VOID);
       UpgradeType.register(SsnRegistry.Items.OP_U.get(), UpgradeType.OP);
+      UpgradeType.register(SsnRegistry.Items.CHUNKLOAD_UPGRADE.get(), UpgradeType.CHUNKLOAD);
     });
     // Built-in cradle adapter (vanilla shulkers + any block/item exposing IItemHandler)
     CradleAdapterRegistry.register(new CradleAdapterDefault());
@@ -109,6 +111,7 @@ public class StorageNetworkMod {
     event.register(SsnRegistry.Menus.REQUEST_EXPANDED.get(), ScreenNetworkInventoryExpanded::new);
     event.register(SsnRegistry.Menus.EXPANDED_REMOTE.get(), ScreenNetworkExpandedRemote::new);
     event.register(SsnRegistry.Menus.STORAGE_CRADLE.get(), ScreenStorageCradle::new);
+    event.register(SsnRegistry.Menus.RECEIVER.get(), ScreenNetworkReceiver::new);
   }
 
   private void registerMapping(final RegisterKeyMappingsEvent event) {

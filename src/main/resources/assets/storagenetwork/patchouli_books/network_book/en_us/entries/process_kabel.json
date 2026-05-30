@@ -1,0 +1,15 @@
+{
+  "name": "block.storagenetwork.process_kabel",
+  "icon": "storagenetwork:process_kabel",
+  "category": "storagenetwork:cables",
+  "pages": [
+    {
+      "type": "text",
+      "text": "block.storagenetwork.process_kabel.guide"
+    },
+    {
+      "type": "crafting",
+      "recipe": "storagenetwork:process_kabel"
+    }
+  ]
+}

@@ -48,5 +48,8 @@ public class TileCableIO extends TileCableWithFacing {
 
   public static <E extends BlockEntity> void serverTick(Level level, BlockPos blockPos, BlockState blockState, TileCableIO tile) {
     tile.refreshInventoryDirection();
+    if (level.getGameTime() % 20L == 0L) {
+      tile.tickChunkloadFor(tile.ioStorage.upgrades);
+    }
   }
 }

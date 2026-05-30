@@ -65,5 +65,8 @@ public class TileCableImportFilter extends TileCableWithFacing implements MenuPr
 
   public static <E extends BlockEntity> void serverTick(Level level, BlockPos blockPos, BlockState blockState, TileCableImportFilter tile) {
     tile.refreshInventoryDirection();
+    if (level.getGameTime() % 20L == 0L) {
+      tile.tickChunkloadFor(tile.ioStorage.upgrades);
+    }
   }
 }

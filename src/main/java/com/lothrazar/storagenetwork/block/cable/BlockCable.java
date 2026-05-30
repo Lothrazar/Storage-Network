@@ -89,6 +89,11 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
         }
         worldIn.updateNeighbourForOutputSignal(pos, this);
       }
+      // Release any chunkload ticket this cable was holding.
+      BlockEntity be = worldIn.getBlockEntity(pos);
+      if (be instanceof com.lothrazar.storagenetwork.block.TileConnectable tc) {
+        tc.releaseChunkTicket();
+      }
       super.onRemove(state, worldIn, pos, newState, isMoving);
     }
   }

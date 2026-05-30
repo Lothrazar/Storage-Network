@@ -160,12 +160,48 @@ public class NetworkModuleDefault implements NetworkModule {
 
   /**
    * Perform refresh (regardless of shouldRefresh flag) and reset the flag back to off
-   * 
+   *
    * @param masterPos
    */
   public void doRefresh(DimPos masterPos) {
+    doRefresh(masterPos, java.util.Collections.emptySet());
+  }
+
+  /**
+   * Refresh including remote subgraphs seeded from each bound receiver position.
+   * Receivers are traversed as cross-dim "boundary" seeds: their neighbors join the
+   * master's network, but the receiver-side walk does NOT auto-nuke other TileMains
+   * it finds in that other dimension.
+   */
+  public void doRefresh(DimPos masterPos, java.util.Set<DimPos> receiverSeeds) {
     try {
-      this.connectables = this.getConnectables(masterPos);
+      HashSet<DimPos> result = new HashSet<>();
+      addConnectables(masterPos, result, masterPos, false);
+      if (receiverSeeds != null) {
+        for (DimPos seed : receiverSeeds) {
+          if (seed == null) {
+            continue;
+          }
+          // Receivers deserialized from NBT have a null world field. Resolve it
+          // via the master's server before checking isLoaded / walking.
+          if (seed.getWorld() == null
+              && masterPos.getWorld() != null
+              && masterPos.getWorld().getServer() != null
+              && seed.getDimension() != null
+              && !seed.getDimension().isEmpty()) {
+            var sl = DimPos.stringDimensionLookup(seed.getDimension(), masterPos.getWorld().getServer());
+            if (sl != null) {
+              seed.setWorld(sl);
+            }
+          }
+          if (seed.getWorld() == null || !seed.isLoaded()) {
+            continue;
+          }
+          // Walk neighbors of the receiver, treating it as a remote seed.
+          addConnectables(seed, result, masterPos, true);
+        }
+      }
+      this.connectables = result;
       this.shouldRefresh = false;
       masterPos.getWorld().getChunk(masterPos.getBlockPos()).setUnsaved(true);
     }
@@ -379,6 +415,10 @@ public class NetworkModuleDefault implements NetworkModule {
    * scary recursive stuff. the big mess that keeps the network connected and updated in real time
    */
   private void addConnectables(DimPos sourcePos, Set<DimPos> set, DimPos masterPos) {
+    addConnectables(sourcePos, set, masterPos, false);
+  }
+
+  private void addConnectables(DimPos sourcePos, Set<DimPos> set, DimPos masterPos, boolean remote) {
     if (sourcePos == null || sourcePos.getWorld() == null || !sourcePos.isLoaded()) {
       return;
     }
@@ -395,6 +435,10 @@ public class NetworkModuleDefault implements NetworkModule {
       // Prevent having multiple  on a network and break all others.
       TileMain maybeMain = lookPos.getTileEntity(TileMain.class);
       if (maybeMain != null && !lookPos.equals(masterPos.getWorld(), masterPos.getBlockPos())) {
+        if (remote) {
+          // Remote walks must not nuke other masters they encounter in foreign dimensions.
+          continue;
+        }
         UtilInventory.nukeAndDrop(lookPos);
         continue;
       }
@@ -421,7 +465,7 @@ public class NetworkModuleDefault implements NetworkModule {
           realConnectablePos.setWorld(sourcePos.getWorld());
         }
         set.add(realConnectablePos);
-        addConnectables(realConnectablePos, set, masterPos);
+        addConnectables(realConnectablePos, set, masterPos, remote);
         tileHere.setChanged();
         chunk.setUnsaved(true);
       }

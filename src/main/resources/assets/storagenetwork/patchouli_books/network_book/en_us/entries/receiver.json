@@ -1,0 +1,23 @@
+{
+  "name": "block.storagenetwork.receiver",
+  "icon": "storagenetwork:receiver",
+  "category": "storagenetwork:blocks",
+  "pages": [
+    {
+      "type": "text",
+      "text": "block.storagenetwork.receiver.guide"
+    },
+    {
+      "type": "text",
+      "text": "block.storagenetwork.receiver.guide2"
+    },
+    {
+      "type": "text",
+      "text": "block.storagenetwork.receiver.guide3"
+    },
+    {
+      "type": "crafting",
+      "recipe": "storagenetwork:receiver"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "block.storagenetwork.request_expanded",
+  "icon": "storagenetwork:request_expanded",
+  "category": "storagenetwork:blocks",
+  "pages": [
+    {
+      "type": "text",
+      "text": "block.storagenetwork.request_expanded.guide"
+    },
+    {
+      "type": "crafting",
+      "recipe": "storagenetwork:request_expanded"
+    }
+  ]
+}
