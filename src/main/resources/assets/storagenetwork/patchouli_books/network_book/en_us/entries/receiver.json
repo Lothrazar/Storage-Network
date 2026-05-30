@@ -16,6 +16,10 @@
       "text": "block.storagenetwork.receiver.guide3"
     },
     {
+      "type": "text",
+      "text": "block.storagenetwork.receiver.guide4"
+    },
+    {
       "type": "crafting",
       "recipe": "storagenetwork:receiver"
     }

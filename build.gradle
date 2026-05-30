@@ -162,6 +162,8 @@ dependencies {
 
   // no APIs
   compileOnly "vazkii.patchouli:Patchouli:${minecraft_version}-${patchouli_version}-NEOFORGE"
+  //modtesting
+  localRuntime "vazkii.patchouli:Patchouli:${minecraft_version}-${patchouli_version}-NEOFORGE"
 
   compileOnly "com.blamejared.crafttweaker:CraftTweaker-neoforge-${minecraft_version}:${crafttweaker_version}"
 
@@ -171,9 +173,9 @@ dependencies {
   compileOnly "curse.maven:refined-storage-243076:${rs_id}"
 
   //for testing
-//   localRuntime "curse.maven:guideme-1173950:8129788"
-//   localRuntime "curse.maven:applied-energistics-2-223794:${ae2_id}"
-//  localRuntime "curse.maven:refined-storage-243076:${rs_id}"
+   localRuntime "curse.maven:guideme-1173950:8129788"
+   localRuntime "curse.maven:applied-energistics-2-223794:${ae2_id}"
+  localRuntime "curse.maven:refined-storage-243076:${rs_id}"
 
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository

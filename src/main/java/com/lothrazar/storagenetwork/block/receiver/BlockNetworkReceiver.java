@@ -12,10 +12,16 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -87,9 +93,35 @@ public class BlockNetworkReceiver extends EntityBlockFlib {
             up.setStackInSlot(i, ItemStack.EMPTY);
           }
         }
+        // Silk touch preserves the master binding by dropping a stamped BlockItem
+        // and suppressing the normal loot-table drop (which would be unbound).
+        if (recv.getBoundMaster() != null && hasSilkTouch(level, player.getMainHandItem())) {
+          DimPos bm = recv.getBoundMaster();
+          Level masterLevel = bm.resolveLevel();
+          if (masterLevel != null) {
+            ItemStack stamped = new ItemStack(SsnRegistry.Items.RECEIVER.get());
+            DimPos.putPos(stamped, bm.getBlockPos(), masterLevel);
+            Block.popResource(level, pos, stamped);
+            // Replacing with air now means the loot table sees a non-matching
+            // block and yields nothing - so we don't get both a stamped item
+            // AND an unbound one.
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), 35);
+            return state;
+          }
+        }
       }
     }
     return super.playerWillDestroy(level, pos, state, player);
+  }
+
+  private static boolean hasSilkTouch(Level level, ItemStack tool) {
+    if (tool.isEmpty()) {
+      return false;
+    }
+    Holder<Enchantment> silk = level.registryAccess()
+        .lookupOrThrow(Registries.ENCHANTMENT)
+        .getOrThrow(Enchantments.SILK_TOUCH);
+    return EnchantmentHelper.getItemEnchantmentLevel(silk, tool) > 0;
   }
 
   @Override

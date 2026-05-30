@@ -5,7 +5,6 @@
   "custom_book_item":"storagenetwork:network_book",
   "book_texture":"patchouli:textures/gui/book_gray.png",
   "i18n": true,
-  "creative_tab": "storagenetwork:tab", 
   "use_resource_pack":true,
   "show_progress": false
 }
