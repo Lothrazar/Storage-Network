@@ -14,15 +14,18 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 public class ContainerStorageCradle extends AbstractContainerMenu {
 
   public final TileStorageCradle tile;
-  public static final int HELD_ROW_X = 8;
-  public static final int HELD_ROW_Y = 34;
-  public static final int HELD_ROW_X_COUNT = TileStorageCradle.HOLDER_SIZE;
+  public static final int HELD_GRID_COLS = 3;
+  // 3x3 grid centered horizontally in the 176-wide GUI: (176 - 3*18) / 2 = 61
+  public static final int HELD_GRID_X = 61;
+  public static final int HELD_GRID_Y = 17;
 
   public ContainerStorageCradle(int windowId, Level world, BlockPos pos, Inventory playerInv, Player player) {
     super(SsnRegistry.Menus.STORAGE_CRADLE.get(), windowId);
     this.tile = (TileStorageCradle) world.getBlockEntity(pos);
     for (int i = 0; i < TileStorageCradle.HOLDER_SIZE; i++) {
-      this.addSlot(new SlotItemHandler(tile.getHolder(), i, HELD_ROW_X + i * 18, HELD_ROW_Y) {
+      int col = i % HELD_GRID_COLS;
+      int row = i / HELD_GRID_COLS;
+      this.addSlot(new SlotItemHandler(tile.getHolder(), i, HELD_GRID_X + col * 18, HELD_GRID_Y + row * 18) {
 
         @Override
         public int getMaxStackSize() {
