@@ -260,6 +260,14 @@ public class CapabilityConnectableDefault implements CapabilityConnectable, INBT
   }
 
   @Override
+  public DimPos getTargetPos() {
+    if (inventoryFace == null || connectable == null || connectable.getPos() == null) {
+      return null;
+    }
+    return connectable.getPos().offset(inventoryFace);
+  }
+
+  @Override
   public CompoundTag serializeNBT(HolderLookup.Provider registries) {
     CompoundTag result = new CompoundTag();
     result.putInt("prio", priority);

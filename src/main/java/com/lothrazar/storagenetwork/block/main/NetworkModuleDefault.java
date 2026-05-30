@@ -31,8 +31,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -489,9 +493,16 @@ public class NetworkModuleDefault implements NetworkModule {
   }
 
   private Set<CapabilityConnectable> getConnectableStorage() {
-    Set<DimPos> conSet = new HashSet<>(connectables);
+    // Deterministic order: sort by the connectable's own position so when two
+    // link cables aim at the same inventory we always pick the same winner
+    // (no flicker between refreshes).
+    List<DimPos> ordered = new ArrayList<>(connectables);
+    ordered.sort(Comparator
+        .comparing((DimPos d) -> d.getDimension() == null ? "" : d.getDimension())
+        .thenComparingLong(d -> d.getBlockPos() == null ? 0L : d.getBlockPos().asLong()));
     Set<CapabilityConnectable> result = new HashSet<>();
-    for (DimPos dimpos : conSet) {
+    Set<DimPos> seenTargets = new HashSet<>();
+    for (DimPos dimpos : ordered) {
       if (!dimpos.isLoaded()) {
         continue;
       }
@@ -504,9 +515,45 @@ public class NetworkModuleDefault implements NetworkModule {
           && !dimpos.getWorld().hasNeighborSignal(dimpos.getBlockPos())) {
         continue;
       }
+      // Refuse a second storage cap that targets the same inventory another
+      // already-accepted cap is targeting. Handles two link cables on one chest
+      // and two link cables on the two halves of a double chest.
+      DimPos targetKey = canonicalTargetKey(capConnect);
+      if (targetKey != null && !seenTargets.add(targetKey)) {
+        continue;
+      }
       result.add(capConnect);
     }
     return result;
+  }
+
+  /**
+   * Stable key identifying the underlying inventory a storage cap reads/writes.
+   * Returns the target DimPos, collapsing both halves of a connected vanilla
+   * chest to the same canonical half. Returns null when the cap is not bound
+   * to an external neighbor (cradle, remote, etc) so it is never deduped.
+   */
+  private static DimPos canonicalTargetKey(CapabilityConnectable cap) {
+    DimPos target = cap.getTargetPos();
+    if (target == null || target.getWorld() == null) {
+      return target;
+    }
+    try {
+      BlockState state = target.getBlockState();
+      if (state.getBlock() instanceof ChestBlock && state.hasProperty(ChestBlock.TYPE)) {
+        ChestType type = state.getValue(ChestBlock.TYPE);
+        if (type != ChestType.SINGLE) {
+          BlockPos here = target.getBlockPos();
+          BlockPos other = here.relative(ChestBlock.getConnectedDirection(state));
+          BlockPos canonical = here.asLong() <= other.asLong() ? here : other;
+          return new DimPos(target.getWorld(), canonical);
+        }
+      }
+    }
+    catch (Exception e) {
+      // Defensive: chunk unloaded mid-refresh, etc. Fall through to raw target.
+    }
+    return target;
   }
 
   /**

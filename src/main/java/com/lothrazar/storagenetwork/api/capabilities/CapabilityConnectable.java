@@ -111,4 +111,14 @@ public interface CapabilityConnectable {
   public ItemStack extractFromSlot(int slot, int amount, boolean simulate);
 
   void addToStackProviderBatch(Batch<StackProvider> availableItems);
+
+  /**
+   * Position of the inventory this storage is reading from, i.e. the link cable's
+   * facing neighbor. Null if not bound to a directional neighbor (e.g. cradle,
+   * remote, or storage caps that own their own inventory). Used by the network to
+   * detect and refuse duplicate link cables aimed at the same inventory.
+   */
+  default DimPos getTargetPos() {
+    return null;
+  }
 }

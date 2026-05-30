@@ -216,8 +216,8 @@
     "gui.storagenetwork.processing.recipe": "Ingredients for each cycle will be sent as if coming from this block-side",
     "gui.storagenetwork.processing.extract": "When pulling processing results it will be taken as if from this block-side",
 
-    "block.storagenetwork.receiver": "Network Receiver",
-    "block.storagenetwork.receiver.tooltip": "Right-click a Root to bind, then place anywhere - even across dimensions - to extend that network's storage pool",
+    "block.storagenetwork.receiver": "Sub-Network Receiver",
+    "block.storagenetwork.receiver.tooltip": "Right-click a Root to bind, then connect to a sub-network with a Network Cable",
     "block.storagenetwork.receiver.guide": "$(item)Network Receivers$(0) are remote access points for a Storage Network Root. Right-click an existing $(l:master)Root$(/l) with an unbound receiver in hand to stamp the Root's coordinates and dimension into the item. Place the bound receiver anywhere - including in other dimensions - and attach cables to it as you would to the Root itself.  Items in storage attached on the receiver side join the same network pool as the Root's local storage.",
     "block.storagenetwork.receiver.guide2": "A receiver only acts as a bridge while its bound Root is loaded. If the Root's chunk unloads, the receiver-side cables go dormant. The receiver GUI shows the current state: $(bold)Active$(0), $(bold)Dormant$(0) (Root unloaded), or $(bold)Unbound$(0).",
     "block.storagenetwork.receiver.guide3": "To keep both the receiver and the Root loaded while you're away, slot a $(l:chunkload_upgrade)Chunkload Upgrade$(/l) into the receiver's GUI. No fuel cost.  To rebind a receiver to a different Root, break it and place a new bound copy.",
