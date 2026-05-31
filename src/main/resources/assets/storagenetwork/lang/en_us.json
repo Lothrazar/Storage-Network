@@ -233,5 +233,8 @@
     "screen.storagenetwork.receiver.dormant": "Dormant (Root unloaded)",
     "screen.storagenetwork.receiver.slothint": "Insert a Chunkload Upgrade to keep this receiver and its Root loaded",
     "chat.storagenetwork.receiver.bound": "Receiver bound to Root at",
-    "chat.storagenetwork.receiver.alreadybound": "This receiver is already bound. Break it to rebind."
+    "chat.storagenetwork.receiver.alreadybound": "This receiver is already bound. Break it to rebind.",
+    "block.storagenetwork.network_drawer": "Network Drawer",
+    "block.storagenetwork.network_drawer.tooltip": "Single-item drawer that locks to one item type and exposes it via punch/right-click on the front face.",
+    "block.storagenetwork.network_drawer.imprint": "Imprinted: %s"
 }

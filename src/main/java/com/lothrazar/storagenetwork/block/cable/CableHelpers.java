@@ -36,7 +36,8 @@ public class CableHelpers {
         || facingState.is(SsnRegistry.Blocks.REQUEST_EXPANDED.get())
         || facingState.is(SsnRegistry.Blocks.KABEL.get())
         || facingState.is(SsnRegistry.Blocks.STORAGE_CRADLE.get())
-        || facingState.is(SsnRegistry.Blocks.RECEIVER.get());
+        || facingState.is(SsnRegistry.Blocks.RECEIVER.get())
+        || facingState.is(SsnRegistry.Blocks.NETWORK_DRAWER.get());
   }
 
   public static boolean isInventory(Direction facing, LevelAccessor world, BlockPos facingPos) {

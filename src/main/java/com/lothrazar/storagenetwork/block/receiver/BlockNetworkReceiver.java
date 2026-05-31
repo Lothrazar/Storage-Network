@@ -14,6 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -138,7 +139,7 @@ public class BlockNetworkReceiver extends EntityBlockFlib {
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
     super.appendHoverText(stack, context, tooltip, flag);
     tooltip.add(Component.translatable("block.storagenetwork.receiver.tooltip").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
     DimPos stored = DimPos.getPosStored(stack);

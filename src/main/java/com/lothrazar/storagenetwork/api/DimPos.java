@@ -3,6 +3,7 @@ package com.lothrazar.storagenetwork.api;
 import com.google.common.base.Objects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.component.DataComponents;
@@ -216,7 +217,7 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
   }
 
   @Override
-  public CompoundTag serializeNBT(net.minecraft.core.HolderLookup.Provider registries) {
+  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
     if (pos == null) {
       pos = new BlockPos(0, 0, 0);
     }
@@ -229,7 +230,7 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
   }
 
   @Override
-  public void deserializeNBT(net.minecraft.core.HolderLookup.Provider registries, CompoundTag nbt) {
+  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
     if (nbt.contains(NBT_X)) {
       pos = new BlockPos(nbt.getInt(NBT_X), nbt.getInt(NBT_Y), nbt.getInt(NBT_Z));
     }

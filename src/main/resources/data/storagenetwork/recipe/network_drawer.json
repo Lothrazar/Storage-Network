@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ipi",
+    "kck",
+    "ipi"
+  ],
+  "key": {
+    "k": { "item": "storagenetwork:kabel" },
+    "c": { "item": "minecraft:chest" },
+    "p": { "item": "minecraft:glass_pane" },
+    "i": { "tag": "c:ingots/copper" }
+  },
+  "result": {
+    "id": "storagenetwork:network_drawer"
+  }
+}

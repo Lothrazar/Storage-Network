@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -16,6 +17,7 @@ public class ContainerNetworkReceiver extends AbstractContainerMenu {
   public final TileNetworkReceiver tile;
   public static final int UPGRADE_X = 80;
   public static final int UPGRADE_Y = 35;
+  private int activeSync;
 
   public ContainerNetworkReceiver(int windowId, Level world, BlockPos pos, Inventory playerInv, Player player) {
     super(SsnRegistry.Menus.RECEIVER.get(), windowId);
@@ -35,6 +37,22 @@ public class ContainerNetworkReceiver extends AbstractContainerMenu {
     for (int i = 0; i < 9; ++i) {
       addSlot(new Slot(playerInv, i, 8 + i * 18, 142));
     }
+    this.addDataSlot(new DataSlot() {
+
+      @Override
+      public int get() {
+        return tile != null && tile.isActive() ? 1 : 0;
+      }
+
+      @Override
+      public void set(int v) {
+        activeSync = v;
+      }
+    });
+  }
+
+  public boolean isActiveSynced() {
+    return activeSync != 0;
   }
 
   @Override

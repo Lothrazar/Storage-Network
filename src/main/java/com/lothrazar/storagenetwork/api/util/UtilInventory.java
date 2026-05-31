@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -71,7 +72,7 @@ public class UtilInventory {
 
   private static boolean isRemoteWithData(ItemStack stack, Item remote) {
     //if it has a tag, assume pos to network is valid
-    return stack.getItem() == remote && stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
+    return stack.getItem() == remote && stack.has(DataComponents.CUSTOM_DATA);
   }
 
   public static String formatLargeNumber(int size) {

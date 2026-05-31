@@ -123,7 +123,7 @@ public class ItemCollector extends ItemFlib {
 
   @Override
   @OnlyIn(Dist.CLIENT)
-  public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
     MutableComponent t = Component.translatable(getDescriptionId() + ".tooltip");
     t.withStyle(ChatFormatting.GRAY);
     tooltip.add(t);

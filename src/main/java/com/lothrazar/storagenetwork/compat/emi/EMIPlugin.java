@@ -19,6 +19,7 @@ import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.inventory.Slot;
 
 @EmiEntrypoint
 public class EMIPlugin implements EmiPlugin {
@@ -33,7 +34,7 @@ public class EMIPlugin implements EmiPlugin {
     //        registry.addGenericDragDropHandler(new EmiGhostIngredientHandler());
     registry.addGenericStackProvider((scr, x, y) -> {
       if (scr instanceof ScreenNetworkTable || scr instanceof ScreenNetworkCraftingRemote || scr instanceof ScreenNetworkInventoryExpanded || scr instanceof ScreenNetworkExpandedRemote) {
-        net.minecraft.world.inventory.Slot sl = ((AbstractContainerScreen<?>) scr).getSlotUnderMouse();
+        Slot sl = ((AbstractContainerScreen<?>) scr).getSlotUnderMouse();
         if (sl != null) return new EmiStackInteraction(EmiStack.of(sl.getItem()), null, false);
       }
       return EmiStackInteraction.EMPTY;

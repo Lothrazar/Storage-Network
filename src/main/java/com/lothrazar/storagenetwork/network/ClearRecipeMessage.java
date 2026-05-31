@@ -5,6 +5,7 @@ import java.util.List;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.gui.ContainerNetwork;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +22,7 @@ public class ClearRecipeMessage implements CustomPacketPayload {
   public static final CustomPacketPayload.Type<ClearRecipeMessage> TYPE =
       new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "clear_recipe"));
 
-  public static final StreamCodec<net.minecraft.network.FriendlyByteBuf, ClearRecipeMessage> STREAM_CODEC =
+  public static final StreamCodec<FriendlyByteBuf, ClearRecipeMessage> STREAM_CODEC =
       StreamCodec.unit(INSTANCE);
 
   @Override

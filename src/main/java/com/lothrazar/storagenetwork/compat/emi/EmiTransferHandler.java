@@ -22,6 +22,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -77,7 +78,7 @@ public class EmiTransferHandler<T extends ContainerNetwork> implements StandardR
     CompoundTag nbt = new CompoundTag();
     List<EmiIngredient> ingredients = recipe.getInputs();
     for (Slot slot : screen.getMenu().slots) {
-      if (slot.container instanceof net.minecraft.world.inventory.CraftingContainer) {
+      if (slot.container instanceof CraftingContainer) {
         if (slot.getSlotIndex() > ingredients.size() - 1) {
           continue;
         }

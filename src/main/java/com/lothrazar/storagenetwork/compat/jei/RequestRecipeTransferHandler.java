@@ -18,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -45,7 +46,7 @@ public abstract class RequestRecipeTransferHandler<C extends AbstractContainerMe
     HolderLookup.Provider registries = Minecraft.getInstance().level.registryAccess();
     List<IRecipeSlotView> slotsViewList = recipeSlots.getSlotViews();
     for (Slot slot : container.slots) {
-      if (slot.container instanceof net.minecraft.world.inventory.CraftingContainer) {
+      if (slot.container instanceof CraftingContainer) {
         //for some reason it was looping like this  (int j = 1; j < 10; j++)
         IRecipeSlotView slotView = slotsViewList.get(slot.getSlotIndex() + 1);
         if (slotView == null) {

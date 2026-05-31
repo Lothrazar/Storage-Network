@@ -6,6 +6,7 @@ import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.library.data.ShapeCache;
 import com.lothrazar.storagenetwork.api.EnumConnectType;
 import com.lothrazar.storagenetwork.api.network.ConnectableNode;
+import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExport;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExportDefault;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
@@ -91,7 +92,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
       }
       // Release any chunkload ticket this cable was holding.
       BlockEntity be = worldIn.getBlockEntity(pos);
-      if (be instanceof com.lothrazar.storagenetwork.block.TileConnectable tc) {
+      if (be instanceof TileConnectable tc) {
         tc.releaseChunkTicket();
       }
       super.onRemove(state, worldIn, pos, newState, isMoving);

@@ -56,7 +56,7 @@ public class ScreenNetworkReceiver extends AbstractContainerScreen<ContainerNetw
       return;
     }
     DimPos m = tile.getBoundMaster();
-    Component status = tile.isActive()
+    Component status = menu.isActiveSynced()
         ? Component.translatable("screen.storagenetwork.receiver.active").withStyle(ChatFormatting.GREEN)
         : Component.translatable("screen.storagenetwork.receiver.dormant").withStyle(ChatFormatting.YELLOW);
     ms.drawString(font, status, x, y, 0xFFFFFF, false);

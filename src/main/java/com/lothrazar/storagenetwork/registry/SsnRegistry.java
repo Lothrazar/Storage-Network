@@ -25,6 +25,8 @@ import com.lothrazar.storagenetwork.block.collection.TileCollection;
 import com.lothrazar.storagenetwork.block.cradle.BlockStorageCradle;
 import com.lothrazar.storagenetwork.block.cradle.ContainerStorageCradle;
 import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
+import com.lothrazar.storagenetwork.block.drawer.BlockNetworkDrawer;
+import com.lothrazar.storagenetwork.block.drawer.TileNetworkDrawer;
 import com.lothrazar.storagenetwork.block.exchange.BlockExchange;
 import com.lothrazar.storagenetwork.block.exchange.TileExchange;
 import com.lothrazar.storagenetwork.block.expand.BlockInventoryExpanded;
@@ -87,6 +89,7 @@ public class SsnRegistry {
     public static final DeferredBlock<Block> COLLECTOR = BLOCKS.register("collector", () -> new BlockCollection());
     public static final DeferredBlock<Block> STORAGE_CRADLE = BLOCKS.register("storage_cradle", () -> new BlockStorageCradle());
     public static final DeferredBlock<Block> RECEIVER = BLOCKS.register("receiver", () -> new BlockNetworkReceiver());
+    public static final DeferredBlock<Block> NETWORK_DRAWER = BLOCKS.register("network_drawer", () -> new BlockNetworkDrawer());
   }
 
   public static class Items {
@@ -122,6 +125,7 @@ public class SsnRegistry {
     public static final DeferredItem<ItemRemote> EXPANDED_REMOTE = ITEMS.register("expanded_remote", () -> new ItemRemote(new Item.Properties()));
     public static final DeferredItem<Item> RECEIVER = ITEMS.register("receiver", () -> new BlockItem(Blocks.RECEIVER.get(), new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> CHUNKLOAD_UPGRADE = ITEMS.register("chunkload_upgrade", () -> new ItemUpgrade(new Item.Properties()));
+    public static final DeferredItem<Item> NETWORK_DRAWER = ITEMS.register("network_drawer", () -> new BlockItem(Blocks.NETWORK_DRAWER.get(), new Item.Properties()));
   }
 
   public static class Tiles {
@@ -143,6 +147,7 @@ public class SsnRegistry {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableProcess>> PROCESS_KABEL = TILES.register("process_kabel", () -> BlockEntityType.Builder.of(TileCableProcess::new, Blocks.PROCESS_KABEL.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileStorageCradle>> STORAGE_CRADLE = TILES.register("storage_cradle", () -> BlockEntityType.Builder.of(TileStorageCradle::new, Blocks.STORAGE_CRADLE.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileNetworkReceiver>> RECEIVER = TILES.register("receiver", () -> BlockEntityType.Builder.of(TileNetworkReceiver::new, Blocks.RECEIVER.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileNetworkDrawer>> NETWORK_DRAWER = TILES.register("network_drawer", () -> BlockEntityType.Builder.of(TileNetworkDrawer::new, Blocks.NETWORK_DRAWER.get()).build(null));
   }
 
   public static class Menus {

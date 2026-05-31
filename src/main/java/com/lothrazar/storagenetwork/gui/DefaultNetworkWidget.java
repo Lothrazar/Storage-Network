@@ -31,6 +31,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.fml.ModList;
@@ -277,7 +278,7 @@ public class DefaultNetworkWidget implements NetworkWidget {
     else if (searchText.startsWith(EnumSearchPrefix.TOOLTIP.getPrefix())) { // search tooltips
       String tooltipString;
       Minecraft mc = Minecraft.getInstance();
-      List<Component> tooltip = stack.getTooltipLines(net.minecraft.world.item.Item.TooltipContext.of(mc.level), mc.player, TooltipFlag.Default.NORMAL);
+      List<Component> tooltip = stack.getTooltipLines(Item.TooltipContext.of(mc.level), mc.player, TooltipFlag.Default.NORMAL);
       List<String> unformattedTooltip = tooltip.stream().map(Component::getString).collect(Collectors.toList());
       tooltipString = Joiner.on(' ').join(unformattedTooltip).toLowerCase().trim();
       return tooltipString.contains(searchText.toLowerCase().substring(1));

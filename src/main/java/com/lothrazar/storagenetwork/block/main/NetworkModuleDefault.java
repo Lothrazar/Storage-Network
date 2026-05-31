@@ -168,7 +168,7 @@ public class NetworkModuleDefault implements NetworkModule {
    * @param masterPos
    */
   public void doRefresh(DimPos masterPos) {
-    doRefresh(masterPos, java.util.Collections.emptySet());
+    doRefresh(masterPos, Collections.emptySet());
   }
 
   /**
@@ -177,7 +177,7 @@ public class NetworkModuleDefault implements NetworkModule {
    * master's network, but the receiver-side walk does NOT auto-nuke other TileMains
    * it finds in that other dimension.
    */
-  public void doRefresh(DimPos masterPos, java.util.Set<DimPos> receiverSeeds) {
+  public void doRefresh(DimPos masterPos, Set<DimPos> receiverSeeds) {
     try {
       HashSet<DimPos> result = new HashSet<>();
       addConnectables(masterPos, result, masterPos, false);
