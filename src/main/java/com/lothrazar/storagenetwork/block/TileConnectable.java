@@ -1,6 +1,7 @@
 package com.lothrazar.storagenetwork.block;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
+import com.lothrazar.storagenetwork.api.ChunkLoadingTicket;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.api.UpgradeType;
@@ -30,10 +31,10 @@ public abstract class TileConnectable extends BlockEntity implements BlockEntity
 
   public static final Logger LOGGER = LogManager.getLogger();
   private final ConnectableNodeDefault connectable;
-  // Chunkload-ticket state shared by any cable/connectable that exposes
-  // a chunkload upgrade slot. Per-tile vanilla forced-chunk state.
-  protected boolean chunkTicketHeld;
-  protected ChunkPos heldChunk;
+  // Forced-chunk ticket for this tile's own chunk. Used by any cable/connectable
+  // that exposes a chunkload upgrade slot. The helper encapsulates the held flag,
+  // chunk pos, dim, and the idempotent assert/release calls.
+  protected final ChunkLoadingTicket ownChunk = new ChunkLoadingTicket();
 
   public TileConnectable(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
     super(tileEntityTypeIn, pos, state);
@@ -64,14 +65,14 @@ public abstract class TileConnectable extends BlockEntity implements BlockEntity
     if (compound.contains("connectable")) {
       connectable.deserializeNBT(registries, compound.getCompound("connectable"));
     }
-    chunkTicketHeld = compound.getBoolean("chunkTicketHeld");
+    ownChunk.load(compound, "chunkTicketHeld", "ownTicketDim", "ownTicketChunkX", "ownTicketChunkZ");
     super.loadAdditional(compound, registries);
   }
 
   @Override
   protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
     compound.put("connectable", connectable.serializeNBT(registries));
-    compound.putBoolean("chunkTicketHeld", chunkTicketHeld);
+    ownChunk.save(compound, "chunkTicketHeld", "ownTicketDim", "ownTicketChunkX", "ownTicketChunkZ");
     super.saveAdditional(compound, registries);
   }
 
@@ -130,28 +131,15 @@ public abstract class TileConnectable extends BlockEntity implements BlockEntity
     if (level == null || level.isClientSide || !(level instanceof ServerLevel sl)) {
       return;
     }
-    // Idempotent re-assert: vanilla updateChunkForced is a LongSet add, so re-calling
-    // each tick is cheap and self-heals when chunkTicketHeld desyncs from
-    // ForcedChunksSavedData (eg. when only the boolean was persisted but the chunk
-    // didn't end up in the saved forced set, or on first run after the host's
-    // forced-chunks file was wiped).
     if (want) {
-      ChunkPos cp = new ChunkPos(worldPosition);
-      sl.getChunkSource().updateChunkForced(cp, true);
-      if (!chunkTicketHeld || heldChunk == null) {
-        chunkTicketHeld = true;
-        heldChunk = cp;
+      if (ownChunk.assertOn(sl, new ChunkPos(worldPosition))) {
         setChanged();
-        LOGGER.debug("Asserting own-chunk forced ticket at {} in {}", cp, sl.dimension().location());
+        LOGGER.debug("Asserting own-chunk forced ticket at {} in {}", ownChunk.chunkPos(), sl.dimension().location());
       }
     }
-    else if (chunkTicketHeld) {
-      ChunkPos cp = heldChunk != null ? heldChunk : new ChunkPos(worldPosition);
-      sl.getChunkSource().updateChunkForced(cp, false);
-      chunkTicketHeld = false;
-      heldChunk = null;
+    else if (ownChunk.release(level.getServer())) {
       setChanged();
-      LOGGER.debug("Releasing own-chunk forced ticket at {} in {}", cp, sl.dimension().location());
+      LOGGER.debug("Released own-chunk forced ticket at {} in {}", new ChunkPos(worldPosition), sl.dimension().location());
     }
   }
 
@@ -160,14 +148,11 @@ public abstract class TileConnectable extends BlockEntity implements BlockEntity
    * Releases any chunk ticket this tile is holding for itself.
    */
   public void releaseChunkTicket() {
-    if (!chunkTicketHeld) {
-      return;
+    if (level != null) {
+      ownChunk.release(level.getServer());
     }
-    if (level instanceof ServerLevel sl) {
-      ChunkPos cp = heldChunk != null ? heldChunk : new ChunkPos(worldPosition);
-      sl.getChunkSource().updateChunkForced(cp, false);
+    else {
+      ownChunk.clear();
     }
-    chunkTicketHeld = false;
-    heldChunk = null;
   }
 }

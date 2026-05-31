@@ -3,6 +3,7 @@ package com.lothrazar.storagenetwork.block.receiver;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.UpgradeType;
+import com.lothrazar.storagenetwork.api.ChunkLoadingTicket;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
@@ -25,11 +26,9 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
 
   private DimPos boundMaster;
   private boolean registeredWithMaster = false;
-  // Own-chunk ticket lives in TileConnectable (chunkTicketHeld / heldChunk).
-  // Only the cross-dim master-chunk ticket is receiver-specific.
-  private boolean masterTicketHeld = false;
-  private ChunkPos heldMasterChunk;
-  private String heldMasterDim;
+  // Own-chunk ticket lives in TileConnectable (ownChunk). The cross-dim
+  // master-chunk ticket is receiver-specific because it lives on a foreign level.
+  private final ChunkLoadingTicket masterChunk = new ChunkLoadingTicket();
 
   private final ItemStackHandler upgrades = new ItemStackHandler(1) {
 
@@ -126,50 +125,28 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
     boolean want = hasChunkloadUpgrade() && isBound();
     // Own chunk - delegate to TileConnectable's shared ticket logic.
     updateChunkloadTicket(want);
-    // Master chunk - receiver-specific because it lives in a different level.
-    // Re-assert every tick rather than gating on masterTicketHeld: vanilla
-    // updateChunkForced is idempotent (LongSet add), and the persisted
-    // masterTicketHeld flag can desync from ForcedChunksSavedData across
-    // server restarts (heldMasterChunk / heldMasterDim aren't saved). If we
-    // trusted the flag we'd skip re-adding and leave the master unloaded.
+    // Master chunk - cross-dim, so we use the ChunkLoadingTicket helper.
     Level masterLevel = boundMaster != null ? boundMaster.resolveLevel() : null;
     if (want && masterLevel instanceof ServerLevel msl) {
       ChunkPos cp = new ChunkPos(boundMaster.getBlockPos());
-      msl.getChunkSource().updateChunkForced(cp, true);
-      boolean masterChunkLoaded = msl.hasChunk(cp.x, cp.z);
-      if (!masterTicketHeld || heldMasterChunk == null || heldMasterDim == null) {
-        masterTicketHeld = true;
-        heldMasterChunk = cp;
-        heldMasterDim = boundMaster.getDimension();
+      boolean newlyHeld = masterChunk.assertOn(msl, cp);
+      if (newlyHeld) {
         setChanged();
-        LOGGER.info("Receiver @ {} ({}) asserting MASTER chunk ticket on {} @ {} (chunkLoadedNow={})",
-            worldPosition, level.dimension().location(), cp, heldMasterDim, masterChunkLoaded);
+        LOGGER.debug("Receiver @ {} ({}) asserting MASTER chunk ticket on {} @ {} (chunkLoadedNow={})",
+            worldPosition, level.dimension().location(), cp, masterChunk.dim(), msl.hasChunk(cp.x, cp.z));
       }
-      else if (!masterChunkLoaded) {
-        // Ticket present but chunk not actually loaded - log so we can see if
+      else if (!msl.hasChunk(cp.x, cp.z)) {
+        // Ticket present but chunk not actually loaded - flag so we can see if
         // updateChunkForced is failing to translate into an actual chunk load.
         LOGGER.warn("Receiver @ {} ({}): master ticket asserted on {} @ {} but chunk reports NOT loaded",
-            worldPosition, level.dimension().location(), cp, heldMasterDim);
+            worldPosition, level.dimension().location(), cp, masterChunk.dim());
       }
     }
-    else if (!want && masterTicketHeld) {
-      releaseMasterTicket();
-    }
-  }
-
-  private void releaseMasterTicket() {
-    if (!masterTicketHeld) {
-      return;
-    }
-    if (heldMasterDim != null && heldMasterChunk != null && level != null && level.getServer() != null) {
-      ServerLevel sl = DimPos.stringDimensionLookup(heldMasterDim, level.getServer());
-      if (sl != null) {
-        sl.getChunkSource().updateChunkForced(heldMasterChunk, false);
+    else if (!want && masterChunk.isHeld() && level != null) {
+      if (masterChunk.release(level.getServer())) {
+        setChanged();
       }
     }
-    masterTicketHeld = false;
-    heldMasterChunk = null;
-    heldMasterDim = null;
   }
 
   /**
@@ -187,7 +164,7 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
       master.unregisterReceiver(new DimPos(level, worldPosition));
     }
     releaseChunkTicket(); // own chunk, inherited
-    releaseMasterTicket();
+    masterChunk.release(level.getServer());
   }
 
   @Override
@@ -205,13 +182,7 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
     if (compound.contains("upgrades")) {
       upgrades.deserializeNBT(registries, compound.getCompound("upgrades"));
     }
-    masterTicketHeld = compound.getBoolean("masterTicketHeld");
-    if (compound.contains("heldMasterDim")) {
-      heldMasterDim = compound.getString("heldMasterDim");
-    }
-    if (compound.contains("heldMasterChunkX") && compound.contains("heldMasterChunkZ")) {
-      heldMasterChunk = new ChunkPos(compound.getInt("heldMasterChunkX"), compound.getInt("heldMasterChunkZ"));
-    }
+    masterChunk.load(compound, "masterTicketHeld", "heldMasterDim", "heldMasterChunkX", "heldMasterChunkZ");
   }
 
   @Override
@@ -221,14 +192,7 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
       compound.put("boundMaster", boundMaster.serializeNBT(registries));
     }
     compound.put("upgrades", upgrades.serializeNBT(registries));
-    compound.putBoolean("masterTicketHeld", masterTicketHeld);
-    if (heldMasterDim != null) {
-      compound.putString("heldMasterDim", heldMasterDim);
-    }
-    if (heldMasterChunk != null) {
-      compound.putInt("heldMasterChunkX", heldMasterChunk.x);
-      compound.putInt("heldMasterChunkZ", heldMasterChunk.z);
-    }
+    masterChunk.save(compound, "masterTicketHeld", "heldMasterDim", "heldMasterChunkX", "heldMasterChunkZ");
   }
 
   @Override
