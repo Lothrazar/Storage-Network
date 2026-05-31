@@ -12,6 +12,6 @@
     "i": { "tag": "c:ingots/copper" }
   },
   "result": {
-    "id": "storagenetwork:network_drawer"
+    "id": "storagenetwork:drawer"
   }
 }

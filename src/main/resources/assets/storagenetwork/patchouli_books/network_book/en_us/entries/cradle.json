@@ -1,0 +1,23 @@
+{
+  "name": "block.storagenetwork.cradle",
+  "icon": "storagenetwork:cradle",
+  "category": "storagenetwork:blocks",
+  "pages": [
+    {
+      "type": "text",
+      "text": "block.storagenetwork.cradle.guide"
+    },
+    {
+      "type": "text",
+      "text": "block.storagenetwork.cradle.guide2"
+    },
+    {
+      "type": "text",
+      "text": "block.storagenetwork.cradle.guide3"
+    },
+    {
+      "type": "crafting",
+      "recipe": "storagenetwork:cradle"
+    }
+  ]
+}

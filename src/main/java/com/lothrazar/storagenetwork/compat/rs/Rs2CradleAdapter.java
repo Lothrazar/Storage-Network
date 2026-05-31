@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
-import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
+import com.lothrazar.storagenetwork.block.cradle.TileCradle;
 import com.lothrazar.storagenetwork.compat.CradleAdapter;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
@@ -30,18 +30,18 @@ import net.minecraft.world.level.Level;
  *
  * RS architecture note: disk contents live in a per-Level StorageRepository keyed by a UUID stored
  * on the disk item. The disk item itself is just a pointer. We therefore look up the storage fresh
- * on every operation (lazy & cheap — single map lookup).
+ * on every operation (lazy & cheap â€” single map lookup).
  */
 public class Rs2CradleAdapter implements CradleAdapter {
 
   @Override
   public boolean accepts(ItemStack heldStack) {
-    // Cheap, pure-item check — safe to call on client side.
+    // Cheap, pure-item check â€” safe to call on client side.
     return heldStack.getItem() instanceof StorageContainerItem;
   }
 
   @Override
-  public CapabilityConnectable wrap(ItemStack heldStack, TileStorageCradle cradle) {
+  public CapabilityConnectable wrap(ItemStack heldStack, TileCradle cradle) {
     Level level = cradle.getLevel();
     if (level == null || level.isClientSide) {
       return null;
@@ -63,14 +63,14 @@ public class Rs2CradleAdapter implements CradleAdapter {
 
   private static final class Link implements CapabilityConnectable {
 
-    private final TileStorageCradle cradle;
+    private final TileCradle cradle;
     private final ItemStack diskStack;
     private final StorageContainerItem diskItem;
     private final StorageRepository repository;
     private final SerializableStorage storage;
     private int priority;
 
-    private Link(TileStorageCradle cradle, ItemStack diskStack, StorageContainerItem diskItem,
+    private Link(TileCradle cradle, ItemStack diskStack, StorageContainerItem diskItem,
         StorageRepository repository, SerializableStorage storage) {
       this.cradle = cradle;
       this.diskStack = diskStack;
@@ -171,7 +171,7 @@ public class Rs2CradleAdapter implements CradleAdapter {
     @Override
     public int getEmptySlots() {
       // RS disks aren't slot-based. Approximate: report "remaining bytes" as remaining slots.
-      // Capacity 0 (UNKNOWN) → 0 empty.
+      // Capacity 0 (UNKNOWN) â†’ 0 empty.
       StorageInfo info = infoOrUnknown();
       long free = info.capacity() - info.stored();
       if (free <= 0) {

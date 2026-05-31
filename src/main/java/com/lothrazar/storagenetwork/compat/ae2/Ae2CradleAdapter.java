@@ -7,7 +7,7 @@ import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
-import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
+import com.lothrazar.storagenetwork.block.cradle.TileCradle;
 import com.lothrazar.storagenetwork.compat.CradleAdapter;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
@@ -31,7 +31,7 @@ public class Ae2CradleAdapter implements CradleAdapter {
   }
 
   @Override
-  public CapabilityConnectable wrap(ItemStack heldStack, TileStorageCradle cradle) {
+  public CapabilityConnectable wrap(ItemStack heldStack, TileCradle cradle) {
     // ISaveProvider gets called by AE2 whenever the cell wants its NBT flushed.
     // Marking the cradle dirty here ensures the held ItemStack's component changes are saved.
     ISaveProvider saver = cradle::setChanged;
@@ -44,11 +44,11 @@ public class Ae2CradleAdapter implements CradleAdapter {
 
   private static final class Link implements CapabilityConnectable {
 
-    private final TileStorageCradle cradle;
+    private final TileCradle cradle;
     private final StorageCell cell;
     private int priority;
 
-    private Link(TileStorageCradle cradle, StorageCell cell) {
+    private Link(TileCradle cradle, StorageCell cell) {
       this.cradle = cradle;
       this.cell = cell;
     }

@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class TileStorageCradle extends TileConnectable implements MenuProvider, BlockEntityCradle {
+public class TileCradle extends TileConnectable implements MenuProvider, BlockEntityCradle {
 
   public static final int HOLDER_SIZE = 9;
   private final ItemStackHandler holder = new ItemStackHandler(HOLDER_SIZE) {
@@ -54,8 +54,8 @@ public class TileStorageCradle extends TileConnectable implements MenuProvider, 
   };
   private final CapabilityConnectableCradle linkCap = new CapabilityConnectableCradle(this);
 
-  public TileStorageCradle(BlockPos pos, BlockState state) {
-    super(SsnRegistry.Tiles.STORAGE_CRADLE.get(), pos, state);
+  public TileCradle(BlockPos pos, BlockState state) {
+    super(SsnRegistry.Tiles.CRADLE.get(), pos, state);
   }
 
   public ItemStackHandler getHolder() {
@@ -107,11 +107,11 @@ public class TileStorageCradle extends TileConnectable implements MenuProvider, 
 
   @Override
   public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player playerEntity) {
-    return new ContainerStorageCradle(i, level, worldPosition, playerInventory, playerEntity);
+    return new ContainerCradle(i, level, worldPosition, playerInventory, playerEntity);
   }
 
   @Override
   public Component getDisplayName() {
-    return Component.translatable("block.storagenetwork.storage_cradle");
+    return Component.translatable("block.storagenetwork.cradle");
   }
 }

@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.lothrazar.library.data.OpCompareType;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.UpgradeType;
 import com.lothrazar.storagenetwork.api.network.BlockEntityConnectableNode;
 import com.lothrazar.storagenetwork.api.network.ConnectableNode;
-import com.lothrazar.storagenetwork.api.OpCompareType;
 import com.lothrazar.storagenetwork.api.network.BlockEntityMainNetwork;
 import com.lothrazar.storagenetwork.api.batch.Request;
 import com.lothrazar.storagenetwork.api.batch.RequestBatch;

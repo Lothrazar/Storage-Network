@@ -10,7 +10,7 @@ import com.lothrazar.storagenetwork.block.cable.processing.ScreenCableProcess;
 import com.lothrazar.storagenetwork.block.cable.linkfilter.ScreenCableFilter;
 import com.lothrazar.storagenetwork.block.collection.ScreenCollectionFilter;
 import com.lothrazar.storagenetwork.registry.CradleAdapterRegistry;
-import com.lothrazar.storagenetwork.block.cradle.ScreenStorageCradle;
+import com.lothrazar.storagenetwork.block.cradle.ScreenCradle;
 import com.lothrazar.storagenetwork.block.receiver.ScreenNetworkReceiver;
 import com.lothrazar.storagenetwork.compat.CradleAdapterDefault;
 import com.lothrazar.storagenetwork.compat.ae2.Ae2CradleBootstrap;
@@ -110,7 +110,7 @@ public class StorageNetworkMod {
     event.register(SsnRegistry.Menus.COLLECTOR.get(), ScreenCollectionFilter::new);
     event.register(SsnRegistry.Menus.REQUEST_EXPANDED.get(), ScreenNetworkInventoryExpanded::new);
     event.register(SsnRegistry.Menus.EXPANDED_REMOTE.get(), ScreenNetworkExpandedRemote::new);
-    event.register(SsnRegistry.Menus.STORAGE_CRADLE.get(), ScreenStorageCradle::new);
+    event.register(SsnRegistry.Menus.CRADLE.get(), ScreenCradle::new);
     event.register(SsnRegistry.Menus.RECEIVER.get(), ScreenNetworkReceiver::new);
   }
 

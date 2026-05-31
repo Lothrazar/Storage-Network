@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.lothrazar.library.gui.TileableTexture;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.EnumSearchPrefix;
 import com.lothrazar.storagenetwork.api.gui.*;
@@ -20,7 +21,7 @@ import com.lothrazar.storagenetwork.network.RequestMessage;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.neoforged.neoforge.network.PacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
-import com.lothrazar.storagenetwork.util.CacheModName;
+import com.lothrazar.storagenetwork.api.util.CacheModName;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -51,7 +52,7 @@ public class DefaultNetworkWidget implements NetworkWidget {
   public static final TileableTexture crafting_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting_right.png"), W, 66);
   public static final TileableTexture player = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_player.png"), 176, 84);
 
-  public static List<ISearchHandler> searchHandlers = new ArrayList<>();
+  public static List<SearchHandler> searchHandlers = new ArrayList<>();
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
     return supplier.get();
   };
@@ -375,7 +376,7 @@ public class DefaultNetworkWidget implements NetworkWidget {
   private void initJei() {
     try {
       if (gui != null && searchBar != null && gui.isJeiSearchSynced()) {
-        Optional<String> searchResult = searchHandlers.stream().map(ISearchHandler::getSearch).findFirst();
+        Optional<String> searchResult = searchHandlers.stream().map(SearchHandler::getSearch).findFirst();
         searchResult.ifPresent(s -> searchBar.setValue(s));
       }
     }

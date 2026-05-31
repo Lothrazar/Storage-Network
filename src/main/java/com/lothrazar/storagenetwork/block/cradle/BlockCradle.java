@@ -22,9 +22,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class BlockStorageCradle extends EntityBlockFlib {
+public class BlockCradle extends EntityBlockFlib {
 
-  public BlockStorageCradle() {
+  public BlockCradle() {
     super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE));
   }
 
@@ -35,13 +35,7 @@ public class BlockStorageCradle extends EntityBlockFlib {
 
   @Override
   public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-    return new TileStorageCradle(pos, state);
-  }
-
-  @Override
-  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-    super.appendHoverText(stack, context, tooltip, flag);
-    tooltip.add(Component.translatable("block.storagenetwork.storage_cradle.tooltip").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+    return new TileCradle(pos, state);
   }
 
   @Override
@@ -64,8 +58,8 @@ public class BlockStorageCradle extends EntityBlockFlib {
   public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
     if (!level.isClientSide && level instanceof ServerLevel) {
       BlockEntity be = level.getBlockEntity(pos);
-      if (be instanceof TileStorageCradle cradle) {
-        for (int i = 0; i < TileStorageCradle.HOLDER_SIZE; i++) {
+      if (be instanceof TileCradle cradle) {
+        for (int i = 0; i < TileCradle.HOLDER_SIZE; i++) {
           ItemStack held = cradle.getHeldStack(i);
           if (!held.isEmpty() && !player.isCreative()) {
             ItemEntity drop = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, held.copy());

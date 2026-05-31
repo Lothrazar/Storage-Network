@@ -3,7 +3,7 @@ package com.lothrazar.storagenetwork.registry;
 import java.util.ArrayList;
 import java.util.List;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
-import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
+import com.lothrazar.storagenetwork.block.cradle.TileCradle;
 import com.lothrazar.storagenetwork.compat.CradleAdapter;
 import net.minecraft.world.item.ItemStack;
 
@@ -29,7 +29,7 @@ public final class CradleAdapterRegistry {
     return false;
   }
 
-  public static CapabilityConnectable wrap(ItemStack heldStack, TileStorageCradle cradle) {
+  public static CapabilityConnectable wrap(ItemStack heldStack, TileCradle cradle) {
     if (heldStack.isEmpty()) {
       return null;
     }

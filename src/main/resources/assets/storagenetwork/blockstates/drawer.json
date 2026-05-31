@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "storagenetwork:block/drawer" },
+    "facing=south": { "model": "storagenetwork:block/drawer", "y": 180 },
+    "facing=west":  { "model": "storagenetwork:block/drawer", "y": 270 },
+    "facing=east":  { "model": "storagenetwork:block/drawer", "y": 90 }
+  }
+}

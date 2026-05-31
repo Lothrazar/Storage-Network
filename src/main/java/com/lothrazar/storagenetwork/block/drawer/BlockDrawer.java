@@ -50,14 +50,14 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
-public class BlockNetworkDrawer extends EntityBlockFlib {
+public class BlockDrawer extends EntityBlockFlib {
 
   private static final Logger LOGGER = LogManager.getLogger();
   public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
   // Imprint is stored in the BlockItem's CUSTOM_DATA under this key (Item registry name).
   public static final String NBT_LOCKED_ITEM = "drawer_locked_item";
 
-  public BlockNetworkDrawer() {
+  public BlockDrawer() {
     super(Block.Properties.of().strength(5.0F, 1200.0F).sound(SoundType.STONE));
     this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
   }
@@ -79,13 +79,13 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
 
   @Override
   public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-    return new TileNetworkDrawer(pos, state);
+    return new TileDrawer(pos, state);
   }
 
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-    return createTickerHelper(type, SsnRegistry.Tiles.NETWORK_DRAWER.get(),
-        world.isClientSide ? TileNetworkDrawer::clientTick : TileNetworkDrawer::serverTick);
+    return createTickerHelper(type, SsnRegistry.Tiles.DRAWER.get(),
+        world.isClientSide ? TileDrawer::clientTick : TileDrawer::serverTick);
   }
 
   @Override
@@ -95,7 +95,7 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
       return;
     }
     BlockEntity be = world.getBlockEntity(pos);
-    if (!(be instanceof TileNetworkDrawer drawer)) {
+    if (!(be instanceof TileDrawer drawer)) {
       return;
     }
     CustomData cd = stack.get(DataComponents.CUSTOM_DATA);
@@ -128,7 +128,7 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
       return ItemInteractionResult.SUCCESS;
     }
     BlockEntity be = world.getBlockEntity(pos);
-    if (!(be instanceof TileNetworkDrawer drawer)) {
+    if (!(be instanceof TileDrawer drawer)) {
       return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
     // Shift + item -> explicit imprint (matches Storage Drawers "lock to this item" feel).
@@ -189,7 +189,7 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
       return InteractionResult.SUCCESS;
     }
     BlockEntity be = world.getBlockEntity(pos);
-    if (!(be instanceof TileNetworkDrawer drawer)) {
+    if (!(be instanceof TileDrawer drawer)) {
       return InteractionResult.PASS;
     }
     if (player.isSecondaryUseActive()) {
@@ -207,11 +207,11 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
     Level world = event.getLevel();
     BlockPos pos = event.getPos();
     BlockState state = world.getBlockState(pos);
-    if (!(state.getBlock() instanceof BlockNetworkDrawer)) {
+    if (!(state.getBlock() instanceof BlockDrawer)) {
       return;
     }
     BlockEntity be = world.getBlockEntity(pos);
-    if (!(be instanceof TileNetworkDrawer drawer)) {
+    if (!(be instanceof TileDrawer drawer)) {
       return;
     }
     // Empty drawer behaves like a normal block: vanilla break path applies.
@@ -246,7 +246,7 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
     world.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.25F, 1.0F);
   }
 
-  private void drainMatchingFromInventory(Player player, TileNetworkDrawer drawer) {
+  private void drainMatchingFromInventory(Player player, TileDrawer drawer) {
     Inventory inv = player.getInventory();
     Item lockedItem = drawer.getLockedStack().getItem();
     for (int i = 0; i < inv.items.size(); i++) {
@@ -280,10 +280,10 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
   public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
     if (!level.isClientSide && !player.isCreative()) {
       BlockEntity be = level.getBlockEntity(pos);
-      if (be instanceof TileNetworkDrawer drawer
+      if (be instanceof TileDrawer drawer
           && !drawer.getLockedStack().isEmpty()
           && hasSilkTouch(level, player.getMainHandItem())) {
-        ItemStack stamped = new ItemStack(SsnRegistry.Items.NETWORK_DRAWER.get());
+        ItemStack stamped = new ItemStack(SsnRegistry.Items.DRAWER.get());
         CompoundTag tag = new CompoundTag();
         ResourceLocation rl = BuiltInRegistries.ITEM.getKey(drawer.getLockedStack().getItem());
         tag.putString(NBT_LOCKED_ITEM, rl.toString());
@@ -319,7 +319,7 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
   @Override
   public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
     super.appendHoverText(stack, context, tooltip, flag);
-    tooltip.add(Component.translatable("block.storagenetwork.network_drawer.tooltip").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+
     CustomData cd = stack.get(DataComponents.CUSTOM_DATA);
     if (cd != null) {
       CompoundTag tag = cd.copyTag();
@@ -328,7 +328,7 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
         if (rl != null) {
           Item item = BuiltInRegistries.ITEM.get(rl);
           if (item != null) {
-            tooltip.add(Component.translatable("block.storagenetwork.network_drawer.imprint", new ItemStack(item).getHoverName()).withStyle(ChatFormatting.AQUA));
+            tooltip.add(Component.translatable("block.storagenetwork.drawer.imprint", new ItemStack(item).getHoverName()).withStyle(ChatFormatting.AQUA));
           }
         }
       }

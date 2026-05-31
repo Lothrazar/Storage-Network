@@ -1,5 +1,5 @@
 package com.lothrazar.storagenetwork.api.gui;
-public interface ISearchHandler {
+public interface SearchHandler {
 
   public abstract void setSearch(String set);
 

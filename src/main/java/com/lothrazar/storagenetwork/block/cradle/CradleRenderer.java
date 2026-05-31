@@ -13,24 +13,24 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.world.level.Level;
 import com.mojang.math.Axis;
 
-public class StorageCradleRenderer implements BlockEntityRenderer<TileStorageCradle> {
+public class CradleRenderer implements BlockEntityRenderer<TileCradle> {
 
   private static final int GRID = 3;
   private static final float CELL = 1F / GRID;
   private static final float SCALE = 0.28F;
   private static final float Y_OFFSET = 1.001F;
 
-  public StorageCradleRenderer(BlockEntityRendererProvider.Context ctx) {}
+  public CradleRenderer(BlockEntityRendererProvider.Context ctx) {}
 
   @Override
-  public void render(TileStorageCradle te, float partial, PoseStack stack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+  public void render(TileCradle te, float partial, PoseStack stack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
     ItemRenderer ir = Minecraft.getInstance().getItemRenderer();
     Level level = te.getLevel();
     int litLight = level == null
         ? packedLight
         : LevelRenderer.getLightColor(level, te.getBlockPos().above());
     // Lay each non-empty held stack flat on the top face in a 3x3 grid.
-    for (int i = 0; i < TileStorageCradle.HOLDER_SIZE; i++) {
+    for (int i = 0; i < TileCradle.HOLDER_SIZE; i++) {
       ItemStack held = te.getHeldStack(i);
       if (held.isEmpty()) {
         continue;

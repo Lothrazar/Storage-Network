@@ -8,7 +8,6 @@ import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
-import com.lothrazar.storagenetwork.util.CacheModName;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -158,7 +157,7 @@ public class ItemBuilder extends ItemFlib {
       Level world = player.getCommandSenderWorld();
       BlockState target = world.getBlockState(event.getPos());
       ItemBuilder.setBlockState(held, target);
-      CacheModName.sendStatusMessage(player, target);
+      ChatUtil.statusMessage(player, target);
       event.setCanceled(true);
     }
   }

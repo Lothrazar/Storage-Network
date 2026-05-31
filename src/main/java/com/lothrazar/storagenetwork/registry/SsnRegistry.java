@@ -22,11 +22,11 @@ import com.lothrazar.storagenetwork.block.cable.processing.TileCableProcess;
 import com.lothrazar.storagenetwork.block.collection.BlockCollection;
 import com.lothrazar.storagenetwork.block.collection.ContainerCollectionFilter;
 import com.lothrazar.storagenetwork.block.collection.TileCollection;
-import com.lothrazar.storagenetwork.block.cradle.BlockStorageCradle;
-import com.lothrazar.storagenetwork.block.cradle.ContainerStorageCradle;
-import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
-import com.lothrazar.storagenetwork.block.drawer.BlockNetworkDrawer;
-import com.lothrazar.storagenetwork.block.drawer.TileNetworkDrawer;
+import com.lothrazar.storagenetwork.block.cradle.BlockCradle;
+import com.lothrazar.storagenetwork.block.cradle.ContainerCradle;
+import com.lothrazar.storagenetwork.block.cradle.TileCradle;
+import com.lothrazar.storagenetwork.block.drawer.BlockDrawer;
+import com.lothrazar.storagenetwork.block.drawer.TileDrawer;
 import com.lothrazar.storagenetwork.block.exchange.BlockExchange;
 import com.lothrazar.storagenetwork.block.exchange.TileExchange;
 import com.lothrazar.storagenetwork.block.expand.BlockInventoryExpanded;
@@ -87,9 +87,9 @@ public class SsnRegistry {
     public static final DeferredBlock<Block> REQUEST_EXPANDED = BLOCKS.register("request_expanded", () -> new BlockInventoryExpanded());
     public static final DeferredBlock<Block> EXCHANGE = BLOCKS.register("exchange", () -> new BlockExchange());
     public static final DeferredBlock<Block> COLLECTOR = BLOCKS.register("collector", () -> new BlockCollection());
-    public static final DeferredBlock<Block> STORAGE_CRADLE = BLOCKS.register("storage_cradle", () -> new BlockStorageCradle());
+    public static final DeferredBlock<Block> CRADLE = BLOCKS.register("cradle", () -> new BlockCradle());
     public static final DeferredBlock<Block> RECEIVER = BLOCKS.register("receiver", () -> new BlockNetworkReceiver());
-    public static final DeferredBlock<Block> NETWORK_DRAWER = BLOCKS.register("network_drawer", () -> new BlockNetworkDrawer());
+    public static final DeferredBlock<Block> DRAWER = BLOCKS.register("drawer", () -> new BlockDrawer());
   }
 
   public static class Items {
@@ -109,7 +109,7 @@ public class SsnRegistry {
     public static final DeferredItem<Item> PK = ITEMS.register("process_kabel", () -> new BlockItem(Blocks.PROCESS_KABEL.get(), new Item.Properties()));
     public static final DeferredItem<Item> EXCHANGE = ITEMS.register("exchange", () -> new BlockItem(Blocks.EXCHANGE.get(), new Item.Properties()));
     public static final DeferredItem<Item> COL = ITEMS.register("collector", () -> new BlockItem(Blocks.COLLECTOR.get(), new Item.Properties()));
-    public static final DeferredItem<Item> STORAGE_CRADLE = ITEMS.register("storage_cradle", () -> new BlockItem(Blocks.STORAGE_CRADLE.get(), new Item.Properties()));
+    public static final DeferredItem<Item> CRADLE = ITEMS.register("cradle", () -> new BlockItem(Blocks.CRADLE.get(), new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> STACK_UPGRADE = ITEMS.register("stack_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> SPEED_UPGRADE = ITEMS.register("speed_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> SLOW_UPGRADE = ITEMS.register("slow_upgrade", () -> new ItemUpgrade(new Item.Properties()));
@@ -125,7 +125,7 @@ public class SsnRegistry {
     public static final DeferredItem<ItemRemote> EXPANDED_REMOTE = ITEMS.register("expanded_remote", () -> new ItemRemote(new Item.Properties()));
     public static final DeferredItem<Item> RECEIVER = ITEMS.register("receiver", () -> new BlockItem(Blocks.RECEIVER.get(), new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> CHUNKLOAD_UPGRADE = ITEMS.register("chunkload_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<Item> NETWORK_DRAWER = ITEMS.register("network_drawer", () -> new BlockItem(Blocks.NETWORK_DRAWER.get(), new Item.Properties()));
+    public static final DeferredItem<Item> DRAWER = ITEMS.register("drawer", () -> new BlockItem(Blocks.DRAWER.get(), new Item.Properties()));
   }
 
   public static class Tiles {
@@ -145,9 +145,9 @@ public class SsnRegistry {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileExchange>> EXCHANGE = TILES.register("exchange", () -> BlockEntityType.Builder.of(TileExchange::new, Blocks.EXCHANGE.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCollection>> COLLECTOR = TILES.register("collector", () -> BlockEntityType.Builder.of(TileCollection::new, Blocks.COLLECTOR.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableProcess>> PROCESS_KABEL = TILES.register("process_kabel", () -> BlockEntityType.Builder.of(TileCableProcess::new, Blocks.PROCESS_KABEL.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileStorageCradle>> STORAGE_CRADLE = TILES.register("storage_cradle", () -> BlockEntityType.Builder.of(TileStorageCradle::new, Blocks.STORAGE_CRADLE.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCradle>> CRADLE = TILES.register("cradle", () -> BlockEntityType.Builder.of(TileCradle::new, Blocks.CRADLE.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileNetworkReceiver>> RECEIVER = TILES.register("receiver", () -> BlockEntityType.Builder.of(TileNetworkReceiver::new, Blocks.RECEIVER.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileNetworkDrawer>> NETWORK_DRAWER = TILES.register("network_drawer", () -> BlockEntityType.Builder.of(TileNetworkDrawer::new, Blocks.NETWORK_DRAWER.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileDrawer>> DRAWER = TILES.register("drawer", () -> BlockEntityType.Builder.of(TileDrawer::new, Blocks.DRAWER.get()).build(null));
   }
 
   public static class Menus {
@@ -187,8 +187,8 @@ public class SsnRegistry {
     public static final DeferredHolder<MenuType<?>, MenuType<ContainerNetworkExpandedRemote>> EXPANDED_REMOTE = CONTAINERS.register("expanded_remote", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
       return new ContainerNetworkExpandedRemote(windowId, inv.player.getInventory());
     }));
-    public static final DeferredHolder<MenuType<?>, MenuType<ContainerStorageCradle>> STORAGE_CRADLE = CONTAINERS.register("storage_cradle", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
-      return new ContainerStorageCradle(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);
+    public static final DeferredHolder<MenuType<?>, MenuType<ContainerCradle>> CRADLE = CONTAINERS.register("cradle", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
+      return new ContainerCradle(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);
     }));
     public static final DeferredHolder<MenuType<?>, MenuType<ContainerNetworkReceiver>> RECEIVER = CONTAINERS.register("receiver", () -> IMenuTypeExtension.create((windowId, inv, data) -> {
       return new ContainerNetworkReceiver(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player);

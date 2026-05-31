@@ -7,7 +7,7 @@ import java.util.List;
 import com.lothrazar.storagenetwork.api.*;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcher;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
-import com.lothrazar.storagenetwork.block.cradle.TileStorageCradle;
+import com.lothrazar.storagenetwork.block.cradle.TileCradle;
 import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +24,7 @@ public class CradleAdapterDefault implements CradleAdapter {
   }
 
   @Override
-  public CapabilityConnectable wrap(ItemStack heldStack, TileStorageCradle cradle) {
+  public CapabilityConnectable wrap(ItemStack heldStack, TileCradle cradle) {
     IItemHandler h = heldStack.getCapability(Capabilities.ItemHandler.ITEM);
     if (h == null) {
       return null;
@@ -34,10 +34,10 @@ public class CradleAdapterDefault implements CradleAdapter {
 
   private static final class Link implements CapabilityConnectable {
 
-    private final TileStorageCradle cradle;
+    private final TileCradle cradle;
     private final IItemHandler handler;
 
-    private Link(TileStorageCradle cradle, IItemHandler handler) {
+    private Link(TileCradle cradle, IItemHandler handler) {
       this.cradle = cradle;
       this.handler = handler;
     }

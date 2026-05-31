@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class TileNetworkDrawer extends TileConnectable {
+public class TileDrawer extends TileConnectable {
 
   private static final Logger LOGGER = LogManager.getLogger();
   private static final String NBT_LOCKED = "lockedStack";
@@ -31,8 +31,8 @@ public class TileNetworkDrawer extends TileConnectable {
   // Transient: per-player last punch tick for double-punch detection.
   private final Map<UUID, Long> lastRightClickTick = new HashMap<>();
 
-  public TileNetworkDrawer(BlockPos pos, BlockState state) {
-    super(SsnRegistry.Tiles.NETWORK_DRAWER.get(), pos, state);
+  public TileDrawer(BlockPos pos, BlockState state) {
+    super(SsnRegistry.Tiles.DRAWER.get(), pos, state);
   }
 
   public ItemStack getLockedStack() {
@@ -132,9 +132,9 @@ public class TileNetworkDrawer extends TileConnectable {
     return main.request(new ItemStackMatcherDefault(lockedStack), count, false);
   }
 
-  public static void clientTick(Level level, BlockPos pos, BlockState state, TileNetworkDrawer tile) {}
+  public static void clientTick(Level level, BlockPos pos, BlockState state, TileDrawer tile) {}
 
-  public static void serverTick(Level level, BlockPos pos, BlockState state, TileNetworkDrawer tile) {
+  public static void serverTick(Level level, BlockPos pos, BlockState state, TileDrawer tile) {
     if ((level.getGameTime() % POLL_INTERVAL) != 0) {
       return;
     }

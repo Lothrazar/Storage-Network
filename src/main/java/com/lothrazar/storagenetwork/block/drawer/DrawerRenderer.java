@@ -18,25 +18,25 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class NetworkDrawerRenderer implements BlockEntityRenderer<TileNetworkDrawer> {
+public class DrawerRenderer implements BlockEntityRenderer<TileDrawer> {
 
   private static final float ITEM_SCALE = 0.5F;
   private static final float TEXT_SCALE = 1F / 64F;
   private static final float FRONT_OFFSET = 0.51F;
 
-  public NetworkDrawerRenderer(BlockEntityRendererProvider.Context ctx) {}
+  public DrawerRenderer(BlockEntityRendererProvider.Context ctx) {}
 
   @Override
-  public void render(TileNetworkDrawer te, float partial, PoseStack ps, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+  public void render(TileDrawer te, float partial, PoseStack ps, MultiBufferSource buffer, int packedLight, int packedOverlay) {
     ItemStack locked = te.getLockedStack();
     if (locked.isEmpty()) {
       return;
     }
     BlockState state = te.getBlockState();
-    if (!state.hasProperty(BlockNetworkDrawer.FACING)) {
+    if (!state.hasProperty(BlockDrawer.FACING)) {
       return;
     }
-    Direction facing = state.getValue(BlockNetworkDrawer.FACING);
+    Direction facing = state.getValue(BlockDrawer.FACING);
     Level level = te.getLevel();
     int litLight = level == null
         ? packedLight

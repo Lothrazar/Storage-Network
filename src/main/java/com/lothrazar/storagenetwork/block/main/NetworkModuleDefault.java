@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.google.common.collect.Lists;
+import com.lothrazar.library.util.ItemStackUtil;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.network.ConnectableNode;
@@ -25,7 +26,6 @@ import com.lothrazar.storagenetwork.api.batch.Batch;
 import com.lothrazar.storagenetwork.api.batch.RequestBatch;
 import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import com.lothrazar.storagenetwork.api.util.UtilInventory;
-import com.lothrazar.storagenetwork.util.CacheModName;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
@@ -101,7 +101,7 @@ public class NetworkModuleDefault implements NetworkModule {
           if (stack == null || stack.isEmpty()) {
             continue;
           }
-          CacheModName.addOrMergeIntoList(stacks, stack);
+          ItemStackUtil.addOrMergeIntoList(stacks, stack);
         }
       }
     }
@@ -132,7 +132,7 @@ public class NetworkModuleDefault implements NetworkModule {
           if (stack == null || stack.isEmpty()) {
             continue;
           }
-          CacheModName.addOrMergeIntoList(stacks, stack);
+          ItemStackUtil.addOrMergeIntoList(stacks, stack);
         }
       }
     }

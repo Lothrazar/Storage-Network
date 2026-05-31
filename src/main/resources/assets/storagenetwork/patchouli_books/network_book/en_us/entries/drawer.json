@@ -1,0 +1,23 @@
+{
+  "name": "block.storagenetwork.drawer",
+  "icon": "storagenetwork:drawer",
+  "category": "storagenetwork:blocks",
+  "pages": [
+    {
+      "type": "text",
+      "text": "block.storagenetwork.drawer.guide"
+    },
+    {
+      "type": "text",
+      "text": "block.storagenetwork.drawer.guide2"
+    },
+    {
+      "type": "text",
+      "text": "block.storagenetwork.drawer.guide3"
+    },
+    {
+      "type": "crafting",
+      "recipe": "storagenetwork:drawer"
+    }
+  ]
+}

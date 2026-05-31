@@ -68,11 +68,11 @@
     "block.storagenetwork.exchange.guide": "This exposes the network as an inventory interface.  For example, the AE2 mod has a ME Storage Bus that will connect to this, so the entire simple storage network can be accessed through your AE2 system.  A Hopper below will export arbitrary items.  Try this with other storage mods!  ",
     "block.storagenetwork.exchange.tooltip": "Endpoint of the network for inventory connections",
 
-    "block.storagenetwork.storage_cradle": "Network Storage Cradle",
-    "block.storagenetwork.storage_cradle.tooltip": "Stores items inside items. Try a shulker box.",
-    "block.storagenetwork.storage_cradle.guide": "Holds up to 9 storage-bearing items at once and exposes their internal storage to the network. Drop in shulker boxes (or anything else that holds items) and their slots become part of the network's pool. Each held item contributes its own capacity.",
-    "block.storagenetwork.storage_cradle.guide2": "$(l:storage_kabel)Link Cables$(/l) and the cradle are siblings - both are network-storage providers. You don't need a Link Cable touching the cradle; the cradle wires itself into the network through any adjacent $(l:kabel)cable$(/l) or network block.",
-    "block.storagenetwork.storage_cradle.guide3": "Compatible storage items:$(br)- Vanilla shulker boxes$(br)- Anything exposing the item-handler capability$(br)- Applied Energistics 2 storage cells$(br)- Refined Storage disks$(br2)Break the cradle to retrieve every held item with its contents intact.",
+    "block.storagenetwork.cradle": "Network Storage Cradle",
+    "block.storagenetwork.cradle.tooltip": "Stores items inside items. Try a shulker box.",
+    "block.storagenetwork.cradle.guide": "Holds up to 9 storage-bearing items at once and exposes their internal storage to the network. Drop in shulker boxes (or anything else that holds items) and their slots become part of the network's pool. Each held item contributes its own capacity.",
+    "block.storagenetwork.cradle.guide2": "$(l:storage_kabel)Link Cables$(/l) and the cradle are siblings - both are network-storage providers. You don't need a Link Cable touching the cradle; the cradle wires itself into the network through any adjacent $(l:kabel)cable$(/l) or network block.",
+    "block.storagenetwork.cradle.guide3": "Compatible storage items:$(br)- Vanilla shulker boxes$(br)- Anything exposing the item-handler capability$(br)- Applied Energistics 2 storage cells$(br)- Refined Storage disks$(br2)Break the cradle to retrieve every held item with its contents intact.",
     "block.storagenetwork.collector": "Network Collection Interface",
     "block.storagenetwork.collector.guide":  "This exposes the network and acts as an insert-only controller for other automation systems or storage solutions.  For example, a normal Hopper will insert items similar to the  $(l:import_kabel)Import Cable$(/l).  Does not allow any item extraction.  Try this with other storage mods!  ",
     "block.storagenetwork.collector.tooltip": "Items inserted enter the network",
@@ -234,7 +234,10 @@
     "screen.storagenetwork.receiver.slothint": "Insert a Chunkload Upgrade to keep this receiver and its Root loaded",
     "chat.storagenetwork.receiver.bound": "Receiver bound to Root at",
     "chat.storagenetwork.receiver.alreadybound": "This receiver is already bound. Break it to rebind.",
-    "block.storagenetwork.network_drawer": "Network Drawer",
-    "block.storagenetwork.network_drawer.tooltip": "Single-item drawer that locks to one item type and exposes it via punch/right-click on the front face.",
-    "block.storagenetwork.network_drawer.imprint": "Imprinted: %s"
+    "block.storagenetwork.drawer": "Network Drawer",
+    "block.storagenetwork.drawer.tooltip": "Single-item drawer that locks to one item type and exposes it via left/right-click on the front face.",
+    "block.storagenetwork.drawer.imprint": "Imprinted: %s",
+    "block.storagenetwork.drawer.guide": "The $(item)Network Drawer$(0) is a single-item access point bound to one item type. Place it adjacent to any cable or network block to join the network. Once it has a target item (its $(thing)imprint$(0)), the drawer shows that item floating on its front face with a live count of how many the network has.$(br2)Imprint by $(thing)right-clicking$(0) any non-1-stack item onto an empty drawer, or $(thing)shift-right-clicking$(0) any item to explicitly set/replace the imprint. $(thing)Shift-right-click with an empty hand$(0) to clear the imprint.",
+    "block.storagenetwork.drawer.guide2": "$(bold)Inserting$(0) (right-click): $(li)$(thing)Right-click$(0) with the matching item to insert one stack$(li)$(thing)Double right-click$(0) (within ~10t) to drain ALL matching stacks from your inventory$(li)Auto-imprint on empty drawer$(0)$(br)$(bold)Extracting$(0) (left-click): $(li)$(thing)Left-click$(0) to take one item (tap or hold)$(li)$(thing)Shift-left-click$(0) to take one full stack",
+    "block.storagenetwork.drawer.guide3": "Behavior follows the classic Storage Drawers convention: $(thing)left = take, right = put$(0).$(br2)An imprinted drawer cannot be broken by tapping it - $(thing)clear the imprint first$(0) (shift-right-click empty hand), then break normally. The drawer drops a stamped item preserving its imprint when silk-touched."
 }

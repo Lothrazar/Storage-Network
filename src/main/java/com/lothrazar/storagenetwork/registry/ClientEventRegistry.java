@@ -3,8 +3,8 @@ package com.lothrazar.storagenetwork.registry;
 import org.lwjgl.glfw.GLFW;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.cable.CableFacadeRenderer;
-import com.lothrazar.storagenetwork.block.cradle.StorageCradleRenderer;
-import com.lothrazar.storagenetwork.block.drawer.NetworkDrawerRenderer;
+import com.lothrazar.storagenetwork.block.cradle.CradleRenderer;
+import com.lothrazar.storagenetwork.block.drawer.DrawerRenderer;
 import com.lothrazar.storagenetwork.registry.SsnRegistry.Tiles;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
@@ -26,7 +26,7 @@ public class ClientEventRegistry {
     event.registerBlockEntityRenderer(Tiles.STORAGE_KABEL.get(), CableFacadeRenderer::new);
     event.registerBlockEntityRenderer(Tiles.IMPORT_FILTER_KABEL.get(), CableFacadeRenderer::new);
     event.registerBlockEntityRenderer(Tiles.IMPORT_KABEL.get(), CableFacadeRenderer::new);
-    event.registerBlockEntityRenderer(Tiles.STORAGE_CRADLE.get(), StorageCradleRenderer::new);
-    event.registerBlockEntityRenderer(Tiles.NETWORK_DRAWER.get(), NetworkDrawerRenderer::new);
+    event.registerBlockEntityRenderer(Tiles.CRADLE.get(), CradleRenderer::new);
+    event.registerBlockEntityRenderer(Tiles.DRAWER.get(), DrawerRenderer::new);
   }
 }

@@ -1,0 +1,8 @@
+{
+  "parent": "block/orientable",
+  "textures": {
+    "top":    "storagenetwork:block/drawer_top",
+    "front":  "storagenetwork:block/drawer_front",
+    "side":   "storagenetwork:block/drawer_side"
+  }
+}

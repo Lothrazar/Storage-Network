@@ -141,7 +141,7 @@ public class BlockNetworkReceiver extends EntityBlockFlib {
   @Override
   public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
     super.appendHoverText(stack, context, tooltip, flag);
-    tooltip.add(Component.translatable("block.storagenetwork.receiver.tooltip").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+
     DimPos stored = DimPos.getPosStored(stack);
     if (stored != null) {
       tooltip.add(Component.translatable("block.storagenetwork.receiver.bound").withStyle(ChatFormatting.AQUA));

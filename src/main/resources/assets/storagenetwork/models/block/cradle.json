@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "storagenetwork:block/storage_cradle"
+        "all": "storagenetwork:block/cradle"
     }
 }

@@ -2,8 +2,8 @@ package com.lothrazar.storagenetwork.registry;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.cable.TileCable;
-import com.lothrazar.storagenetwork.block.drawer.BlockNetworkDrawer;
-import com.lothrazar.storagenetwork.block.drawer.TileNetworkDrawer;
+import com.lothrazar.storagenetwork.block.drawer.BlockDrawer;
+import com.lothrazar.storagenetwork.block.drawer.TileDrawer;
 import com.lothrazar.storagenetwork.item.ItemBuilder;
 import com.lothrazar.storagenetwork.network.CableFacadeMessage;
 import com.lothrazar.storagenetwork.network.KeybindCollectorToggleMessage;
@@ -37,7 +37,7 @@ public class SsnEvents {
     if (ConfigRegistry.enableFacades.get()) {
       onHitFacadeHandler(event);
     }
-    BlockNetworkDrawer.handleLeftClick(event);
+    BlockDrawer.handleLeftClick(event);
   }
 
   private void onHitFacadeHandler(PlayerInteractEvent.LeftClickBlock event) {

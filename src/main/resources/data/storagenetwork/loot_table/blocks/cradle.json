@@ -7,7 +7,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "storagenetwork:network_drawer"
+          "name": "storagenetwork:cradle"
         }
       ],
       "conditions": [
