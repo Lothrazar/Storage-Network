@@ -7,6 +7,7 @@ import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
+import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,7 +25,6 @@ public class TileDrawer extends TileConnectable {
   private static final Logger LOGGER = LogManager.getLogger();
   private static final String NBT_LOCKED = "lockedStack";
   private static final String NBT_CACHED = "cachedCount";
-  private static final int POLL_INTERVAL = 10;
 
   private ItemStack lockedStack = ItemStack.EMPTY;
   private int cachedCount = 0;
@@ -135,7 +135,7 @@ public class TileDrawer extends TileConnectable {
   public static void clientTick(Level level, BlockPos pos, BlockState state, TileDrawer tile) {}
 
   public static void serverTick(Level level, BlockPos pos, BlockState state, TileDrawer tile) {
-    if ((level.getGameTime() % POLL_INTERVAL) != 0) {
+    if ((level.getGameTime() % ConfigRegistry.DRAWER_POLL_INTERVAL.get()) != 0) {
       return;
     }
     int newCount = 0;

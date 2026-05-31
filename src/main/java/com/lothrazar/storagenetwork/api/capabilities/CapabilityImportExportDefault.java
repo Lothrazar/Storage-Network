@@ -16,6 +16,7 @@ import com.lothrazar.storagenetwork.api.batch.Request;
 import com.lothrazar.storagenetwork.api.batch.RequestBatch;
 import com.lothrazar.storagenetwork.api.network.ConnectableNodeDefault;
 import com.lothrazar.storagenetwork.api.util.UtilInventory;
+import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -31,7 +32,6 @@ public class CapabilityImportExportDefault implements INBTSerializable<CompoundT
   public static final Logger LOGGER = LogManager.getLogger();
 
   public static final int DEFAULT_ITEMS_PER = 4;
-  public static final int IO_DEFAULT_SPEED = 30; // TODO CONFIG
 
   public static class Factory implements Callable<CapabilityImportExport> {
 
@@ -250,48 +250,6 @@ public class CapabilityImportExportDefault implements INBTSerializable<CompoundT
     DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
     return inventoryPos.getItemHandler(inventoryFace.getOpposite());
   }
-  //  @Deprecated
-  //  @Override
-  //  public ItemStack extractNextStack(final int amtToRequestIn, boolean simulate) {
-  //    //op mode override
-  //    int amtToRequest = amtToRequestIn;
-  //    boolean operationMode = isOperationMode();
-  //    // If this storage is configured to only export from the network, do not
-  //    // extract from the storage, but abort immediately.
-  //    if (direction == EnumStorageDirection.OUT) {
-  //      return ItemStack.EMPTY;
-  //    }
-  //    if (inventoryFace == null) {
-  //      return ItemStack.EMPTY;
-  //    }
-  //    DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
-  //    // Test whether the connected block has the IItemHandler capability
-  //    IItemHandler itemHandler = inventoryPos.getItemHandler(inventoryFace.getOpposite());
-  //    if (itemHandler == null) {
-  //      return ItemStack.EMPTY;
-  //    }
-  //    for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
-  //      ItemStack stack = itemHandler.getStackInSlot(slot);
-  //      if (stack == null || stack.isEmpty()) {
-  //        continue;
-  //      }
-  //      // Ignore stacks that are filtered
-  //      if (filters.isStackFiltered(stack)) {
-  //        continue;
-  //      }
-  //      if (operationMode && filters.isAllowList) {
-  //        IItemStackMatcher matcher = filters.getFirstMatcher(stack);
-  //        //if filters are also in allow list mode
-  //        //then get the filter matching stack, and get the count of that filter
-  //        if (matcher != null && matcher.getStack().getCount() > 0) {
-  //          amtToRequest = matcher.getStack().getCount(); // the 63 haha
-  //        }
-  //      }
-  //      int extractSize = Math.min(amtToRequest, stack.getCount());
-  //      return itemHandler.extractItem(slot, extractSize, simulate);
-  //    }
-  //    return ItemStack.EMPTY;
-  //  }
 
   @Override
   public boolean isStockMode() {
@@ -335,22 +293,8 @@ public class CapabilityImportExportDefault implements INBTSerializable<CompoundT
 
   @Override
   public boolean canRunNow(DimPos connectablePos, BlockEntityMainNetwork main) {
-    int speedUpgrades = upgrades.getUpgradesOfType(UpgradeType.SPEED);
-    int slowUpgrades = upgrades.getUpgradesOfType(UpgradeType.SLOW);
-    int speedRatio = IO_DEFAULT_SPEED; // no upgrades
-    if (speedUpgrades > 0) {
-      //so 1 speed upgrade is run every 30/2=15t, two is 30/3 ticks etc
-      speedRatio = IO_DEFAULT_SPEED / (speedUpgrades + 1);
-    }
-    else if (slowUpgrades > 0) {
-      //meaning IF one or more speed upgrades are present, then all slowness upgrades are IGNORED
-      //so 1 Slow upgrade is run every 30*2=60t, two is 30*3=90 ticks 
-      speedRatio = IO_DEFAULT_SPEED * (slowUpgrades + 1);
-    }
-    if (speedRatio < 1) {
-      speedRatio = 1; // 0 wont happen but idk maybe
-    }
-    boolean cooldownOk = (connectablePos.getWorld().getGameTime() % speedRatio == 0);
+    final int speedRatio = getSpeedRatio( );
+    final  boolean cooldownOk = (connectablePos.getWorld().getGameTime() % speedRatio == 0);
     if (!cooldownOk) {
       return false;
     }
@@ -360,21 +304,34 @@ public class CapabilityImportExportDefault implements INBTSerializable<CompoundT
     return operationLimitOk;
   }
 
+  private int getSpeedRatio() {
+    final int speedUpgrades = upgrades.getUpgradesOfType(UpgradeType.SPEED);
+    final int slowUpgrades = upgrades.getUpgradesOfType(UpgradeType.SLOW);
+    final int baseSpeed = ConfigRegistry.IO_DEFAULT_SPEED.get();
+    int speedRatio = baseSpeed; // no upgrades
+    if (speedUpgrades > 0) {
+      //so 1 speed upgrade is run every 30/2=15t, two is 30/3 ticks etc
+      speedRatio = baseSpeed / (speedUpgrades + 1);
+    }
+    else if (slowUpgrades > 0) {
+      //meaning IF one or more speed upgrades are present, then all slowness upgrades are IGNORED
+      //so 1 Slow upgrade is run every 30*2=60t, two is 30*3=90 ticks
+      speedRatio = baseSpeed * (slowUpgrades + 1);
+    }
+    if (speedRatio < 1) {
+      speedRatio = 1; // 0 wont happen but idk maybe
+    }
+    return speedRatio;
+  }
+
   @Override
   public List<ItemStackMatcher> getAutoExportList() {
     return filters.getStackMatchers();
   }
 
-//  @Override
-//  public Direction facingInventory() {
-//    return inventoryFace;
-//  }
-
   public UpgradesItemStackHandler getUpgrades() {
     return upgrades;
   }
-
-  public void extractFromSlot(int slot) {}
 
   @Override
   public RequestBatch runExport(BlockEntityMainNetwork main) {

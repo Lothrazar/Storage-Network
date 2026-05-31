@@ -110,6 +110,8 @@ public class SsnRegistry {
     public static final DeferredItem<Item> EXCHANGE = ITEMS.register("exchange", () -> new BlockItem(Blocks.EXCHANGE.get(), new Item.Properties()));
     public static final DeferredItem<Item> COL = ITEMS.register("collector", () -> new BlockItem(Blocks.COLLECTOR.get(), new Item.Properties()));
     public static final DeferredItem<Item> CRADLE = ITEMS.register("cradle", () -> new BlockItem(Blocks.CRADLE.get(), new Item.Properties()));
+    public static final DeferredItem<Item> DRAWER = ITEMS.register("drawer", () -> new BlockItem(Blocks.DRAWER.get(), new Item.Properties()));
+    public static final DeferredItem<Item> RECEIVER = ITEMS.register("receiver", () -> new BlockItem(Blocks.RECEIVER.get(), new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> STACK_UPGRADE = ITEMS.register("stack_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> SPEED_UPGRADE = ITEMS.register("speed_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> SLOW_UPGRADE = ITEMS.register("slow_upgrade", () -> new ItemUpgrade(new Item.Properties()));
@@ -117,15 +119,13 @@ public class SsnRegistry {
     public static final DeferredItem<ItemUpgrade> OP_U = ITEMS.register("operation_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> SINGLE_UPGRADE = ITEMS.register("single_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemUpgrade> VOID_UPGRADE = ITEMS.register("void_upgrade", () -> new ItemUpgrade(new Item.Properties()));
+    public static final DeferredItem<ItemUpgrade> CHUNKLOAD_UPGRADE = ITEMS.register("chunkload_upgrade", () -> new ItemUpgrade(new Item.Properties()));
     public static final DeferredItem<ItemRemote> INVENTORY_REMOTE = ITEMS.register("inventory_remote", () -> new ItemRemote(new Item.Properties()));
     public static final DeferredItem<ItemRemote> CRAFTING_REMOTE = ITEMS.register("crafting_remote", () -> new ItemRemote(new Item.Properties()));
     public static final DeferredItem<Item> PICKER_REMOTE = ITEMS.register("picker_remote", () -> new ItemPicker(new Item.Properties()));
     public static final DeferredItem<ItemCollector> COLLECTOR_REMOTE = ITEMS.register("collector_remote", () -> new ItemCollector(new Item.Properties()));
     public static final DeferredItem<Item> BUILDER_REMOTE = ITEMS.register("builder_remote", () -> new ItemBuilder(new Item.Properties()));
     public static final DeferredItem<ItemRemote> EXPANDED_REMOTE = ITEMS.register("expanded_remote", () -> new ItemRemote(new Item.Properties()));
-    public static final DeferredItem<Item> RECEIVER = ITEMS.register("receiver", () -> new BlockItem(Blocks.RECEIVER.get(), new Item.Properties()));
-    public static final DeferredItem<ItemUpgrade> CHUNKLOAD_UPGRADE = ITEMS.register("chunkload_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<Item> DRAWER = ITEMS.register("drawer", () -> new BlockItem(Blocks.DRAWER.get(), new Item.Properties()));
   }
 
   public static class Tiles {

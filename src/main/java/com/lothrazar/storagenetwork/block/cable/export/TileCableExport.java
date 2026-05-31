@@ -4,6 +4,7 @@ import com.lothrazar.storagenetwork.api.EnumStorageDirection;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExport;
 import com.lothrazar.storagenetwork.block.TileCableWithFacing;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExportDefault;
+import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -67,7 +68,7 @@ public class TileCableExport extends TileCableWithFacing implements MenuProvider
 
   public static <E extends BlockEntity> void serverTick(Level level, BlockPos blockPos, BlockState blockState, TileCableExport tile) {
     tile.refreshInventoryDirection();
-    if (level.getGameTime() % 20L == 0L) {
+    if (level.getGameTime() % ConfigRegistry.CHUNKLOADER_REFRESH_TICKS.get() == 0L) {
       tile.tickChunkloadFor(tile.ioStorage.upgrades);
     }
   }

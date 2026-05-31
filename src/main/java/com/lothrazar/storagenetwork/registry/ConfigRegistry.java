@@ -26,6 +26,9 @@ public class ConfigRegistry {
   private static ConfigValue<List<? extends String>> IGNORELIST;
   public static IntValue ITEMRANGE;
   public static IntValue RECIPEMAXTAGS;
+  public static IntValue IO_DEFAULT_SPEED;
+  public static IntValue DRAWER_POLL_INTERVAL;
+  public static IntValue CHUNKLOADER_REFRESH_TICKS;
   private static ConfigValue<List<? extends String>> CABLEIGNORELIST;
   public static BooleanValue enableFacades;
   static {
@@ -59,6 +62,12 @@ public class ConfigRegistry {
         .defineInRange("remoteMaxRange", -1, -1, Integer.MAX_VALUE / 256);
     RECIPEMAXTAGS = COMMON_BUILDER.comment("\r\n When matching items to recipes in the JEI + button, this is the maximum number of tags to serialize over the network when on a server.  Reduce if you get errors relating to Packet Sizes being too large (Minecraft 1.12.2 had this hardcoded at 5).")
         .defineInRange("jeiMaximumRecipeTags", 64, 5, 128);
+    IO_DEFAULT_SPEED = COMMON_BUILDER.comment("\r\n Base tick interval between import/export cable operations with no upgrades.  Speed upgrades divide this value, slow upgrades multiply it.  Lower = faster cables but more server load.")
+        .defineInRange("ioDefaultSpeed", 30, 1, 4096);
+    DRAWER_POLL_INTERVAL = COMMON_BUILDER.comment("\r\n How often (in ticks) each Network Drawer polls the master for its cached item count.  Lower = more responsive displays but more server load with many drawers.")
+        .defineInRange("drawerPollInterval", 10, 1, 4096);
+    CHUNKLOADER_REFRESH_TICKS = COMMON_BUILDER.comment("\r\n How often (in ticks) cables and receivers refresh their chunk-load tickets and registration housekeeping.  Mostly relevant for forced-chunk / cross-dimension setups.")
+        .defineInRange("chunkLoaderRefreshTicks", 20, 1, 4096);
     //
     COMMON_BUILDER.push("facades");
     list = Arrays.asList("minecraft:ladder", "minecraft:double_plant", "minecraft:waterlily",

@@ -6,6 +6,7 @@ import com.lothrazar.storagenetwork.api.UpgradeType;
 import com.lothrazar.storagenetwork.api.ChunkLoadingTicket;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.main.TileMain;
+import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -107,7 +108,7 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
       return;
     }
     // Throttle: receivers don't need per-tick logic; once a second is plenty for register/ticket housekeeping.
-    if (level.getGameTime() % 20L != 0L) {
+    if (level.getGameTime() % ConfigRegistry.CHUNKLOADER_REFRESH_TICKS.get() != 0L) {
       return;
     }
     TileMain master = resolveMaster();

@@ -28,6 +28,21 @@
 	# Default: 64
 	# Range: 5 ~ 128
 	jeiMaximumRecipeTags = 64
+	#
+	# Base tick interval between import/export cable operations with no upgrades.  Speed upgrades divide this value, slow upgrades multiply it.  Lower = faster cables but more server load.
+	# Default: 30
+	# Range: 1 ~ 4096
+	ioDefaultSpeed = 30
+	#
+	# How often (in ticks) each Network Drawer polls the master for its cached item count.  Lower = more responsive displays but more server load with many drawers.
+	# Default: 10
+	# Range: 1 ~ 4096
+	drawerPollInterval = 10
+	#
+	# How often (in ticks) cables and receivers refresh their chunk-load tickets and registration housekeeping.  Mostly relevant for forced-chunk / cross-dimension setups.
+	# Default: 20
+	# Range: 1 ~ 4096
+	chunkLoaderRefreshTicks = 20
 
 	[storagenetwork.facades]
 		#
