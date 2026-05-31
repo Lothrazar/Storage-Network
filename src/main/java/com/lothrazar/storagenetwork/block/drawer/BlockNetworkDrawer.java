@@ -336,15 +336,15 @@ public class BlockNetworkDrawer extends EntityBlockFlib {
   }
 
   // Helper available to BlockItem subclasses; we use the vanilla BlockItem.
-  public static ItemStack stampedItem(ItemStack baseDrawer, ItemStack locked) {
-    if (locked.isEmpty()) {
-      return baseDrawer;
-    }
-    CompoundTag tag = new CompoundTag();
-    tag.putString(NBT_LOCKED_ITEM, BuiltInRegistries.ITEM.getKey(locked.getItem()).toString());
-    baseDrawer.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
-    return baseDrawer;
-  }
+//  public static ItemStack stampedItem(ItemStack baseDrawer, ItemStack locked) {
+//    if (locked.isEmpty()) {
+//      return baseDrawer;
+//    }
+//    CompoundTag tag = new CompoundTag();
+//    tag.putString(NBT_LOCKED_ITEM, BuiltInRegistries.ITEM.getKey(locked.getItem()).toString());
+//    baseDrawer.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+//    return baseDrawer;
+//  }
 
   // Suppress unused-warning for BlockItem import in case the helper is dropped later.
   @SuppressWarnings("unused")

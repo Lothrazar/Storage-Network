@@ -127,14 +127,30 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
     // Own chunk - delegate to TileConnectable's shared ticket logic.
     updateChunkloadTicket(want);
     // Master chunk - receiver-specific because it lives in a different level.
+    // Re-assert every tick rather than gating on masterTicketHeld: vanilla
+    // updateChunkForced is idempotent (LongSet add), and the persisted
+    // masterTicketHeld flag can desync from ForcedChunksSavedData across
+    // server restarts (heldMasterChunk / heldMasterDim aren't saved). If we
+    // trusted the flag we'd skip re-adding and leave the master unloaded.
     Level masterLevel = boundMaster != null ? boundMaster.resolveLevel() : null;
-    if (want && !masterTicketHeld && masterLevel instanceof ServerLevel msl) {
+    if (want && masterLevel instanceof ServerLevel msl) {
       ChunkPos cp = new ChunkPos(boundMaster.getBlockPos());
       msl.getChunkSource().updateChunkForced(cp, true);
-      masterTicketHeld = true;
-      heldMasterChunk = cp;
-      heldMasterDim = boundMaster.getDimension();
-      setChanged();
+      boolean masterChunkLoaded = msl.hasChunk(cp.x, cp.z);
+      if (!masterTicketHeld || heldMasterChunk == null || heldMasterDim == null) {
+        masterTicketHeld = true;
+        heldMasterChunk = cp;
+        heldMasterDim = boundMaster.getDimension();
+        setChanged();
+        LOGGER.info("Receiver @ {} ({}) asserting MASTER chunk ticket on {} @ {} (chunkLoadedNow={})",
+            worldPosition, level.dimension().location(), cp, heldMasterDim, masterChunkLoaded);
+      }
+      else if (!masterChunkLoaded) {
+        // Ticket present but chunk not actually loaded - log so we can see if
+        // updateChunkForced is failing to translate into an actual chunk load.
+        LOGGER.warn("Receiver @ {} ({}): master ticket asserted on {} @ {} but chunk reports NOT loaded",
+            worldPosition, level.dimension().location(), cp, heldMasterDim);
+      }
     }
     else if (!want && masterTicketHeld) {
       releaseMasterTicket();
@@ -190,6 +206,12 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
       upgrades.deserializeNBT(registries, compound.getCompound("upgrades"));
     }
     masterTicketHeld = compound.getBoolean("masterTicketHeld");
+    if (compound.contains("heldMasterDim")) {
+      heldMasterDim = compound.getString("heldMasterDim");
+    }
+    if (compound.contains("heldMasterChunkX") && compound.contains("heldMasterChunkZ")) {
+      heldMasterChunk = new ChunkPos(compound.getInt("heldMasterChunkX"), compound.getInt("heldMasterChunkZ"));
+    }
   }
 
   @Override
@@ -200,6 +222,13 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
     }
     compound.put("upgrades", upgrades.serializeNBT(registries));
     compound.putBoolean("masterTicketHeld", masterTicketHeld);
+    if (heldMasterDim != null) {
+      compound.putString("heldMasterDim", heldMasterDim);
+    }
+    if (heldMasterChunk != null) {
+      compound.putInt("heldMasterChunkX", heldMasterChunk.x);
+      compound.putInt("heldMasterChunkZ", heldMasterChunk.z);
+    }
   }
 
   @Override

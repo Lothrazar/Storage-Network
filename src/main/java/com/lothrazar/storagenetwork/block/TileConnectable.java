@@ -103,7 +103,7 @@ public abstract class TileConnectable extends BlockEntity implements BlockEntity
         }
       }
       catch (Exception e) {
-        LOGGER.info("Error on chunk unload " + e);
+        LOGGER.error("Error on chunk unload {}", String.valueOf(e));
       }
     }
   }
@@ -130,19 +130,28 @@ public abstract class TileConnectable extends BlockEntity implements BlockEntity
     if (level == null || level.isClientSide || !(level instanceof ServerLevel sl)) {
       return;
     }
-    if (want && !chunkTicketHeld) {
+    // Idempotent re-assert: vanilla updateChunkForced is a LongSet add, so re-calling
+    // each tick is cheap and self-heals when chunkTicketHeld desyncs from
+    // ForcedChunksSavedData (eg. when only the boolean was persisted but the chunk
+    // didn't end up in the saved forced set, or on first run after the host's
+    // forced-chunks file was wiped).
+    if (want) {
       ChunkPos cp = new ChunkPos(worldPosition);
       sl.getChunkSource().updateChunkForced(cp, true);
-      chunkTicketHeld = true;
-      heldChunk = cp;
-      setChanged();
+      if (!chunkTicketHeld || heldChunk == null) {
+        chunkTicketHeld = true;
+        heldChunk = cp;
+        setChanged();
+        LOGGER.debug("Asserting own-chunk forced ticket at {} in {}", cp, sl.dimension().location());
+      }
     }
-    else if (!want && chunkTicketHeld) {
+    else if (chunkTicketHeld) {
       ChunkPos cp = heldChunk != null ? heldChunk : new ChunkPos(worldPosition);
       sl.getChunkSource().updateChunkForced(cp, false);
       chunkTicketHeld = false;
       heldChunk = null;
       setChanged();
+      LOGGER.debug("Releasing own-chunk forced ticket at {} in {}", cp, sl.dimension().location());
     }
   }
 
