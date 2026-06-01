@@ -1,7 +1,7 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/simple-storage-network",
 	"promos": {
-		"1.20.1-latest": "1.13.0"
+		"1.20.1-latest": "1.13.1"
 	},
 	"1.20.1": {
 		"1.10.0":"Ported to 1.20.1, depends on flib-0.0.7+ . Fixed patchouli book.  Port to new non-deprecated curios datapack tags.  Includes pull requests merged into the 1.18 and 1.19 branches :  Merge pull request #492 from IIpragmaII/trunk/1.18 @IIpragmaII @VasurTrekkson Improved performance for export node.  fix priority german translation @lightlike .   Fixed recipes not showing when pressing the JEI recipe key @Demerso.   Create uk_ua.json @SKZGx   "
@@ -15,6 +15,9 @@
 		,"1.12.0":"Added a new Expanded Request Table and the Expanded Remote to support GUI Scale 2 or larger for players on large monitors/resolutions.  Internal refactoring for Import and Export cable capabilities: item transactions are now executed inside the cable tile-entities instead of the main node tile-entity (meaning the main root node is doing less processing work, and also the network overall should have fewer wasted cycles).  "
 		,"1.12.1": "Fix JEI/EMI recipe autocomplete"
 		,"1.13.0": "Improved look and feel of the plain Network Cable intersections.  Merge pull request #593 from KishCom/trunk/1.20.1, Fix multiple export cables not working fixing #581\n  Merge pull request #586 from ArtByteFilip/trunk/1.20.1 added the option to turn the network collector remote on and off "
+		,"1.13.1": "Fix cable visually disconnecting after certain blockstate updates, such as single<->double chests"
+
+
 
 	}
 }

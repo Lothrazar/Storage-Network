@@ -21,6 +21,7 @@ build
 run
 logs
 libs
+mcmodsrepo
 
 # Files from Forge MDK
 forge*changelog.txt
