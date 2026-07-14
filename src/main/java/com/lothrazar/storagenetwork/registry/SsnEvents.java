@@ -1,11 +1,11 @@
 package com.lothrazar.storagenetwork.registry;
 
+import com.lothrazar.library.packet.BlockFacadeMessage;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.block.cable.TileCable;
 import com.lothrazar.storagenetwork.block.drawer.BlockDrawer;
 import com.lothrazar.storagenetwork.block.drawer.TileDrawer;
 import com.lothrazar.storagenetwork.item.ItemBuilder;
-import com.lothrazar.storagenetwork.network.CableFacadeMessage;
 import com.lothrazar.storagenetwork.network.KeybindCollectorToggleMessage;
 import com.lothrazar.storagenetwork.network.KeybindCurioMessage;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -53,7 +53,7 @@ public class SsnEvents {
     TileCable cable = TileCable.getTileCable(level, event.getPos());
     if (cable != null) {
       if (held.isEmpty()) {
-        PacketDistributor.sendToServer(new CableFacadeMessage(event.getPos(), true));
+        PacketDistributor.sendToServer(new BlockFacadeMessage(event.getPos(), true));
       } else {
         Block block = Block.byItem(held.getItem());
         if (block == null || block == Blocks.AIR) {
@@ -68,8 +68,8 @@ public class SsnEvents {
         BlockHitResult bhr = (BlockHitResult) player.pick(player.blockInteractionRange(), 1, pickFluids);
         BlockPlaceContext context = new BlockPlaceContext(player, event.getHand(), held, bhr);
         BlockState facadeState = block.getStateForPlacement(context);
-        CompoundTag tags = (facadeState == null) ? null : NbtUtils.writeBlockState(facadeState);
-        PacketDistributor.sendToServer(new CableFacadeMessage(event.getPos(), tags));
+        CompoundTag tags = (facadeState == null) ? new CompoundTag() : NbtUtils.writeBlockState(facadeState);
+        PacketDistributor.sendToServer(new BlockFacadeMessage(event.getPos(), tags));
       }
     }
   }

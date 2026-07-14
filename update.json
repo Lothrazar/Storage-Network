@@ -5,6 +5,6 @@
 	},
 	"1.21.1": {
 		"1.13.0": "Improved look and feel of the plain Network Cable intersections.  \nNew block: Cradle to hold backpacks, storage disks, and shulkers. \n New block: Drawer. \n New block: Sub-Network Receiver to connect distant networks.  \nAdd Processing Cable (mimic 1.12.2 functionality).  \nAdd redstone control to Filtered Link Cable. \nAdd Void Upgrade. \n Add Chunkloader upgrade.  \nMain network Root emits a comparator signal proportional to how full the linked storage is. \n Merge pull request #593 from KishCom/trunk/1.20.1, Fix multiple export cables not working fixing #581\n  Merge pull request #586 from ArtByteFilip/trunk/1.20.1 added the option to turn the network collector remote on and off .  \nNew crafting button to allow player to slow down shift-crafting, so you can get one result instead of a full stack at once."
-
+        ,"1.13.1": ""
 	}
 }

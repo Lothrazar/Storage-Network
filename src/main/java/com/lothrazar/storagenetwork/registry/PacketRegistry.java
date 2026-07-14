@@ -18,7 +18,7 @@ public class PacketRegistry {
     reg.playToServer(SettingsSyncMessage.TYPE, SettingsSyncMessage.STREAM_CODEC, SettingsSyncMessage::handle);
     reg.playToServer(RecipeMessage.TYPE, RecipeMessage.STREAM_CODEC, RecipeMessage::handle);
     reg.playToServer(CableLimitMessage.TYPE, CableLimitMessage.STREAM_CODEC, CableLimitMessage::handle);
-    reg.playToServer(CableFacadeMessage.TYPE, CableFacadeMessage.STREAM_CODEC, CableFacadeMessage::handle);
+    // BlockFacadeMessage is registered by flib itself under its own "flib" namespace, not here.
     reg.playToServer(KeybindCurioMessage.TYPE, KeybindCurioMessage.STREAM_CODEC, KeybindCurioMessage::handle);
     reg.playToServer(KeybindCollectorToggleMessage.TYPE, KeybindCollectorToggleMessage.STREAM_CODEC, KeybindCollectorToggleMessage::handle);
     reg.playToClient(StackRefreshClientMessage.TYPE, StackRefreshClientMessage.STREAM_CODEC, StackRefreshClientMessage::handle);

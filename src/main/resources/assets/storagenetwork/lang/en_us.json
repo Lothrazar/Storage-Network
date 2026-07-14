@@ -4,7 +4,7 @@
     "item.storagenetwork.network_book":"Network Guide Book",
     "storagenetwork.network_book.landing_text":"Simple storage network will manage all your inventories.  See $(l:gs_setup)Getting started$(/l) or look up an item ",
     "block.storagenetwork.kabel": "Network Cable",
-    "block.storagenetwork.kabel.guide": "Network cable basic only connects to network blocks",
+    "block.storagenetwork.kabel.guide": "Network cable basic only connects to network blocks. All cables accept facades: sneak + left-click with a block to apply it as a facade, or sneak + left-click with an empty hand to clear it.",
     "block.storagenetwork.storage_kabel": "Link Cable",
     "block.storagenetwork.storage_kabel.guide": "Each Link Cable connects one inventory to the network.  These are the main connection point for inventories in your network, with no controls for priority or automation.  Upgrade to  $(l:filter_kabel)Filtered version$(/l) ",
     "block.storagenetwork.export_kabel": "Export Cable",

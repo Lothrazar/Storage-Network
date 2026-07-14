@@ -3,6 +3,7 @@ package com.lothrazar.storagenetwork.block.cable;
 import java.util.Map;
 import com.google.common.collect.Maps;
 import com.lothrazar.library.block.EntityBlockFlib;
+import com.lothrazar.library.core.IBlockFacade;
 import com.lothrazar.library.data.ShapeCache;
 import com.lothrazar.storagenetwork.api.EnumConnectType;
 import com.lothrazar.storagenetwork.api.network.ConnectableNode;
@@ -40,7 +41,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBlock {
+public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBlock, IBlockFacade {
   public static final Logger LOGGER = LogManager.getLogger();
 
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -50,7 +51,8 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
     registerDefaultState(stateDefinition.any()
         .setValue(NORTH, EnumConnectType.NONE).setValue(EAST, EnumConnectType.NONE)
         .setValue(SOUTH, EnumConnectType.NONE).setValue(WEST, EnumConnectType.NONE)
-        .setValue(UP, EnumConnectType.NONE).setValue(DOWN, EnumConnectType.NONE).setValue(WATERLOGGED, false));
+        .setValue(UP, EnumConnectType.NONE).setValue(DOWN, EnumConnectType.NONE).setValue(WATERLOGGED, false)
+        .setValue(IBlockFacade.HAS_FACADE, false));
   }
 
   @Override
@@ -128,9 +130,9 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
   @Override
   public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
     if (ConfigRegistry.COMMON_CONFIG.isLoaded() && ConfigRegistry.enableFacades.get()) {
-      TileCable tile = TileCable.getTileCable(worldIn, pos);
-      if (tile != null && tile.getFacadeState() != null) {
-        return tile.getFacadeState().getShape(worldIn, pos, context);
+      VoxelShape facadeShape = getFacadeShape(state, worldIn, pos, context);
+      if (facadeShape != null) {
+        return facadeShape;
       }
     }
     return ShapeCache.getOrCreate(state, ShapeBuilder::createShape);
@@ -138,7 +140,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
 
   @Override
   public RenderShape getRenderShape(BlockState bs) {
-    return RenderShape.MODEL;
+    return bs.getValue(IBlockFacade.HAS_FACADE) ? RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
   }
 
   @Override
@@ -176,7 +178,7 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
   @Override
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
     super.createBlockStateDefinition(builder);
-    builder.add(UP, DOWN, NORTH, EAST, SOUTH, WEST, WATERLOGGED);
+    builder.add(UP, DOWN, NORTH, EAST, SOUTH, WEST, WATERLOGGED, IBlockFacade.HAS_FACADE);
   }
 
   @Override

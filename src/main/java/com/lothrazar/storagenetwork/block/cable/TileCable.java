@@ -1,12 +1,11 @@
 package com.lothrazar.storagenetwork.block.cable;
 
+import com.lothrazar.library.core.ITileFacade;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -16,10 +15,9 @@ import net.minecraft.world.level.block.state.BlockState;
  * Base class for TileCable
  *
  */
-public class TileCable extends TileConnectable {
+public class TileCable extends TileConnectable implements ITileFacade {
 
-  private static final String NBT_FACADE = "facade";
-  private CompoundTag facadeState = null;
+  private CompoundTag facade = null;
 
   public TileCable(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
     super(tileEntityTypeIn, pos, state);
@@ -32,22 +30,12 @@ public class TileCable extends TileConnectable {
   @Override
   protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
     super.loadAdditional(compound, registries);
-    if (compound.contains(NBT_FACADE)) {
-      setFacadeState(compound.getCompound(NBT_FACADE));
-    }
-    else {
-      setFacadeState(null);
-    }
+    loadFacade(compound);
   }
 
   @Override
   protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    if (facadeState == null) {
-      compound.remove(NBT_FACADE);
-    }
-    else {
-      compound.put(NBT_FACADE, facadeState);
-    }
+    saveFacade(compound);
     super.saveAdditional(compound, registries);
   }
 
@@ -60,14 +48,16 @@ public class TileCable extends TileConnectable {
   }
 
   public BlockState getFacadeState() {
-    if (level == null || facadeState == null || facadeState.isEmpty()) {
-      return null; // level is null on world load 
-    }
-    BlockState stateFound = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), facadeState);
-    return stateFound;
+    return getFacadeState(level); // level is null on world load, ITileFacade default handles that
   }
 
-  public void setFacadeState(CompoundTag facadeState) {
-    this.facadeState = facadeState;
+  @Override
+  public CompoundTag getFacade() {
+    return facade;
+  }
+
+  @Override
+  public void setFacade(CompoundTag facade) {
+    this.facade = facade;
   }
 }
