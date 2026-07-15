@@ -29,6 +29,12 @@ minecraft {
     replace "@VERSION@", "${mod_version}"
 }
 
+// this old ForgeGradle's asset downloader still uses plain HTTP, which Mojang's CDN now rejects (400) for
+// too many non-English/realms lang files. The client runs fine without them, so skip the task entirely
+// instead of spamming unsuppressable error lines (they're logged via SLF4J ERROR + a raw
+// stack trace, so no Gradle log-level flag can filter them).
+getAssets.enabled = false
+
 task signJar(type: SignJar, dependsOn: reobfJar) {
 
      // Skips if the keyStore property is missing.
