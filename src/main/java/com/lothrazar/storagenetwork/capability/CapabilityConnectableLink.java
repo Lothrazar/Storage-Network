@@ -48,6 +48,14 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
     return connectable == null ? null : connectable.getPos();
   }
 
+  @Override
+  public DimPos getTargetPos() {
+    if (inventoryFace == null || connectable == null || connectable.getPos() == null) {
+      return null;
+    }
+    return connectable.getPos().offset(inventoryFace);
+  }
+
   public FilterItemStackHandler getFilter() {
     return filters;
   }
