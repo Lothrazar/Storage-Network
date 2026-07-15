@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.state.properties.ChestType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -539,9 +541,16 @@ public class TileMain extends TileEntity implements ITickableTileEntity {
   }
 
   private Set<IConnectableLink> getConnectableStorage() {
+    // Deterministic order: sort by the connectable's own position so when two
+    // link cables aim at the same inventory we always pick the same winner
+    // (no flicker between refreshes).
+    List<DimPos> ordered = new ArrayList<>(getConnectablePositions());
+    ordered.sort(Comparator
+        .comparing((DimPos d) -> d.getDimension() == null ? "" : d.getDimension())
+        .thenComparingLong(d -> d.getBlockPos() == null ? 0L : d.getBlockPos().toLong()));
     Set<IConnectableLink> result = new HashSet<>();
-    Set<DimPos> connectablePositions = getConnectablePositions();
-    for (DimPos dimpos : connectablePositions) {
+    Set<DimPos> seenTargets = new HashSet<>();
+    for (DimPos dimpos : ordered) {
       if (!dimpos.isLoaded()) {
         continue;
       }
@@ -557,9 +566,45 @@ public class TileMain extends TileEntity implements ITickableTileEntity {
         StorageNetwork.log("keep going??main tile exhchange bandaid");
         //        continue;
       }
+      // Refuse a second storage cap that targets the same inventory another
+      // already-accepted cap is targeting. Handles two link cables on one chest
+      // and two link cables on the two halves of a double chest.
+      DimPos targetKey = canonicalTargetKey(capConnect);
+      if (targetKey != null && !seenTargets.add(targetKey)) {
+        continue;
+      }
       result.add(capConnect);
     }
     return result;
+  }
+
+  /**
+   * Stable key identifying the underlying inventory a storage link reads/writes. Returns the target
+   * DimPos, collapsing both halves of a vanilla double chest to the same canonical half. Returns null
+   * when the link isn't bound to an external neighbor (processing, auto-io, etc) so it is never
+   * deduped.
+   */
+  private static DimPos canonicalTargetKey(IConnectableLink link) {
+    DimPos target = link.getTargetPos();
+    if (target == null || target.getWorld() == null) {
+      return target;
+    }
+    try {
+      BlockState state = target.getBlockState();
+      if (state.getBlock() instanceof ChestBlock && state.hasProperty(ChestBlock.TYPE)) {
+        ChestType type = state.get(ChestBlock.TYPE);
+        if (type != ChestType.SINGLE) {
+          BlockPos here = target.getBlockPos();
+          BlockPos other = here.offset(ChestBlock.getDirectionToAttached(state));
+          BlockPos canonical = here.toLong() <= other.toLong() ? here : other;
+          return new DimPos(target.getWorld(), canonical);
+        }
+      }
+    }
+    catch (Exception e) {
+      // Defensive: chunk unloaded mid-refresh, etc. Fall through to raw target.
+    }
+    return target;
   }
 
   @Override

@@ -1,7 +1,7 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/simple-storage-network",
   "promos": {
-    "1.16.5-latest": "1.5.5"
+    "1.16.5-latest": "1.5.6"
   },
   "1.16.5": {
    	"1.0.1":"Ported to the latest forge version to fix rendering issues (tooltips, player models transparent, etc)"
@@ -25,5 +25,6 @@
   	,"1.5.3":"Fix  Curios and modifiers cause a crash #440 . "
   	,"1.5.4":"The Storage Request Table 'storagenetwork:request' block no longer saves the contents of its crafting-grid; instead items are returned to the player on close, exactly matching vanilla crafting table behavior  (this was changed to prevent potential exploits. If any items are left behind in the grid during world upgrade they will be returned and not lost. No changes were made to the remotes or to other blocks)  .   Fix the bug when using small window sizes where the top row of player inventory items getting inserted instead of picked up when using the remote when jei is installed.  Fixed a null pointer exception"
   	,"1.5.5":"Fix #564 Server in 1.16.5 crashes when using storage request table"
+    ,"1.5.6": "Backported fix from mc1.21.1: Fix items showing doubled in the terminal when two link cables (or a double chest with a cable on each half) connect to the same inventory (#84 #587 #590 #460 #399 #540)"
   }
 }
