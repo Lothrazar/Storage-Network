@@ -214,6 +214,14 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
     return filterDirection;
   }
 
+  @Override
+  public DimPos getTargetPos() {
+    if (inventoryFace == null || connectable == null || connectable.getPos() == null) {
+      return null;
+    }
+    return connectable.getPos().offset(inventoryFace);
+  }
+
   public void setInventoryFace(EnumFacing inventoryFace) {
     this.inventoryFace = inventoryFace;
   }

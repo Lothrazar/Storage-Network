@@ -1,6 +1,7 @@
 package mrriegel.storagenetwork.api.capability;
 
 import java.util.List;
+import mrriegel.storagenetwork.api.data.DimPos;
 import mrriegel.storagenetwork.api.data.EnumStorageDirection;
 import mrriegel.storagenetwork.api.data.IItemStackMatcher;
 import net.minecraft.item.ItemStack;
@@ -73,4 +74,15 @@ public interface IConnectableLink {
    * @return
    */
   int getEmptySlots();
+
+  /**
+   * The position of the external inventory this link reads/writes, if any. Used to detect when two links target the
+   * same underlying inventory (e.g. two link cables on one chest, or one on each half of a double chest) so the
+   * network doesn't double-count its contents.
+   *
+   * @return the target position, or null if this link isn't bound to an external neighbor
+   */
+  default DimPos getTargetPos() {
+    return null;
+  }
 }
