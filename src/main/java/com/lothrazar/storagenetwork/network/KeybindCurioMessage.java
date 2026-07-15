@@ -12,11 +12,13 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class KeybindCurioMessage implements CustomPacketPayload {
 
+  public static final KeybindCurioMessage INSTANCE = new KeybindCurioMessage();
+
   public static final CustomPacketPayload.Type<KeybindCurioMessage> TYPE =
       new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "keybind_curio"));
 
   public static final StreamCodec<FriendlyByteBuf, KeybindCurioMessage> STREAM_CODEC =
-      StreamCodec.unit(new KeybindCurioMessage());
+      StreamCodec.unit(INSTANCE);
 
   @Override
   public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

@@ -77,11 +77,11 @@ public class SsnEvents {
   @SubscribeEvent
   public void onKeyInput(InputEvent.Key event) {
     if (ClientEventRegistry.INVENTORY_KEY.consumeClick()) {
-      PacketDistributor.sendToServer(new KeybindCurioMessage());
+      PacketDistributor.sendToServer(KeybindCurioMessage.INSTANCE);
     }
 
     if (ClientEventRegistry.COLLECTOR_TOGGLE_KEY.consumeClick()) {
-      PacketDistributor.sendToServer(new KeybindCollectorToggleMessage());
+      PacketDistributor.sendToServer(KeybindCollectorToggleMessage.INSTANCE);
     }
   }
 }

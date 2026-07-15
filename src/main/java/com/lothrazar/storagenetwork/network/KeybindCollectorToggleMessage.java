@@ -13,11 +13,13 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class KeybindCollectorToggleMessage implements CustomPacketPayload {
 
+  public static final KeybindCollectorToggleMessage INSTANCE = new KeybindCollectorToggleMessage();
+
   public static final CustomPacketPayload.Type<KeybindCollectorToggleMessage> TYPE =
       new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "keybind_collector_toggle"));
 
   public static final StreamCodec<FriendlyByteBuf, KeybindCollectorToggleMessage> STREAM_CODEC =
-      StreamCodec.unit(new KeybindCollectorToggleMessage());
+      StreamCodec.unit(INSTANCE);
 
   @Override
   public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
