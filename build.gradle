@@ -49,12 +49,12 @@ task signJar(type: SignJar, dependsOn: reobfJar) {
 
 dependencies {
    deobfCompile "mezz.jei:jei_${mc_version}:${jei_version}"
-   deobfCompile "fastworkbench:FastWorkbench:${mc_version}:${fb_version}"
+   deobfCompile "curse.maven:fastworkbench-288885:${fb_file_id}"
 
-   deobfCompile "baubles:Baubles:1.12:${baubles_version}"
+   deobfCompile "com.azanor.baubles:Baubles:1.12-${baubles_version}"
    
 //  optional:
-   deobfCompile "compact-machines:compactmachines3-${mc_version}:${cm_version}:${cm_build}" 
+   deobfCompile "compact-machines:compactmachines3-${mc_version}:${cm_version}:${cm_build}"
 //   deobfCompile  "vazkii.patchouli:Patchouli:${patchouli_version}"
 }
 
@@ -66,9 +66,7 @@ repositories {
     maven { url "https://maven.blamejared.com/vazkii" }
     maven { url "https://minecraft.curseforge.com/api/maven/"    }
     maven { url 'https://www.cursemaven.com'  }
-    maven {   url "https://maven.thiakil.com/"    } 
-// ?? http://maven.thiakil.com/com/azanor/baubles/Baubles/
-    //   maven {   url "https://tehnut.info/maven/"    } // 404s
+    maven { url "https://maven.thiakil.com/"    }
 
 }
 
