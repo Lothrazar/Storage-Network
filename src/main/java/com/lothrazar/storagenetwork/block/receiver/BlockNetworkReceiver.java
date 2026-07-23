@@ -14,6 +14,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -34,8 +36,8 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class BlockNetworkReceiver extends EntityBlockFlib {
 
-  public BlockNetworkReceiver() {
-    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE));
+  public BlockNetworkReceiver(Identifier id) {
+    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
   }
 
   @Override

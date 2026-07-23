@@ -52,6 +52,8 @@ import com.lothrazar.storagenetwork.item.remote.ContainerNetworkExpandedRemote;
 import com.lothrazar.storagenetwork.item.remote.ContainerNetworkRemote;
 import com.lothrazar.storagenetwork.item.remote.ItemRemote;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -62,6 +64,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import java.util.function.UnaryOperator;
 
 public class SsnRegistry {
 
@@ -74,58 +77,58 @@ public class SsnRegistry {
 
     public static void init() {}
 
-    public static final DeferredBlock<Block> REQUEST = BLOCKS.register("request", () -> new BlockRequest());
-    public static final DeferredBlock<Block> KABEL = BLOCKS.register("kabel", () -> new BlockCable());
-    public static final DeferredBlock<Block> MASTER = BLOCKS.register("master", () -> new BlockMain());
-    public static final DeferredBlock<Block> STORAGE_KABEL = BLOCKS.register("storage_kabel", () -> new BlockCableLink());
-    public static final DeferredBlock<Block> IMPORT_KABEL = BLOCKS.register("import_kabel", () -> new BlockCableIO());
-    public static final DeferredBlock<Block> IMPORT_FILTER_KABEL = BLOCKS.register("import_filter_kabel", () -> new BlockCableImportFilter());
-    public static final DeferredBlock<Block> FILTER_KABEL = BLOCKS.register("filter_kabel", () -> new BlockCableFilter());
-    public static final DeferredBlock<Block> EXPORT_KABEL = BLOCKS.register("export_kabel", () -> new BlockCableExport());
-    public static final DeferredBlock<Block> PROCESS_KABEL = BLOCKS.register("process_kabel", () -> new BlockCableProcess());
-    public static final DeferredBlock<Block> INVENTORY = BLOCKS.register("inventory", () -> new BlockInventory());
-    public static final DeferredBlock<Block> REQUEST_EXPANDED = BLOCKS.register("request_expanded", () -> new BlockInventoryExpanded());
-    public static final DeferredBlock<Block> EXCHANGE = BLOCKS.register("exchange", () -> new BlockExchange());
-    public static final DeferredBlock<Block> COLLECTOR = BLOCKS.register("collector", () -> new BlockCollection());
-    public static final DeferredBlock<Block> CRADLE = BLOCKS.register("cradle", () -> new BlockCradle());
-    public static final DeferredBlock<Block> RECEIVER = BLOCKS.register("receiver", () -> new BlockNetworkReceiver());
-    public static final DeferredBlock<Block> DRAWER = BLOCKS.register("drawer", () -> new BlockDrawer());
+    public static final DeferredBlock<Block> REQUEST = BLOCKS.register("request", id -> new BlockRequest(id));
+    public static final DeferredBlock<Block> KABEL = BLOCKS.register("kabel", id -> new BlockCable(id));
+    public static final DeferredBlock<Block> MASTER = BLOCKS.register("master", id -> new BlockMain(id));
+    public static final DeferredBlock<Block> STORAGE_KABEL = BLOCKS.register("storage_kabel", id -> new BlockCableLink(id));
+    public static final DeferredBlock<Block> IMPORT_KABEL = BLOCKS.register("import_kabel", id -> new BlockCableIO(id));
+    public static final DeferredBlock<Block> IMPORT_FILTER_KABEL = BLOCKS.register("import_filter_kabel", id -> new BlockCableImportFilter(id));
+    public static final DeferredBlock<Block> FILTER_KABEL = BLOCKS.register("filter_kabel", id -> new BlockCableFilter(id));
+    public static final DeferredBlock<Block> EXPORT_KABEL = BLOCKS.register("export_kabel", id -> new BlockCableExport(id));
+    public static final DeferredBlock<Block> PROCESS_KABEL = BLOCKS.register("process_kabel", id -> new BlockCableProcess(id));
+    public static final DeferredBlock<Block> INVENTORY = BLOCKS.register("inventory", id -> new BlockInventory(id));
+    public static final DeferredBlock<Block> REQUEST_EXPANDED = BLOCKS.register("request_expanded", id -> new BlockInventoryExpanded(id));
+    public static final DeferredBlock<Block> EXCHANGE = BLOCKS.register("exchange", id -> new BlockExchange(id));
+    public static final DeferredBlock<Block> COLLECTOR = BLOCKS.register("collector", id -> new BlockCollection(id));
+    public static final DeferredBlock<Block> CRADLE = BLOCKS.register("cradle", id -> new BlockCradle(id));
+    public static final DeferredBlock<Block> RECEIVER = BLOCKS.register("receiver", id -> new BlockNetworkReceiver(id));
+    public static final DeferredBlock<Block> DRAWER = BLOCKS.register("drawer", id -> new BlockDrawer(id));
   }
 
   public static class Items {
 
     public static void init() {}
 
-    public static final DeferredItem<Item> REQUEST = ITEMS.register("request", () -> new BlockItem(Blocks.REQUEST.get(), new Item.Properties()));
-    public static final DeferredItem<Item> KABEL = ITEMS.register("kabel", () -> new BlockItem(Blocks.KABEL.get(), new Item.Properties()));
-    public static final DeferredItem<Item> INVENTORY = ITEMS.register("inventory", () -> new BlockItem(Blocks.INVENTORY.get(), new Item.Properties()));
-    public static final DeferredItem<Item> REQUEST_EXPANDED = ITEMS.register("request_expanded", () -> new BlockItem(Blocks.REQUEST_EXPANDED.get(), new Item.Properties()));
-    public static final DeferredItem<Item> MAS = ITEMS.register("master", () -> new BlockItem(Blocks.MASTER.get(), new Item.Properties()));
-    public static final DeferredItem<Item> SK = ITEMS.register("storage_kabel", () -> new BlockItem(Blocks.STORAGE_KABEL.get(), new Item.Properties()));
-    public static final DeferredItem<Item> IK = ITEMS.register("import_kabel", () -> new BlockItem(Blocks.IMPORT_KABEL.get(), new Item.Properties()));
-    public static final DeferredItem<Item> IFK = ITEMS.register("import_filter_kabel", () -> new BlockItem(Blocks.IMPORT_FILTER_KABEL.get(), new Item.Properties()));
-    public static final DeferredItem<Item> FK = ITEMS.register("filter_kabel", () -> new BlockItem(Blocks.FILTER_KABEL.get(), new Item.Properties()));
-    public static final DeferredItem<Item> EK = ITEMS.register("export_kabel", () -> new BlockItem(Blocks.EXPORT_KABEL.get(), new Item.Properties()));
-    public static final DeferredItem<Item> PK = ITEMS.register("process_kabel", () -> new BlockItem(Blocks.PROCESS_KABEL.get(), new Item.Properties()));
-    public static final DeferredItem<Item> EXCHANGE = ITEMS.register("exchange", () -> new BlockItem(Blocks.EXCHANGE.get(), new Item.Properties()));
-    public static final DeferredItem<Item> COL = ITEMS.register("collector", () -> new BlockItem(Blocks.COLLECTOR.get(), new Item.Properties()));
-    public static final DeferredItem<Item> CRADLE = ITEMS.register("cradle", () -> new BlockItem(Blocks.CRADLE.get(), new Item.Properties()));
-    public static final DeferredItem<Item> DRAWER = ITEMS.register("drawer", () -> new BlockItem(Blocks.DRAWER.get(), new Item.Properties()));
-    public static final DeferredItem<Item> RECEIVER = ITEMS.register("receiver", () -> new BlockItem(Blocks.RECEIVER.get(), new Item.Properties()));
-    public static final DeferredItem<ItemUpgrade> STACK_UPGRADE = ITEMS.register("stack_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<ItemUpgrade> SPEED_UPGRADE = ITEMS.register("speed_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<ItemUpgrade> SLOW_UPGRADE = ITEMS.register("slow_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<ItemUpgrade> STOCK_UPGRADE = ITEMS.register("stock_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<ItemUpgrade> OP_U = ITEMS.register("operation_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<ItemUpgrade> SINGLE_UPGRADE = ITEMS.register("single_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<ItemUpgrade> VOID_UPGRADE = ITEMS.register("void_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<ItemUpgrade> CHUNKLOAD_UPGRADE = ITEMS.register("chunkload_upgrade", () -> new ItemUpgrade(new Item.Properties()));
-    public static final DeferredItem<ItemRemote> INVENTORY_REMOTE = ITEMS.register("inventory_remote", () -> new ItemRemote(new Item.Properties()));
-    public static final DeferredItem<ItemRemote> CRAFTING_REMOTE = ITEMS.register("crafting_remote", () -> new ItemRemote(new Item.Properties()));
-    public static final DeferredItem<Item> PICKER_REMOTE = ITEMS.register("picker_remote", () -> new ItemPicker(new Item.Properties()));
-    public static final DeferredItem<ItemCollector> COLLECTOR_REMOTE = ITEMS.register("collector_remote", () -> new ItemCollector(new Item.Properties()));
-    public static final DeferredItem<Item> BUILDER_REMOTE = ITEMS.register("builder_remote", () -> new ItemBuilder(new Item.Properties()));
-    public static final DeferredItem<ItemRemote> EXPANDED_REMOTE = ITEMS.register("expanded_remote", () -> new ItemRemote(new Item.Properties()));
+    public static final DeferredItem<BlockItem> REQUEST = ITEMS.registerSimpleBlockItem("request", Blocks.REQUEST, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> KABEL = ITEMS.registerSimpleBlockItem("kabel", Blocks.KABEL, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> INVENTORY = ITEMS.registerSimpleBlockItem("inventory", Blocks.INVENTORY, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> REQUEST_EXPANDED = ITEMS.registerSimpleBlockItem("request_expanded", Blocks.REQUEST_EXPANDED, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> MAS = ITEMS.registerSimpleBlockItem("master", Blocks.MASTER, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> SK = ITEMS.registerSimpleBlockItem("storage_kabel", Blocks.STORAGE_KABEL, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> IK = ITEMS.registerSimpleBlockItem("import_kabel", Blocks.IMPORT_KABEL, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> IFK = ITEMS.registerSimpleBlockItem("import_filter_kabel", Blocks.IMPORT_FILTER_KABEL, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> FK = ITEMS.registerSimpleBlockItem("filter_kabel", Blocks.FILTER_KABEL, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> EK = ITEMS.registerSimpleBlockItem("export_kabel", Blocks.EXPORT_KABEL, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> PK = ITEMS.registerSimpleBlockItem("process_kabel", Blocks.PROCESS_KABEL, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> EXCHANGE = ITEMS.registerSimpleBlockItem("exchange", Blocks.EXCHANGE, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> COL = ITEMS.registerSimpleBlockItem("collector", Blocks.COLLECTOR, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> CRADLE = ITEMS.registerSimpleBlockItem("cradle", Blocks.CRADLE, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> DRAWER = ITEMS.registerSimpleBlockItem("drawer", Blocks.DRAWER, UnaryOperator.identity());
+    public static final DeferredItem<BlockItem> RECEIVER = ITEMS.registerSimpleBlockItem("receiver", Blocks.RECEIVER, UnaryOperator.identity());
+    public static final DeferredItem<ItemUpgrade> STACK_UPGRADE = ITEMS.register("stack_upgrade", id -> new ItemUpgrade(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemUpgrade> SPEED_UPGRADE = ITEMS.register("speed_upgrade", id -> new ItemUpgrade(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemUpgrade> SLOW_UPGRADE = ITEMS.register("slow_upgrade", id -> new ItemUpgrade(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemUpgrade> STOCK_UPGRADE = ITEMS.register("stock_upgrade", id -> new ItemUpgrade(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemUpgrade> OP_U = ITEMS.register("operation_upgrade", id -> new ItemUpgrade(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemUpgrade> SINGLE_UPGRADE = ITEMS.register("single_upgrade", id -> new ItemUpgrade(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemUpgrade> VOID_UPGRADE = ITEMS.register("void_upgrade", id -> new ItemUpgrade(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemUpgrade> CHUNKLOAD_UPGRADE = ITEMS.register("chunkload_upgrade", id -> new ItemUpgrade(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemRemote> INVENTORY_REMOTE = ITEMS.register("inventory_remote", id -> new ItemRemote(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemRemote> CRAFTING_REMOTE = ITEMS.register("crafting_remote", id -> new ItemRemote(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<Item> PICKER_REMOTE = ITEMS.register("picker_remote", id -> new ItemPicker(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemCollector> COLLECTOR_REMOTE = ITEMS.register("collector_remote", id -> new ItemCollector(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<Item> BUILDER_REMOTE = ITEMS.register("builder_remote", id -> new ItemBuilder(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
+    public static final DeferredItem<ItemRemote> EXPANDED_REMOTE = ITEMS.register("expanded_remote", id -> new ItemRemote(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))));
   }
 
   public static class Tiles {

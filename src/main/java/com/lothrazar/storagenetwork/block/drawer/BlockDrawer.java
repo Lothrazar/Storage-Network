@@ -14,6 +14,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -56,8 +57,8 @@ public class BlockDrawer extends EntityBlockFlib {
   // Imprint is stored in the BlockItem's CUSTOM_DATA under this key (Item registry name).
   public static final String NBT_LOCKED_ITEM = "drawer_locked_item";
 
-  public BlockDrawer() {
-    super(Block.Properties.of().strength(5.0F, 1200.0F).sound(SoundType.STONE));
+  public BlockDrawer(Identifier id) {
+    super(Block.Properties.of().strength(5.0F, 1200.0F).sound(SoundType.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
     this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
   }
 

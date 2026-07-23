@@ -3,6 +3,9 @@ package com.lothrazar.storagenetwork.block.request;
 import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.storagenetwork.network.SortClientMessage;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -19,8 +22,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public class BlockRequest extends EntityBlockFlib {
 
-  public BlockRequest() {
-    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE));
+  public BlockRequest(Identifier id) {
+    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
   }
 
   @Override

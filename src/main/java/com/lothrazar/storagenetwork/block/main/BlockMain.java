@@ -9,7 +9,10 @@ import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,8 +30,8 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockMain extends EntityBlockFlib {
 
-  public BlockMain() {
-    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE));
+  public BlockMain(Identifier id) {
+    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
   }
 
   @Override

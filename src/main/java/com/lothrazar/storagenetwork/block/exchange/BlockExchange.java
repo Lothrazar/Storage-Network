@@ -5,7 +5,10 @@ import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -20,8 +23,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockExchange extends EntityBlockFlib {
 
-  public BlockExchange() {
-    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE));
+  public BlockExchange(Identifier id) {
+    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
   }
 
   @Override

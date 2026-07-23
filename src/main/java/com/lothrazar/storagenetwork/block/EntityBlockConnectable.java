@@ -3,6 +3,9 @@ package com.lothrazar.storagenetwork.block;
 import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.storagenetwork.network.SortClientMessage;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,8 +24,8 @@ public abstract class EntityBlockConnectable extends EntityBlockFlib {
 
   protected boolean hasGui = true;
 
-  public EntityBlockConnectable() {
-    this(Block.Properties.of().strength(0.5F).sound(SoundType.STONE));
+  public EntityBlockConnectable(Identifier id) {
+    this(Block.Properties.of().strength(0.5F).sound(SoundType.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
   }
 
   public EntityBlockConnectable(BlockBehaviour.Properties p) {

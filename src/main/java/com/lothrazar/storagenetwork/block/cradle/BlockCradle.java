@@ -4,7 +4,10 @@ import java.util.List;
 import com.lothrazar.library.block.EntityBlockFlib;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -24,8 +27,8 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockCradle extends EntityBlockFlib {
 
-  public BlockCradle() {
-    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE));
+  public BlockCradle(Identifier id) {
+    super(Block.Properties.of().strength(0.5F).sound(SoundType.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
   }
 
   @Override

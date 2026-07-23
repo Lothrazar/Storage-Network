@@ -3,6 +3,7 @@ package com.lothrazar.storagenetwork.block.cable.linkfilter;
 import com.lothrazar.storagenetwork.block.cable.BlockCable;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -17,8 +18,8 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockCableFilter extends BlockCable {
 
-  public BlockCableFilter() {
-    super();
+  public BlockCableFilter(Identifier id) {
+    super(id);
   }
 
   @Override

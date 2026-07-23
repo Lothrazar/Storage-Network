@@ -9,13 +9,13 @@ import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
 import com.lothrazar.storagenetwork.network.RecipeMessage;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import dev.emi.emi.api.recipe.EmiPlayerInventory;
-import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
-import dev.emi.emi.api.recipe.handler.EmiCraftContext;
-import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
-import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
+//import dev.emi.emi.api.recipe.EmiPlayerInventory;
+//import dev.emi.emi.api.recipe.EmiRecipe;
+//import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+//import dev.emi.emi.api.recipe.handler.EmiCraftContext;
+//import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
+//import dev.emi.emi.api.stack.EmiIngredient;
+//import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.HolderLookup;
@@ -27,89 +27,89 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class EmiTransferHandler<T extends ContainerNetwork> implements StandardRecipeHandler<T> {
-
-  @Override
-  public List<Slot> getInputSources(T handler) {
-    return null;
-  }
-
-  @Override
-  public List<Slot> getCraftingSlots(T handler) {
-    return null;
-  }
-
-  @Override
-  public @Nullable Slot getOutputSlot(T handler) {
-    return handler.getResultSlot();
-  }
-
-  @Override
-  public EmiPlayerInventory getInventory(AbstractContainerScreen<T> screen) {
-    List<EmiStack> stacks = new ArrayList<>();
-    if (screen instanceof GuiNetwork s) {
-      var main = s.getNetwork();
-      if (main != null) {
-        List<ItemStack> networkStacks = main.getStacks();
-        networkStacks.stream().map(EmiStack::of).forEach(stacks::add);
-      }
-    }
-    for (Slot each : screen.getMenu().getPlayerSlots()) {
-      EmiStack emiStack = EmiStack.of(each.getItem());
-      stacks.add(emiStack);
-    }
-    return new EmiPlayerInventory(stacks);
-  }
-
-  @Override
-  public boolean supportsRecipe(EmiRecipe recipe) {
-    return recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING && recipe.supportsRecipeTree();
-  }
-
-  @Override
-  public boolean craft(EmiRecipe recipe, EmiCraftContext<T> context) {
-    AbstractContainerScreen<T> screen = context.getScreen();
-    CompoundTag nbt = buildRecipe(recipe, screen);
-    ClientPacketDistributor.sendToServer(new RecipeMessage(nbt));
-    Minecraft.getInstance().setScreen(screen);
-    return true;
-  }
-
-  private CompoundTag buildRecipe(EmiRecipe recipe, AbstractContainerScreen<T> screen) {
-    CompoundTag nbt = new CompoundTag();
-    List<EmiIngredient> ingredients = recipe.getInputs();
-    for (Slot slot : screen.getMenu().slots) {
-      if (slot.container instanceof CraftingContainer) {
-        if (slot.getSlotIndex() > ingredients.size() - 1) {
-          continue;
-        }
-        EmiIngredient slotIngredient = ingredients.get(slot.getSlotIndex());
-        if (slotIngredient == null) {
-          continue;
-        }
-        List<ItemStack> possibleItems = new ArrayList<>();
-        for (EmiStack each : slotIngredient.getEmiStacks()) {
-          ItemStack stack = each.getItemStack();
-          possibleItems.add(stack);
-        }
-        if (possibleItems.isEmpty()) {
-          continue;
-        }
-        HolderLookup.Provider registries = Minecraft.getInstance().level.registryAccess();
-        ListTag invList = new ListTag();
-        for (int i = 0; i < possibleItems.size(); i++) {
-          if (i >= ConfigRegistry.RECIPEMAXTAGS.get()) {
-            break;
-          }
-          ItemStack itemStack = possibleItems.get(i);
-          if (!itemStack.isEmpty()) {
-            Tag stackTag = ItemStack.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), itemStack).getOrThrow();
-            invList.add(stackTag);
-          }
-        }
-        nbt.put("s" + (slot.getSlotIndex()), invList);
-      }
-    }
-    return nbt;
-  }
-}
+//public class EmiTransferHandler<T extends ContainerNetwork> implements StandardRecipeHandler<T> {
+//
+//  @Override
+//  public List<Slot> getInputSources(T handler) {
+//    return null;
+//  }
+//
+//  @Override
+//  public List<Slot> getCraftingSlots(T handler) {
+//    return null;
+//  }
+//
+//  @Override
+//  public @Nullable Slot getOutputSlot(T handler) {
+//    return handler.getResultSlot();
+//  }
+//
+//  @Override
+//  public EmiPlayerInventory getInventory(AbstractContainerScreen<T> screen) {
+//    List<EmiStack> stacks = new ArrayList<>();
+//    if (screen instanceof GuiNetwork s) {
+//      var main = s.getNetwork();
+//      if (main != null) {
+//        List<ItemStack> networkStacks = main.getStacks();
+//        networkStacks.stream().map(EmiStack::of).forEach(stacks::add);
+//      }
+//    }
+//    for (Slot each : screen.getMenu().getPlayerSlots()) {
+//      EmiStack emiStack = EmiStack.of(each.getItem());
+//      stacks.add(emiStack);
+//    }
+//    return new EmiPlayerInventory(stacks);
+//  }
+//
+//  @Override
+//  public boolean supportsRecipe(EmiRecipe recipe) {
+//    return recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING && recipe.supportsRecipeTree();
+//  }
+//
+//  @Override
+//  public boolean craft(EmiRecipe recipe, EmiCraftContext<T> context) {
+//    AbstractContainerScreen<T> screen = context.getScreen();
+//    CompoundTag nbt = buildRecipe(recipe, screen);
+//    ClientPacketDistributor.sendToServer(new RecipeMessage(nbt));
+//    Minecraft.getInstance().setScreen(screen);
+//    return true;
+//  }
+//
+//  private CompoundTag buildRecipe(EmiRecipe recipe, AbstractContainerScreen<T> screen) {
+//    CompoundTag nbt = new CompoundTag();
+//    List<EmiIngredient> ingredients = recipe.getInputs();
+//    for (Slot slot : screen.getMenu().slots) {
+//      if (slot.container instanceof CraftingContainer) {
+//        if (slot.getSlotIndex() > ingredients.size() - 1) {
+//          continue;
+//        }
+//        EmiIngredient slotIngredient = ingredients.get(slot.getSlotIndex());
+//        if (slotIngredient == null) {
+//          continue;
+//        }
+//        List<ItemStack> possibleItems = new ArrayList<>();
+//        for (EmiStack each : slotIngredient.getEmiStacks()) {
+//          ItemStack stack = each.getItemStack();
+//          possibleItems.add(stack);
+//        }
+//        if (possibleItems.isEmpty()) {
+//          continue;
+//        }
+//        HolderLookup.Provider registries = Minecraft.getInstance().level.registryAccess();
+//        ListTag invList = new ListTag();
+//        for (int i = 0; i < possibleItems.size(); i++) {
+//          if (i >= ConfigRegistry.RECIPEMAXTAGS.get()) {
+//            break;
+//          }
+//          ItemStack itemStack = possibleItems.get(i);
+//          if (!itemStack.isEmpty()) {
+//            Tag stackTag = ItemStack.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), itemStack).getOrThrow();
+//            invList.add(stackTag);
+//          }
+//        }
+//        nbt.put("s" + (slot.getSlotIndex()), invList);
+//      }
+//    }
+//    return nbt;
+//  }
+//}

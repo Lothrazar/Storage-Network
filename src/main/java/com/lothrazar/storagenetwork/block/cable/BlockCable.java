@@ -15,6 +15,9 @@ import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
 import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -48,8 +51,8 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
 
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-  public BlockCable() {
-    super(Block.Properties.of().strength(0.2F));
+  public BlockCable(Identifier id) {
+    super(Block.Properties.of().strength(0.2F).setId(ResourceKey.create(Registries.BLOCK, id)));
     registerDefaultState(stateDefinition.any()
         .setValue(NORTH, EnumConnectType.NONE).setValue(EAST, EnumConnectType.NONE)
         .setValue(SOUTH, EnumConnectType.NONE).setValue(WEST, EnumConnectType.NONE)
