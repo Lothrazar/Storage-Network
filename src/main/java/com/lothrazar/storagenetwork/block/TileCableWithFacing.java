@@ -7,10 +7,10 @@ import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.block.cable.CableHelpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class TileCableWithFacing extends TileCable {
 
@@ -58,21 +58,17 @@ public class TileCableWithFacing extends TileCable {
   }
 
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.loadAdditional(compound, registries);
-    if (compound.contains("direction")) {
-      this.direction = Direction.values()[(compound.getInt("direction"))];
-    }
-    else {
-      this.direction = null;
-    }
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
+    Integer dirOrdinal = input.getInt("direction").orElse(null);
+    this.direction = dirOrdinal != null ? Direction.values()[dirOrdinal] : null;
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.saveAdditional(compound, registries);
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
     if (direction != null) {
-      compound.putInt("direction", this.direction.ordinal());
+      output.putInt("direction", this.direction.ordinal());
     }
   }
 }

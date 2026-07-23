@@ -12,7 +12,7 @@ import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExport;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExportDefault;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.StorageNetworkCapabilities;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
@@ -21,7 +21,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -74,32 +76,8 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
     return false;
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-    if (state.getBlock() != newState.getBlock()) {
-      IItemHandler items = worldIn.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
-      if (items != null) {
-        for (int i = 0; i < items.getSlots(); ++i) {
-          Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), items.getStackInSlot(i));
-        }
-        worldIn.updateNeighbourForOutputSignal(pos, this);
-      }
-      CapabilityImportExport connectable = worldIn.getCapability(StorageNetworkCapabilities.CONNECTABLE_AUTO_IO, pos, null);
-      if (connectable instanceof CapabilityImportExportDefault filterCable) {
-        for (int i = 0; i < filterCable.upgrades.getSlots(); ++i) {
-          Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), filterCable.upgrades.getStackInSlot(i));
-        }
-        worldIn.updateNeighbourForOutputSignal(pos, this);
-      }
-      // Release any chunkload ticket this cable was holding.
-      BlockEntity be = worldIn.getBlockEntity(pos);
-      if (be instanceof TileConnectable tc) {
-        tc.releaseChunkTicket();
-      }
-      super.onRemove(state, worldIn, pos, newState, isMoving);
-    }
-  }
+  // Block#onRemove is gone in 26.1; this cleanup now lives in TileCable#preRemoveSideEffects,
+  // which the game calls at the equivalent point in the block-removal sequence.
 
   public static BlockState cleanBlockState(BlockState state) {
     for (Direction d : Direction.values()) {
@@ -140,7 +118,10 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
 
   @Override
   public RenderShape getRenderShape(BlockState bs) {
-    return bs.getValue(IBlockFacade.HAS_FACADE) ? RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
+    // RenderShape.ENTITYBLOCK_ANIMATED is gone in 26.1 (enum is now just INVISIBLE/MODEL); the
+    // block-entity renderer now runs independently of this value whenever one is registered, so
+    // the facade case no longer needs a distinct render shape - the static model always renders.
+    return RenderShape.MODEL;
   }
 
   @Override
@@ -182,7 +163,8 @@ public class BlockCable extends EntityBlockFlib implements SimpleWaterloggedBloc
   }
 
   @Override
-  public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor world, BlockPos currentPos, BlockPos facingPos) {
+  public BlockState updateShape(BlockState stateIn, LevelReader world, ScheduledTickAccess ticks, BlockPos currentPos,
+      Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random) {
     EnumProperty<EnumConnectType> property = FACING_TO_PROPERTY_MAP.get(facing);
     if (CableHelpers.isCableOverride(facingState)) {
       return stateIn.setValue(property, EnumConnectType.CABLE);

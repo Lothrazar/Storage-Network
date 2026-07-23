@@ -1,9 +1,10 @@
 package com.lothrazar.storagenetwork.api;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * Reusable holder for a single vanilla FORCED chunk ticket. Encapsulates the
@@ -48,7 +49,7 @@ public class ChunkLoadingTicket {
     if (isNewlyHeld) {
       held = true;
       chunkPos = cp;
-      dim = sl.dimension().location().toString();
+      dim = sl.dimension().identifier().toString();
     }
     return isNewlyHeld;
   }
@@ -80,25 +81,22 @@ public class ChunkLoadingTicket {
     dim = null;
   }
 
-  public void save(CompoundTag tag, String heldKey, String dimKey, String chunkXKey, String chunkZKey) {
-    tag.putBoolean(heldKey, held);
+  public void save(ValueOutput output, String heldKey, String dimKey, String chunkXKey, String chunkZKey) {
+    output.putBoolean(heldKey, held);
     if (dim != null) {
-      tag.putString(dimKey, dim);
+      output.putString(dimKey, dim);
     }
     if (chunkPos != null) {
-      tag.putInt(chunkXKey, chunkPos.x);
-      tag.putInt(chunkZKey, chunkPos.z);
+      output.putInt(chunkXKey, chunkPos.x());
+      output.putInt(chunkZKey, chunkPos.z());
     }
   }
 
-  public void load(CompoundTag tag, String heldKey, String dimKey, String chunkXKey, String chunkZKey) {
-    held = tag.getBoolean(heldKey);
-    dim = tag.contains(dimKey) ? tag.getString(dimKey) : null;
-    if (tag.contains(chunkXKey) && tag.contains(chunkZKey)) {
-      chunkPos = new ChunkPos(tag.getInt(chunkXKey), tag.getInt(chunkZKey));
-    }
-    else {
-      chunkPos = null;
-    }
+  public void load(ValueInput input, String heldKey, String dimKey, String chunkXKey, String chunkZKey) {
+    held = input.getBooleanOr(heldKey, false);
+    dim = input.getStringOr(dimKey, null);
+    Integer x = input.getInt(chunkXKey).orElse(null);
+    Integer z = input.getInt(chunkZKey).orElse(null);
+    chunkPos = (x != null && z != null) ? new ChunkPos(x, z) : null;
   }
 }

@@ -10,7 +10,7 @@ import com.lothrazar.storagenetwork.util.SsnConsts;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
@@ -20,7 +20,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 public class RequestMessage implements CustomPacketPayload {
 
   public static final CustomPacketPayload.Type<RequestMessage> TYPE =
-      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "request"));
+      new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "request"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, RequestMessage> STREAM_CODEC = StreamCodec.of(
       RequestMessage::write,

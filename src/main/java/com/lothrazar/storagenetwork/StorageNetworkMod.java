@@ -63,7 +63,7 @@ public class StorageNetworkMod {
     SsnRegistry.TILES.register(modEventBus);
     SsnRegistry.Menus.init();
     SsnRegistry.CONTAINERS.register(modEventBus);
-    if (FMLEnvironment.dist == Dist.CLIENT) {
+    if (FMLEnvironment.getDist() == Dist.CLIENT) {
       modEventBus.register(ClientEventRegistry.class);
       modEventBus.addListener(this::setupClient);
       modEventBus.addListener(this::registerScreens);

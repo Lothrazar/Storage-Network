@@ -4,7 +4,7 @@ import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.block.AbstractNetworkScreen;
 import com.lothrazar.storagenetwork.api.gui.NetworkScreenSize;
 import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -16,14 +16,20 @@ public class ScreenNetworkExpandedRemote extends AbstractNetworkScreen<Container
   private final ItemStack remote;
 
   public ScreenNetworkExpandedRemote(ContainerNetworkExpandedRemote screenContainer, Inventory inv, Component titleIn) {
-    super(screenContainer, inv, titleIn);
+    super(screenContainer, inv, titleIn, computeWidth(), computeHeight());
     //since the rightclick action forces only MAIN_HAND openings, is ok
     this.remote = screenContainer.getRemote();
     network = new DefaultNetworkWidget(this, NetworkScreenSize.EXPANDED);
-    imageHeight = DefaultNetworkWidget.player.height() + DefaultNetworkWidget.crafting.height()
-        + DefaultNetworkWidget.row.height() * network.getSize().lines()
+  }
+
+  private static int computeWidth() {
+    return 256 + 12 * 18; //scrollWidth
+  }
+
+  private static int computeHeight() {
+    return DefaultNetworkWidget.player.height() + DefaultNetworkWidget.crafting.height()
+        + DefaultNetworkWidget.row.height() * NetworkScreenSize.EXPANDED.lines()
         + DefaultNetworkWidget.head.height();
-    imageWidth = 256 + 12 * 18;//scrollWidth
   }
 
   @Override
@@ -44,7 +50,8 @@ public class ScreenNetworkExpandedRemote extends AbstractNetworkScreen<Container
   }
 
   @Override
-  protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
+  public void extractBackground(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractBackground(ms, mouseX, mouseY, partialTicks);
     final int xCenter = (this.width - this.imageWidth) / 2;
     final int yCenter = (this.height - this.imageHeight) / 2;
     network.renderBgExpanded(ms, xCenter, yCenter);

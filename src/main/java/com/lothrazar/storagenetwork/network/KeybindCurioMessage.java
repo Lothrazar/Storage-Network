@@ -5,7 +5,7 @@ import com.lothrazar.storagenetwork.item.remote.RemoteHelpers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -15,7 +15,7 @@ public class KeybindCurioMessage implements CustomPacketPayload {
   public static final KeybindCurioMessage INSTANCE = new KeybindCurioMessage();
 
   public static final CustomPacketPayload.Type<KeybindCurioMessage> TYPE =
-      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "keybind_curio"));
+      new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "keybind_curio"));
 
   public static final StreamCodec<FriendlyByteBuf, KeybindCurioMessage> STREAM_CODEC =
       StreamCodec.unit(INSTANCE);

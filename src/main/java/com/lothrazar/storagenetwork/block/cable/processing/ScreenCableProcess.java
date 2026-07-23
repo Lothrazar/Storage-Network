@@ -1,5 +1,6 @@
 package com.lothrazar.storagenetwork.block.cable.processing;
 
+import net.minecraft.client.Minecraft;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,16 +15,18 @@ import com.lothrazar.storagenetwork.network.CableProcessMessage;
 import com.lothrazar.storagenetwork.network.CableProcessMessage.ProcessMessageType;
 import com.lothrazar.storagenetwork.registry.ClientEventRegistry;
 import com.lothrazar.storagenetwork.util.SsnConsts;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public class ScreenCableProcess extends AbstractContainerScreen<ContainerCableProcess> implements GuiPrivate {
 
@@ -36,7 +39,7 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
   private static final int GRID_Y = 36;
   private static final int FACE_Y = GRID_Y + 3 * SLOT_SIZE + 4; // 94
 
-  private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable_process.png");
+  private final Identifier texture = Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable_process.png");
   private final ContainerCableProcess container;
   private List<ItemSlotNetwork> inputSlots;
   private List<ItemSlotNetwork> outputSlots;
@@ -50,10 +53,8 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
   private ButtonRequest btnPlus;
 
   public ScreenCableProcess(ContainerCableProcess container, Inventory inv, Component name) {
-    super(container, inv, name);
+    super(container, inv, name, 176, 200);
     this.container = container;
-    this.imageWidth = 176;
-    this.imageHeight = 200;
   }
 
   @Override
@@ -71,13 +72,13 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
     }, DEFAULT_NARRATION));
     btnMinus = addRenderableWidget(new ButtonRequest(leftPos + 64, topPos + 4, "", p -> {
       ProcessRequestModel m = container.tile.getProcessModel();
-      int next = Math.max(0, m.getCount() - (hasShiftDown() ? 10 : 1));
+      int next = Math.max(0, m.getCount() - (Minecraft.getInstance().hasShiftDown() ? 10 : 1));
       send(ProcessMessageType.SET_COUNT, next, ItemStack.EMPTY);
     }, DEFAULT_NARRATION));
     btnMinus.setTextureId(TextureEnum.MINUS);
     btnPlus = addRenderableWidget(new ButtonRequest(leftPos + 116, topPos + 4, "", p -> {
       ProcessRequestModel m = container.tile.getProcessModel();
-      int next = m.getCount() + (hasShiftDown() ? 10 : 1);
+      int next = m.getCount() + (Minecraft.getInstance().hasShiftDown() ? 10 : 1);
       send(ProcessMessageType.SET_COUNT, next, ItemStack.EMPTY);
     }, DEFAULT_NARRATION));
     btnPlus.setTextureId(TextureEnum.PLUS);
@@ -101,14 +102,12 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
   }
 
   private void send(ProcessMessageType type, int value, ItemStack stack) {
-    PacketDistributor.sendToServer(new CableProcessMessage(type.ordinal(), value, stack));
+    ClientPacketDistributor.sendToServer(new CableProcessMessage(type.ordinal(), value, stack));
   }
 
   @Override
-  public void render(GuiGraphics ms, int mouseX, int mouseY, float partialTicks) {
-    renderBackground(ms, mouseX, mouseY, partialTicks);
-    super.render(ms, mouseX, mouseY, partialTicks);
-    this.renderTooltip(ms, mouseX, mouseY);
+  public void extractRenderState(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractRenderState(ms, mouseX, mouseY, partialTicks);
     btnRedstone.setTextureId(container.cap.needsRedstone() ? TextureEnum.REDSTONETRUE : TextureEnum.REDSTONEFALSE);
     ProcessRequestModel m = container.tile.getProcessModel();
     btnAlways.setMessage(Component.literal(m.isAlwaysActive() ? "A" : "N"));
@@ -123,25 +122,26 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
   }
 
   @Override
-  public void renderLabels(GuiGraphics ms, int mouseX, int mouseY) {
+  protected void extractLabels(GuiGraphicsExtractor ms, int mouseX, int mouseY) {
     ProcessRequestModel m = container.tile.getProcessModel();
     // count label centered between - and + buttons (between x=80 and x=116)
     String countLabel = m.isAlwaysActive() ? "INF" : String.valueOf(m.getCount());
-    ms.drawString(font, countLabel, 98 - font.width(countLabel) / 2, 8, FONT);
+    ms.text(font, countLabel, 98 - font.width(countLabel) / 2, 8, FONT);
     // status: y=24 sits just above the grid at y=36
     String status = m.getStatus().name();
-    ms.drawString(font, status, 8, 24, FONT);
+    ms.text(font, status, 8, 24, FONT);
     // face labels under each grid
-    ms.drawString(font, "In", INPUT_X, FACE_Y + 4, FONT);
-    ms.drawString(font, "Out", OUTPUT_X, FACE_Y + 4, FONT);
+    ms.text(font, "In", INPUT_X, FACE_Y + 4, FONT);
+    ms.text(font, "Out", OUTPUT_X, FACE_Y + 4, FONT);
   }
 
   @Override
-  protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
+  public void extractBackground(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
     // background sheet (200x176 - see textures/gui/cable_process.png)
-    ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
     // slot frames behind ghost items
     drawSlotFrames(ms, INPUT_X);
     drawSlotFrames(ms, OUTPUT_X);
@@ -149,18 +149,18 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
     outputSlots = buildGhostGrid(ms, container.cap.getFiltersOut(), OUTPUT_X, mouseX, mouseY);
   }
 
-  private void drawSlotFrames(GuiGraphics ms, int x0) {
+  private void drawSlotFrames(GuiGraphicsExtractor ms, int x0) {
     for (int row = 0; row < 3; row++) {
       for (int col = 0; col < 3; col++) {
         int x = leftPos + x0 + col * SLOT_SIZE;
         int y = topPos + GRID_Y + row * SLOT_SIZE;
         // slot.png is 18x18; draw at (x-1, y-1) so 16x16 item sits centered inside the frame
-        ms.blit(ClientEventRegistry.SLOT, x - 1, y - 1, 0, 0, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE);
+        ms.blit(RenderPipelines.GUI_TEXTURED, ClientEventRegistry.SLOT, x - 1, y - 1, 0, 0, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE, SLOT_SIZE);
       }
     }
   }
 
-  private List<ItemSlotNetwork> buildGhostGrid(GuiGraphics ms, FilterItemStackHandler handler, int x0, int mouseX, int mouseY) {
+  private List<ItemSlotNetwork> buildGhostGrid(GuiGraphicsExtractor ms, FilterItemStackHandler handler, int x0, int mouseX, int mouseY) {
     List<ItemSlotNetwork> list = new ArrayList<>();
     int index = 0;
     for (int row = 0; row < 3; row++) {
@@ -180,24 +180,24 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
     return list;
   }
 
-  private void drawGhostTooltips(GuiGraphics ms, int mouseX, int mouseY) {
+  private void drawGhostTooltips(GuiGraphicsExtractor ms, int mouseX, int mouseY) {
     drawGhostTooltips(ms, inputSlots, mouseX, mouseY);
     drawGhostTooltips(ms, outputSlots, mouseX, mouseY);
   }
 
-  private void drawGhostTooltips(GuiGraphics ms, List<ItemSlotNetwork> slots, int mouseX, int mouseY) {
+  private void drawGhostTooltips(GuiGraphicsExtractor ms, List<ItemSlotNetwork> slots, int mouseX, int mouseY) {
     if (slots == null) {
       return;
     }
     for (ItemSlotNetwork slot : slots) {
       if (slot.isMouseOverSlot(mouseX, mouseY) && !slot.getStack().isEmpty()) {
-        ms.renderTooltip(font, slot.getStack(), mouseX, mouseY);
+        ms.setTooltipForNextFrame(font, slot.getStack(), mouseX, mouseY);
         return;
       }
     }
   }
 
-  private void drawButtonTooltips(GuiGraphics ms, int mouseX, int mouseY) {
+  private void drawButtonTooltips(GuiGraphicsExtractor ms, int mouseX, int mouseY) {
     tip(ms, btnRedstone, mouseX, mouseY,
         "gui.storagenetwork.redstone." + container.cap.needsRedstone());
     tip(ms, btnImport, mouseX, mouseY, "gui.storagenetwork.processing.import");
@@ -211,10 +211,10 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
     tip(ms, btnOutputFace, mouseX, mouseY, "gui.storagenetwork.processing.extract");
   }
 
-  private void tip(GuiGraphics ms, AbstractWidget btn, int mouseX, int mouseY, String key) {
+  private void tip(GuiGraphicsExtractor ms, AbstractWidget btn, int mouseX, int mouseY, String key) {
     if (btn != null && btn.isMouseOver(mouseX, mouseY)) {
       // render() is in raw screen coords (no leftPos/topPos translation), so pass the mouse position as-is.
-      ms.renderTooltip(font,
+      ms.setTooltipForNextFrame(font,
           Lists.newArrayList(Component.translatable(key)),
           Optional.empty(),
           mouseX, mouseY);
@@ -222,7 +222,10 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+  public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    double mouseX = event.x();
+    double mouseY = event.y();
+    int mouseButton = event.button();
     ItemStack carried = minecraft.player.containerMenu.getCarried();
     if (handleGridClick(inputSlots, container.cap.getFilters(), ProcessMessageType.SAVE_FILTER_IN, mouseX, mouseY, mouseButton, carried)) {
       return true;
@@ -230,7 +233,7 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
     if (handleGridClick(outputSlots, container.cap.getFiltersOut(), ProcessMessageType.SAVE_FILTER_OUT, mouseX, mouseY, mouseButton, carried)) {
       return true;
     }
-    return super.mouseClicked(mouseX, mouseY, mouseButton);
+    return super.mouseClicked(event, doubleClick);
   }
 
   private boolean handleGridClick(List<ItemSlotNetwork> slots,
@@ -246,7 +249,7 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
       }
       if (!slot.getStack().isEmpty()) {
         if (mouseButton == SsnConsts.MOUSE_BTN_RIGHT) {
-          int direction = hasShiftDown() ? -1 : 1;
+          int direction = Minecraft.getInstance().hasShiftDown() ? -1 : 1;
           int newCount = Math.min(64, slot.getStack().getCount() + direction);
           if (newCount < 1) {
             newCount = 1;
@@ -320,8 +323,8 @@ public class ScreenCableProcess extends AbstractContainerScreen<ContainerCablePr
   }
 
   @Override
-  public void renderStackTooltip(GuiGraphics ms, ItemStack stack, int mouseX, int mouseY) {
-    ms.renderTooltip(font, stack, mouseX, mouseY);
+  public void renderStackTooltip(GuiGraphicsExtractor ms, ItemStack stack, int mouseX, int mouseY) {
+    ms.setTooltipForNextFrame(font, stack, mouseX, mouseY);
   }
 
 

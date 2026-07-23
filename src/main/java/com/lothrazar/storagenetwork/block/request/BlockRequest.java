@@ -4,8 +4,6 @@ import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.storagenetwork.network.SortClientMessage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Container;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -35,22 +33,12 @@ public class BlockRequest extends EntityBlockFlib {
     return new TileRequest(pos, state);
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-    if (!state.is(newState.getBlock())) {
-      BlockEntity blockentity = worldIn.getBlockEntity(pos);
-      if (blockentity instanceof Container) {
-        Containers.dropContents(worldIn, pos, (Container) blockentity);
-        worldIn.updateNeighbourForOutputSignal(pos, this);
-      }
-      super.onRemove(state, worldIn, pos, newState, isMoving);
-    }
-  }
+  // Block#onRemove is gone in 26.1; this cleanup now lives in TileRequest#preRemoveSideEffects,
+  // which the game calls at the equivalent point in the block-removal sequence.
 
   @Override
   public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult result) {
-    if (!world.isClientSide) {
+    if (!world.isClientSide()) {
       TileRequest tile = (TileRequest) world.getBlockEntity(pos);
       if (tile.getMain() == null || tile.getMain().getBlockPos() == null) {
         return InteractionResult.PASS;

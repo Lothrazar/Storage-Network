@@ -14,22 +14,23 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 
-/** Built-in adapter  anything exposing Capabilities.ItemHandler.ITEM (vanilla shulkers, modded inventories). */
+/** Built-in adapter  anything exposing Capabilities.Item.ITEM (vanilla shulkers, modded inventories). */
 public class CradleAdapterDefault implements CradleAdapter {
 
   @Override
   public boolean accepts(ItemStack heldStack) {
-    return heldStack.getCapability(Capabilities.ItemHandler.ITEM) != null;
+    return heldStack.getCapability(Capabilities.Item.ITEM, ItemAccess.forStack(heldStack)) != null;
   }
 
   @Override
   public CapabilityConnectable wrap(ItemStack heldStack, TileCradle cradle) {
-    IItemHandler h = heldStack.getCapability(Capabilities.ItemHandler.ITEM);
-    if (h == null) {
+    var resourceHandler = heldStack.getCapability(Capabilities.Item.ITEM, ItemAccess.forStack(heldStack));
+    if (resourceHandler == null) {
       return null;
     }
-    return new Link(cradle, h);
+    return new Link(cradle, IItemHandler.of(resourceHandler));
   }
 
   private static final class Link implements CapabilityConnectable {

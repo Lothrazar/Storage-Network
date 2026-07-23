@@ -17,7 +17,7 @@ public class BlockCableLink extends BlockCable {
 
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-    return createTickerHelper(type, SsnRegistry.Tiles.STORAGE_KABEL.get(), world.isClientSide ? TileCableLink::clientTick : TileCableLink::serverTick);
+    return createTickerHelper(type, SsnRegistry.Tiles.STORAGE_KABEL.get(), world.isClientSide() ? TileCableLink::clientTick : TileCableLink::serverTick);
   }
 
   @Override

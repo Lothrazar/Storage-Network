@@ -25,7 +25,7 @@ public class ContainerNetworkRemote extends ContainerNetwork {
     DimPos dp = DimPos.getPosStored(remote);
     Level level = player.level();
     if (dp == null) {
-      StorageNetworkMod.LOGGER.error(level.isClientSide + "=client||Remote opening with null pos Stored {} ", result);
+      StorageNetworkMod.LOGGER.error(level.isClientSide() + "=client||Remote opening with null pos Stored {} ", result);
     }
     else {
       this.root = dp.getTileEntity(TileMain.class, level);

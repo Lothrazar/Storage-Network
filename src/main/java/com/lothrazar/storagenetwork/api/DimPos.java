@@ -3,13 +3,12 @@ package com.lothrazar.storagenetwork.api;
 import com.google.common.base.Objects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -18,15 +17,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
+public class DimPos implements ValueIOSerializable {  // NOPMD
 
   public static final Logger LOGGER = LogManager.getLogger();
   private String dimension;
@@ -35,9 +36,9 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
   public DimPos(CompoundTag tag) {
     if (tag.contains(NBT_X)) {
-      pos = new BlockPos(tag.getInt(NBT_X), tag.getInt(NBT_Y), tag.getInt(NBT_Z));
+      pos = new BlockPos(tag.getIntOr(NBT_X, 0), tag.getIntOr(NBT_Y, 0), tag.getIntOr(NBT_Z, 0));
     }
-    dimension = tag.getString(NBT_DIM);
+    dimension = tag.getStringOr(NBT_DIM, "");
   }
 
   public DimPos(Level world, BlockPos pos) {
@@ -50,7 +51,7 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
   public static DimPos getPosStored(ItemStack itemStackIn) {
     CustomData data = itemStackIn.get(DataComponents.CUSTOM_DATA);
-    if (data == null || !data.copyTag().getBoolean(NBT_BOUND)) {
+    if (data == null || !data.copyTag().getBooleanOr(NBT_BOUND, false)) {
       return null;
     }
     return new DimPos(data.copyTag());
@@ -74,7 +75,7 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
   public static String dimensionToString(Level w) {
     //example: returns "minecraft:overworld" resource location
-    return w.dimension().location().toString();
+    return w.dimension().identifier().toString();
   }
 
   public static final String NBT_Z = "Z";
@@ -95,7 +96,7 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
 
   public static String getDim(ItemStack stack) {
     CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-    return data != null ? data.copyTag().getString(NBT_DIM) : "";
+    return data != null ? data.copyTag().getStringOr(NBT_DIM, "") : "";
   }
 
   public static void putDim(ItemStack stack, Level world) {
@@ -104,10 +105,10 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
   }
 
   public static ServerLevel stringDimensionLookup(String s, MinecraftServer serv) {
-    return stringDimensionLookup(ResourceLocation.tryParse(s), serv);
+    return stringDimensionLookup(Identifier.tryParse(s), serv);
   }
 
-  public static ServerLevel stringDimensionLookup(ResourceLocation s, MinecraftServer serv) {
+  public static ServerLevel stringDimensionLookup(Identifier s, MinecraftServer serv) {
     ResourceKey<Level> worldKey = ResourceKey.create(Registries.DIMENSION, s);
     if (worldKey == null) {
       return null;
@@ -173,7 +174,8 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
     if (world == null || getBlockPos() == null) {
       return null;
     }
-    return world.getCapability(Capabilities.ItemHandler.BLOCK, getBlockPos(), side);
+    var handler = world.getCapability(Capabilities.Item.BLOCK, getBlockPos(), side);
+    return handler == null ? null : IItemHandler.of(handler);
   }
 
   @SuppressWarnings("deprecation")
@@ -217,24 +219,26 @@ public class DimPos implements INBTSerializable<CompoundTag> {  // NOPMD
   }
 
   @Override
-  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
+  public void serialize(ValueOutput output) {
     if (pos == null) {
       pos = new BlockPos(0, 0, 0);
     }
-    CompoundTag result = new CompoundTag();
-    result.putInt(NBT_X, pos.getX());
-    result.putInt(NBT_Y, pos.getY());
-    result.putInt(NBT_Z, pos.getZ());
-    result.putString(NBT_DIM, dimension != null ? dimension : "");
-    return result;
+    output.putInt(NBT_X, pos.getX());
+    output.putInt(NBT_Y, pos.getY());
+    output.putInt(NBT_Z, pos.getZ());
+    output.putString(NBT_DIM, dimension != null ? dimension : "");
   }
 
   @Override
-  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
-    if (nbt.contains(NBT_X)) {
-      pos = new BlockPos(nbt.getInt(NBT_X), nbt.getInt(NBT_Y), nbt.getInt(NBT_Z));
-    }
-    dimension = nbt.getString(NBT_DIM);
+  public void deserialize(ValueInput input) {
+    pos = new BlockPos(input.getIntOr(NBT_X, 0), input.getIntOr(NBT_Y, 0), input.getIntOr(NBT_Z, 0));
+    dimension = input.getStringOr(NBT_DIM, "");
+  }
+
+  public static DimPos of(ValueInput input) {
+    DimPos dp = new DimPos(null, null);
+    dp.deserialize(input);
+    return dp;
   }
 
   public DimPos offset(Direction direction) {

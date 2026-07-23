@@ -6,16 +6,17 @@ import com.lothrazar.storagenetwork.network.RecipeMessage;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.HolderLookup;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -36,7 +37,7 @@ public abstract class RequestRecipeTransferHandler<C extends AbstractContainerMe
       boolean maxTransfer, boolean doTransfer) {
     if (doTransfer) {
       CompoundTag nbt = RequestRecipeTransferHandler.recipeToTag(c, recipeSlots);
-      PacketDistributor.sendToServer(new RecipeMessage(nbt));
+      ClientPacketDistributor.sendToServer(new RecipeMessage(nbt));
     }
     return null;
   }
@@ -63,7 +64,7 @@ public abstract class RequestRecipeTransferHandler<C extends AbstractContainerMe
           }
           ItemStack itemStack = possibleItems.get(i);
           if (!itemStack.isEmpty()) {
-            invList.add(itemStack.save(registries));
+            invList.add(ItemStack.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), itemStack).getOrThrow());
           }
         }
         nbt.put("s" + (slot.getSlotIndex()), invList);
@@ -73,7 +74,7 @@ public abstract class RequestRecipeTransferHandler<C extends AbstractContainerMe
   }
 
   @Override
-  public RecipeType<RecipeHolder<CraftingRecipe>> getRecipeType() {
+  public IRecipeType<RecipeHolder<CraftingRecipe>> getRecipeType() {
     return RecipeTypes.CRAFTING;
   }
 }

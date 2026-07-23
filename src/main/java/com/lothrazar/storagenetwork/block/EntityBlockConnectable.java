@@ -36,7 +36,7 @@ public abstract class EntityBlockConnectable extends EntityBlockFlib {
 
   @Override
   public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult result) {
-    if (!world.isClientSide && hasGui) {
+    if (!world.isClientSide() && hasGui) {
       if (world.getBlockEntity(pos) instanceof TileConnectable tile) {
         if (tile.getMain() == null || tile.getMain().getBlockPos() == null) {
           return InteractionResult.PASS;

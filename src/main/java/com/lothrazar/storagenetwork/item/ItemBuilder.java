@@ -1,6 +1,6 @@
 package com.lothrazar.storagenetwork.item;
 
-import java.util.List;
+import java.util.function.Consumer;
 import com.lothrazar.library.item.ItemFlib;
 import com.lothrazar.library.util.ChatUtil;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
@@ -24,13 +24,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
 
 public class ItemBuilder extends ItemFlib {
@@ -55,7 +54,7 @@ public class ItemBuilder extends ItemFlib {
     if (!tag.contains(NBTBLOCKSTATE)) {
       return null;
     }
-    return NbtUtils.readBlockState(level.registryAccess().lookupOrThrow(Registries.BLOCK), tag.getCompound(NBTBLOCKSTATE));
+    return NbtUtils.readBlockState(level.registryAccess().lookupOrThrow(Registries.BLOCK), tag.getCompoundOrEmpty(NBTBLOCKSTATE));
   }
 
   @SuppressWarnings("deprecation")
@@ -77,7 +76,7 @@ public class ItemBuilder extends ItemFlib {
       ItemStack stack = player.getItemInHand(hand);
       //succeed or fail
       DimPos dp = DimPos.getPosStored(stack);
-      if (dp != null && hand == InteractionHand.MAIN_HAND && !world.isClientSide) {
+      if (dp != null && hand == InteractionHand.MAIN_HAND && !world.isClientSide()) {
         ServerLevel serverTargetWorld = DimPos.stringDimensionLookup(dp.getDimension(), world.getServer());
         if (serverTargetWorld == null) {
           StorageNetworkMod.LOGGER.error("Missing dimension key " + dp.getDimension());
@@ -98,12 +97,12 @@ public class ItemBuilder extends ItemFlib {
               //NOT SIMULATED, extract item from network
             }
           }
-          else {
-            player.displayClientMessage(Component.translatable("item.remote.notfound.item"), true);
+          else if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
+            sp.sendSystemMessage(Component.translatable("item.remote.notfound.item"), true);
           }
         }
-        else {
-          player.displayClientMessage(Component.translatable("item.remote.notfound"), true);
+        else if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
+          sp.sendSystemMessage(Component.translatable("item.remote.notfound"), true);
         }
       }
     }
@@ -121,15 +120,14 @@ public class ItemBuilder extends ItemFlib {
   }
 
   @Override
-  @OnlyIn(Dist.CLIENT)
-  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
     MutableComponent t = Component.translatable(getDescriptionId() + ".tooltip");
     t.withStyle(ChatFormatting.GRAY);
-    tooltip.add(t);
+    tooltip.accept(t);
     if (stack.has(DataComponents.CUSTOM_DATA)) {
       DimPos dp = DimPos.getPosStored(stack);
       if (dp != null) {
-        tooltip.add(dp.makeTooltip());
+        tooltip.accept(dp.makeTooltip());
       } // block state?
       BlockState target = null;
       if (context.level() != null) {
@@ -139,13 +137,13 @@ public class ItemBuilder extends ItemFlib {
         String block = target.getBlock().getDescriptionId();
         t = Component.translatable(block);
         t.withStyle(ChatFormatting.AQUA);
-        tooltip.add(t);
+        tooltip.accept(t);
       }
       else {
         //if it has a network connection but no blockstate saved, then
         t = Component.translatable(getDescriptionId() + ".blockstate");
         t.withStyle(ChatFormatting.AQUA);
-        tooltip.add(t);
+        tooltip.accept(t);
       }
     }
   }
@@ -154,7 +152,7 @@ public class ItemBuilder extends ItemFlib {
     Player player = event.getEntity();
     ItemStack held = player.getItemInHand(event.getHand());
     if (held.getItem() == SsnRegistry.Items.BUILDER_REMOTE.get()) {
-      Level world = player.getCommandSenderWorld();
+      Level world = player.level();
       BlockState target = world.getBlockState(event.getPos());
       ItemBuilder.setBlockState(held, target);
       ChatUtil.statusMessage(player, target);

@@ -207,7 +207,7 @@ public class NetworkModuleDefault implements NetworkModule {
       }
       this.connectables = result;
       this.shouldRefresh = false;
-      masterPos.getWorld().getChunk(masterPos.getBlockPos()).setUnsaved(true);
+      masterPos.getWorld().getChunk(masterPos.getBlockPos()).markUnsaved();
     }
     catch (Throwable e) {
        LOGGER.info("Refresh network error ", e);
@@ -471,7 +471,7 @@ public class NetworkModuleDefault implements NetworkModule {
         set.add(realConnectablePos);
         addConnectables(realConnectablePos, set, masterPos, remote);
         tileHere.setChanged();
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
       }
     }
   }

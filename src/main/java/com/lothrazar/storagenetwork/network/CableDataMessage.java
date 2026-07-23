@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.block.main.TileMain;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -17,7 +17,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 public class CableDataMessage implements CustomPacketPayload {
 
   public static final CustomPacketPayload.Type<CableDataMessage> TYPE =
-      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "cable_data"));
+      new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "cable_data"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, CableDataMessage> STREAM_CODEC = StreamCodec.of(
       CableDataMessage::write,

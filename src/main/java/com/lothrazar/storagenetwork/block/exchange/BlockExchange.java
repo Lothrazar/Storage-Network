@@ -26,7 +26,7 @@ public class BlockExchange extends EntityBlockFlib {
 
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-    return createTickerHelper(type, SsnRegistry.Tiles.EXCHANGE.get(), world.isClientSide ? TileExchange::clientTick : TileExchange::serverTick);
+    return createTickerHelper(type, SsnRegistry.Tiles.EXCHANGE.get(), world.isClientSide() ? TileExchange::clientTick : TileExchange::serverTick);
   }
 
   @Override

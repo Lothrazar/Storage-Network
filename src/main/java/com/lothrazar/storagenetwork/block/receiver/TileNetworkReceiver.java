@@ -9,8 +9,6 @@ import com.lothrazar.storagenetwork.block.main.TileMain;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
@@ -21,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class TileNetworkReceiver extends TileConnectable implements MenuProvider {
@@ -46,7 +46,7 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
     @Override
     protected void onContentsChanged(int slot) {
       setChanged();
-      if (level != null && !level.isClientSide) {
+      if (level != null && !level.isClientSide()) {
         level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
       }
     }
@@ -104,7 +104,7 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
   }
 
   private void tick() {
-    if (level == null || level.isClientSide || boundMaster == null) {
+    if (level == null || level.isClientSide() || boundMaster == null) {
       return;
     }
     // Throttle: receivers don't need per-tick logic; once a second is plenty for register/ticket housekeeping.
@@ -129,18 +129,18 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
     // Master chunk - cross-dim, so we use the ChunkLoadingTicket helper.
     Level masterLevel = boundMaster != null ? boundMaster.resolveLevel() : null;
     if (want && masterLevel instanceof ServerLevel msl) {
-      ChunkPos cp = new ChunkPos(boundMaster.getBlockPos());
+      ChunkPos cp = ChunkPos.containing(boundMaster.getBlockPos());
       boolean newlyHeld = masterChunk.assertOn(msl, cp);
       if (newlyHeld) {
         setChanged();
         LOGGER.debug("Receiver @ {} ({}) asserting MASTER chunk ticket on {} @ {} (chunkLoadedNow={})",
-            worldPosition, level.dimension().location(), cp, masterChunk.dim(), msl.hasChunk(cp.x, cp.z));
+            worldPosition, level.dimension().identifier(), cp, masterChunk.dim(), msl.hasChunk(cp.x(), cp.z()));
       }
-      else if (!msl.hasChunk(cp.x, cp.z)) {
+      else if (!msl.hasChunk(cp.x(), cp.z())) {
         // Ticket present but chunk not actually loaded - flag so we can see if
         // updateChunkForced is failing to translate into an actual chunk load.
         LOGGER.warn("Receiver @ {} ({}): master ticket asserted on {} @ {} but chunk reports NOT loaded",
-            worldPosition, level.dimension().location(), cp, masterChunk.dim());
+            worldPosition, level.dimension().identifier(), cp, masterChunk.dim());
       }
     }
     else if (!want && masterChunk.isHeld() && level != null) {
@@ -157,7 +157,7 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
    * state mid-save.
    */
   public void onBlockBroken() {
-    if (level == null || level.isClientSide) {
+    if (level == null || level.isClientSide()) {
       return;
     }
     TileMain master = resolveMaster();
@@ -174,26 +174,30 @@ public class TileNetworkReceiver extends TileConnectable implements MenuProvider
     // Do not unregister - master should keep us in its list. We come back next load.
   }
 
+  // Block#onRemove is gone in 26.1; the block-actually-changed gating that used to live in
+  // BlockNetworkReceiver#onRemove is now done by the caller before this is even invoked.
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.loadAdditional(compound, registries);
-    if (compound.contains("boundMaster")) {
-      boundMaster = new DimPos(compound.getCompound("boundMaster"));
-    }
-    if (compound.contains("upgrades")) {
-      upgrades.deserializeNBT(registries, compound.getCompound("upgrades"));
-    }
-    masterChunk.load(compound, "masterTicketHeld", "heldMasterDim", "heldMasterChunkX", "heldMasterChunkZ");
+  public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+    super.preRemoveSideEffects(pos, state);
+    onBlockBroken();
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.saveAdditional(compound, registries);
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
+    input.child("boundMaster").ifPresent(child -> boundMaster = DimPos.of(child));
+    input.child("upgrades").ifPresent(upgrades::deserialize);
+    masterChunk.load(input, "masterTicketHeld", "heldMasterDim", "heldMasterChunkX", "heldMasterChunkZ");
+  }
+
+  @Override
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
     if (boundMaster != null) {
-      compound.put("boundMaster", boundMaster.serializeNBT(registries));
+      boundMaster.serialize(output.child("boundMaster"));
     }
-    compound.put("upgrades", upgrades.serializeNBT(registries));
-    masterChunk.save(compound, "masterTicketHeld", "heldMasterDim", "heldMasterChunkX", "heldMasterChunkZ");
+    upgrades.serialize(output.child("upgrades"));
+    masterChunk.save(output, "masterTicketHeld", "heldMasterDim", "heldMasterChunkX", "heldMasterChunkZ");
   }
 
   @Override

@@ -63,7 +63,7 @@ public class RemoteHelpers {
     }
     //else it is -1 so dont even check distance
     //k now server only 
-    if (world.isClientSide) {
+    if (world.isClientSide()) {
       return false;
     }
     //now check the dimension world
@@ -91,7 +91,7 @@ public class RemoteHelpers {
       return true;
     }
     else {
-      player.displayClientMessage(Component.translatable("item.remote.notfound"), true);
+      ((ServerPlayer) player).sendSystemMessage(Component.translatable("item.remote.notfound"), true);
       return false;
     }
   }

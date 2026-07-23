@@ -5,10 +5,11 @@ import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.block.AbstractNetworkScreen;
 import com.lothrazar.storagenetwork.api.gui.NetworkScreenSize;
 import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.fml.ModList;
 
@@ -16,16 +17,14 @@ public class ScreenNetworkTable extends AbstractNetworkScreen<ContainerNetworkCr
 
   private static final int HEIGHT = 256;
   public static final int WIDTH = 176;
-  private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/request.png");
+  private final Identifier texture = Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/request.png");
   private final DefaultNetworkWidget network;
   private TileRequest tile;
 
   public ScreenNetworkTable(ContainerNetworkCraftingTable container, Inventory inv, Component name) {
-    super(container, inv, name);
+    super(container, inv, name, WIDTH, HEIGHT);
     tile = container.getTileRequest();
     network = new DefaultNetworkWidget(this, NetworkScreenSize.NORMAL);
-    imageWidth = WIDTH;
-    imageHeight = HEIGHT;
   }
 
   @Override
@@ -48,10 +47,11 @@ public class ScreenNetworkTable extends AbstractNetworkScreen<ContainerNetworkCr
   }
 
   @Override
-  public void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
+  public void extractBackground(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
-    ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
     //good stuff
     network.applySearchTextToSlots();
     network.renderItemSlots(ms, mouseX, mouseY, font);

@@ -12,7 +12,7 @@ import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExportDefau
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -21,7 +21,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 public class CableIOMessage implements CustomPacketPayload {
 
   public static final CustomPacketPayload.Type<CableIOMessage> TYPE =
-      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "cable_io"));
+      new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "cable_io"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, CableIOMessage> STREAM_CODEC = StreamCodec.of(
       CableIOMessage::write,

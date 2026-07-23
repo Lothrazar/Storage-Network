@@ -143,7 +143,7 @@ public class UtilInventory {
   }
 
   public static void dropItem(Level world, BlockPos pos, ItemStack stack) {
-    if (pos == null || world.isClientSide || stack.isEmpty()) {
+    if (pos == null || world.isClientSide() || stack.isEmpty()) {
       return;
     }
     world.addFreshEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack));

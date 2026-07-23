@@ -6,14 +6,17 @@ import com.lothrazar.storagenetwork.api.network.TileNetworkSync;
 import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class TileRequest extends TileConnectable implements MenuProvider, TileNetworkSync {
 
@@ -32,29 +35,23 @@ public class TileRequest extends TileConnectable implements MenuProvider, TileNe
   }
 
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    autoFocus = compound.getBoolean("autoFocus");
-    setDownwards(compound.getBoolean(NBT_DIR));
-    if (compound.contains(NBT_SORT)) {
-      setSort(EnumSortType.values()[compound.getInt(NBT_SORT)]);
-    }
-    if (compound.contains(NBT_JEI)) {
-      this.setJeiSearchSynced(compound.getBoolean(NBT_JEI));
-    }
-    if (compound.contains(NBT_FULLSTACK)) {
-      this.setFullStackCraft(compound.getBoolean(NBT_FULLSTACK));
-    }
-    super.loadAdditional(compound, registries);
+  protected void loadAdditional(ValueInput input) {
+    autoFocus = input.getBooleanOr("autoFocus", true);
+    setDownwards(input.getBooleanOr(NBT_DIR, false));
+    setSort(EnumSortType.values()[input.getIntOr(NBT_SORT, getSort().ordinal())]);
+    this.setJeiSearchSynced(input.getBooleanOr(NBT_JEI, false));
+    this.setFullStackCraft(input.getBooleanOr(NBT_FULLSTACK, true));
+    super.loadAdditional(input);
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    compound.putBoolean("autoFocus", autoFocus);
-    compound.putBoolean(NBT_DIR, isDownwards());
-    compound.putInt(NBT_SORT, getSort().ordinal());
-    compound.putBoolean(NBT_JEI, this.isJeiSearchSynced());
-    compound.putBoolean(NBT_FULLSTACK, this.isFullStackCraft());
-    super.saveAdditional(compound, registries);
+  protected void saveAdditional(ValueOutput output) {
+    output.putBoolean("autoFocus", autoFocus);
+    output.putBoolean(NBT_DIR, isDownwards());
+    output.putInt(NBT_SORT, getSort().ordinal());
+    output.putBoolean(NBT_JEI, this.isJeiSearchSynced());
+    output.putBoolean(NBT_FULLSTACK, this.isFullStackCraft());
+    super.saveAdditional(output);
   }
 
   @Override
@@ -113,5 +110,20 @@ public class TileRequest extends TileConnectable implements MenuProvider, TileNe
   @Override
   public void setFullStackCraft(boolean val) {
     this.fullStackCraft = val;
+  }
+
+  // Block#onRemove is gone in 26.1; this cleanup (used to live in BlockRequest#onRemove) now
+  // runs here, called by the game at the equivalent point in the block-removal sequence.
+  @Override
+  public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+    super.preRemoveSideEffects(pos, state);
+    if (level == null) {
+      return;
+    }
+    BlockEntity blockentity = level.getBlockEntity(pos);
+    if (blockentity instanceof Container container) {
+      Containers.dropContents(level, pos, container);
+      level.updateNeighbourForOutputSignal(pos, state.getBlock());
+    }
   }
 }

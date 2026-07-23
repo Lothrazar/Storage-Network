@@ -5,14 +5,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class StackResponseClientMessage implements CustomPacketPayload {
 
   public static final CustomPacketPayload.Type<StackResponseClientMessage> TYPE =
-      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "stack_response_client"));
+      new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "stack_response_client"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, StackResponseClientMessage> STREAM_CODEC = StreamCodec.of(
       StackResponseClientMessage::write,

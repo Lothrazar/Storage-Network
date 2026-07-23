@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +20,7 @@ public class ClearRecipeMessage implements CustomPacketPayload {
   public static final ClearRecipeMessage INSTANCE = new ClearRecipeMessage();
 
   public static final CustomPacketPayload.Type<ClearRecipeMessage> TYPE =
-      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "clear_recipe"));
+      new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "clear_recipe"));
 
   public static final StreamCodec<FriendlyByteBuf, ClearRecipeMessage> STREAM_CODEC =
       StreamCodec.unit(INSTANCE);

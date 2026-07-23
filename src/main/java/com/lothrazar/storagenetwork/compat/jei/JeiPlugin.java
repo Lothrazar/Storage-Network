@@ -13,7 +13,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.MenuType;
 
 @mezz.jei.api.JeiPlugin
@@ -22,8 +22,8 @@ public class JeiPlugin implements IModPlugin {
   public static IJeiRuntime runtime = null;
 
   @Override
-  public ResourceLocation getPluginUid() {
-    return ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "jei");
+  public Identifier getPluginUid() {
+    return Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "jei");
   }
 
   @Override

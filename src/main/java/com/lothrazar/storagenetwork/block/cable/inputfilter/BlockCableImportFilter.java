@@ -28,12 +28,12 @@ public class BlockCableImportFilter extends BlockCable {
 
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-    return createTickerHelper(type, SsnRegistry.Tiles.IMPORT_FILTER_KABEL.get(), world.isClientSide ? TileCableImportFilter::clientTick : TileCableImportFilter::serverTick);
+    return createTickerHelper(type, SsnRegistry.Tiles.IMPORT_FILTER_KABEL.get(), world.isClientSide() ? TileCableImportFilter::clientTick : TileCableImportFilter::serverTick);
   }
 
   @Override
   public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player playerIn, BlockHitResult result) {
-    if (!world.isClientSide) {
+    if (!world.isClientSide()) {
       BlockEntity tile = world.getBlockEntity(pos);
       if (tile instanceof MenuProvider) {
         ServerPlayer player = (ServerPlayer) playerIn;

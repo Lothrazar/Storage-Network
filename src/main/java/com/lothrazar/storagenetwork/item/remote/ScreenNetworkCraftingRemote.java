@@ -5,9 +5,10 @@ import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.block.AbstractNetworkScreen;
 import com.lothrazar.storagenetwork.api.gui.NetworkScreenSize;
 import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
@@ -16,17 +17,15 @@ public class ScreenNetworkCraftingRemote extends AbstractNetworkScreen<Container
 
   private static final int HEIGHT = 256;
   private static final int WIDTH = 176;
-  private static final ResourceLocation textureCraft = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/request.png");
+  private static final Identifier textureCraft = Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/request.png");
   private final DefaultNetworkWidget network;
   private final ItemStack remote;
 
   public ScreenNetworkCraftingRemote(ContainerNetworkCraftingRemote screenContainer, Inventory inv, Component titleIn) {
-    super(screenContainer, inv, titleIn);
+    super(screenContainer, inv, titleIn, WIDTH, HEIGHT);
     //since the rightclick action forces only MAIN_HAND openings, is ok
     remote = screenContainer.getRemote();// inv.player.getItemInHand(InteractionHand.MAIN_HAND);
     network = new DefaultNetworkWidget(this, NetworkScreenSize.NORMAL);
-    imageWidth = WIDTH;
-    imageHeight = HEIGHT;
   }
 
   @Override
@@ -49,10 +48,11 @@ public class ScreenNetworkCraftingRemote extends AbstractNetworkScreen<Container
   }
 
   @Override
-  protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
+  public void extractBackground(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractBackground(ms, mouseX, mouseY, partialTicks);
     final int xCenter = (width - imageWidth) / 2;
     final int yCenter = (height - imageHeight) / 2;
-    ms.blit(textureCraft, xCenter, yCenter, 0, 0, this.imageWidth, this.imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, textureCraft, xCenter, yCenter, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
     //update network
     network.applySearchTextToSlots();
     network.renderItemSlots(ms, mouseX, mouseY, font);

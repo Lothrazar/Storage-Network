@@ -7,8 +7,6 @@ import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExportDefau
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,6 +15,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class TileCableImportFilter extends TileCableWithFacing implements MenuProvider {
 
@@ -48,17 +48,17 @@ public class TileCableImportFilter extends TileCableWithFacing implements MenuPr
   }
 
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.loadAdditional(compound, registries);
-    this.ioStorage.deserializeNBT(registries, compound.getCompound("ioStorage"));
-    ioStorage.upgrades.deserializeNBT(registries, compound.getCompound("upgrades"));
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
+    this.ioStorage.deserialize(input.childOrEmpty("ioStorage"));
+    ioStorage.upgrades.deserialize(input.childOrEmpty("upgrades"));
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.saveAdditional(compound, registries);
-    compound.put("ioStorage", this.ioStorage.serializeNBT(registries));
-    compound.put("upgrades", ioStorage.upgrades.serializeNBT(registries));
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
+    this.ioStorage.serialize(output.child("ioStorage"));
+    ioStorage.upgrades.serialize(output.child("upgrades"));
   }
 
   public static void clientTick(Level level, BlockPos blockPos, BlockState blockState, TileCableImportFilter tile) {}

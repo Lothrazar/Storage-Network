@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
 import com.lothrazar.storagenetwork.network.RecipeMessage;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
@@ -21,6 +21,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
@@ -69,7 +70,7 @@ public class EmiTransferHandler<T extends ContainerNetwork> implements StandardR
   public boolean craft(EmiRecipe recipe, EmiCraftContext<T> context) {
     AbstractContainerScreen<T> screen = context.getScreen();
     CompoundTag nbt = buildRecipe(recipe, screen);
-    PacketDistributor.sendToServer(new RecipeMessage(nbt));
+    ClientPacketDistributor.sendToServer(new RecipeMessage(nbt));
     Minecraft.getInstance().setScreen(screen);
     return true;
   }
@@ -102,7 +103,7 @@ public class EmiTransferHandler<T extends ContainerNetwork> implements StandardR
           }
           ItemStack itemStack = possibleItems.get(i);
           if (!itemStack.isEmpty()) {
-            Tag stackTag = itemStack.save(registries);
+            Tag stackTag = ItemStack.CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), itemStack).getOrThrow();
             invList.add(stackTag);
           }
         }

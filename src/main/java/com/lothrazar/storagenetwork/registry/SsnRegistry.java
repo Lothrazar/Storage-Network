@@ -132,22 +132,22 @@ public class SsnRegistry {
 
     public static void init() {}
 
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileMain>> MASTER = TILES.register("master", () -> BlockEntityType.Builder.of(TileMain::new, Blocks.MASTER.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileInventory>> INVENTORY = TILES.register("inventory", () -> BlockEntityType.Builder.of(TileInventory::new, Blocks.INVENTORY.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileInventoryExpanded>> REQUEST_EXPANDED = TILES.register("request_expanded", () -> BlockEntityType.Builder.of(TileInventoryExpanded::new, Blocks.REQUEST_EXPANDED.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileRequest>> REQUEST = TILES.register("request", () -> BlockEntityType.Builder.of(TileRequest::new, Blocks.REQUEST.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCable>> KABEL = TILES.register("kabel", () -> BlockEntityType.Builder.of(TileCable::new, Blocks.KABEL.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableLink>> STORAGE_KABEL = TILES.register("storage_kabel", () -> BlockEntityType.Builder.of(TileCableLink::new, Blocks.STORAGE_KABEL.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableIO>> IMPORT_KABEL = TILES.register("import_kabel", () -> BlockEntityType.Builder.of(TileCableIO::new, Blocks.IMPORT_KABEL.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableImportFilter>> IMPORT_FILTER_KABEL = TILES.register("import_filter_kabel", () -> BlockEntityType.Builder.of(TileCableImportFilter::new, Blocks.IMPORT_FILTER_KABEL.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableFilter>> FILTER_KABEL = TILES.register("filter_kabel", () -> BlockEntityType.Builder.of(TileCableFilter::new, Blocks.FILTER_KABEL.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableExport>> EXPORT_KABEL = TILES.register("export_kabel", () -> BlockEntityType.Builder.of(TileCableExport::new, Blocks.EXPORT_KABEL.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileExchange>> EXCHANGE = TILES.register("exchange", () -> BlockEntityType.Builder.of(TileExchange::new, Blocks.EXCHANGE.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCollection>> COLLECTOR = TILES.register("collector", () -> BlockEntityType.Builder.of(TileCollection::new, Blocks.COLLECTOR.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableProcess>> PROCESS_KABEL = TILES.register("process_kabel", () -> BlockEntityType.Builder.of(TileCableProcess::new, Blocks.PROCESS_KABEL.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCradle>> CRADLE = TILES.register("cradle", () -> BlockEntityType.Builder.of(TileCradle::new, Blocks.CRADLE.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileNetworkReceiver>> RECEIVER = TILES.register("receiver", () -> BlockEntityType.Builder.of(TileNetworkReceiver::new, Blocks.RECEIVER.get()).build(null));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileDrawer>> DRAWER = TILES.register("drawer", () -> BlockEntityType.Builder.of(TileDrawer::new, Blocks.DRAWER.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileMain>> MASTER = TILES.register("master", () -> new BlockEntityType<>(TileMain::new, Blocks.MASTER.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileInventory>> INVENTORY = TILES.register("inventory", () -> new BlockEntityType<>(TileInventory::new, Blocks.INVENTORY.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileInventoryExpanded>> REQUEST_EXPANDED = TILES.register("request_expanded", () -> new BlockEntityType<>(TileInventoryExpanded::new, Blocks.REQUEST_EXPANDED.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileRequest>> REQUEST = TILES.register("request", () -> new BlockEntityType<>(TileRequest::new, Blocks.REQUEST.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCable>> KABEL = TILES.register("kabel", () -> new BlockEntityType<>(TileCable::new, Blocks.KABEL.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableLink>> STORAGE_KABEL = TILES.register("storage_kabel", () -> new BlockEntityType<>(TileCableLink::new, Blocks.STORAGE_KABEL.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableIO>> IMPORT_KABEL = TILES.register("import_kabel", () -> new BlockEntityType<>(TileCableIO::new, Blocks.IMPORT_KABEL.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableImportFilter>> IMPORT_FILTER_KABEL = TILES.register("import_filter_kabel", () -> new BlockEntityType<>(TileCableImportFilter::new, Blocks.IMPORT_FILTER_KABEL.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableFilter>> FILTER_KABEL = TILES.register("filter_kabel", () -> new BlockEntityType<>(TileCableFilter::new, Blocks.FILTER_KABEL.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableExport>> EXPORT_KABEL = TILES.register("export_kabel", () -> new BlockEntityType<>(TileCableExport::new, Blocks.EXPORT_KABEL.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileExchange>> EXCHANGE = TILES.register("exchange", () -> new BlockEntityType<>(TileExchange::new, Blocks.EXCHANGE.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCollection>> COLLECTOR = TILES.register("collector", () -> new BlockEntityType<>(TileCollection::new, Blocks.COLLECTOR.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCableProcess>> PROCESS_KABEL = TILES.register("process_kabel", () -> new BlockEntityType<>(TileCableProcess::new, Blocks.PROCESS_KABEL.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileCradle>> CRADLE = TILES.register("cradle", () -> new BlockEntityType<>(TileCradle::new, Blocks.CRADLE.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileNetworkReceiver>> RECEIVER = TILES.register("receiver", () -> new BlockEntityType<>(TileNetworkReceiver::new, Blocks.RECEIVER.get()));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileDrawer>> DRAWER = TILES.register("drawer", () -> new BlockEntityType<>(TileDrawer::new, Blocks.DRAWER.get()));
   }
 
   public static class Menus {

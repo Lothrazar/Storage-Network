@@ -13,14 +13,14 @@ import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
 import com.lothrazar.storagenetwork.api.capabilities.ItemStackMatcherDefault;
 import com.lothrazar.storagenetwork.api.capabilities.UpgradesItemStackHandler;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
-public class CapabilityProcessingDefault implements INBTSerializable<CompoundTag>, CapabilityProcessing {
+public class CapabilityProcessingDefault implements ValueIOSerializable, CapabilityProcessing {
 
   public static class Factory implements Callable<CapabilityProcessing> {
 
@@ -71,35 +71,25 @@ public class CapabilityProcessingDefault implements INBTSerializable<CompoundTag
   }
 
   @Override
-  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
-    CompoundTag result = new CompoundTag();
-    result.putInt("prio", priority);
-    result.put("upgrades", this.upgrades.serializeNBT(registries));
-    result.put("filtersIn", this.filters.serializeNBT(registries));
-    result.put("filtersOut", this.filtersOut.serializeNBT(registries));
+  public void serialize(ValueOutput output) {
+    output.putInt("prio", priority);
+    this.upgrades.serialize(output.child("upgrades"));
+    this.filters.serialize(output.child("filtersIn"));
+    this.filtersOut.serialize(output.child("filtersOut"));
     if (inventoryFace != null) {
-      result.putString("inventoryFace", inventoryFace.toString());
+      output.putString("inventoryFace", inventoryFace.toString());
     }
-    return result;
   }
 
   @Override
-  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
-    priority = nbt.getInt("prio");
-    CompoundTag upgrades = nbt.getCompound("upgrades");
-    if (upgrades != null) {
-      this.upgrades.deserializeNBT(registries, upgrades);
-    }
-    CompoundTag filtersIn = nbt.getCompound("filtersIn");
-    if (filtersIn != null) {
-      this.filters.deserializeNBT(registries, filtersIn);
-    }
-    CompoundTag filtersOut = nbt.getCompound("filtersOut");
-    if (filtersOut != null) {
-      this.filtersOut.deserializeNBT(registries, filtersOut);
-    }
-    if (nbt.contains("inventoryFace")) {
-      inventoryFace = Direction.byName(nbt.getString("inventoryFace"));
+  public void deserialize(ValueInput input) {
+    priority = input.getIntOr("prio", 0);
+    this.upgrades.deserialize(input.childOrEmpty("upgrades"));
+    this.filters.deserialize(input.childOrEmpty("filtersIn"));
+    this.filtersOut.deserialize(input.childOrEmpty("filtersOut"));
+    String faceName = input.getStringOr("inventoryFace", null);
+    if (faceName != null) {
+      inventoryFace = Direction.byName(faceName);
     }
   }
 

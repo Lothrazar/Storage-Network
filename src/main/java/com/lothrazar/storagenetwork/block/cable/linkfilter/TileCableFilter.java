@@ -6,8 +6,6 @@ import com.lothrazar.storagenetwork.block.TileCableWithFacing;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -16,6 +14,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class TileCableFilter extends TileCableWithFacing implements MenuProvider {
 
@@ -47,15 +47,15 @@ public class TileCableFilter extends TileCableWithFacing implements MenuProvider
   }
 
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.loadAdditional(compound, registries);
-    this.capability.deserializeNBT(registries, compound.getCompound("capability"));
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
+    this.capability.deserialize(input.childOrEmpty("capability"));
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.saveAdditional(compound, registries);
-    compound.put("capability", capability.serializeNBT(registries));
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
+    capability.serialize(output.child("capability"));
   }
 
   public static void clientTick(Level level, BlockPos blockPos, BlockState blockState, TileCableFilter tile) {}

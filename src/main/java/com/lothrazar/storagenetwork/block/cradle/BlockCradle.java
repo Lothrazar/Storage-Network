@@ -40,7 +40,7 @@ public class BlockCradle extends EntityBlockFlib {
 
   @Override
   public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player playerIn, BlockHitResult result) {
-    if (!world.isClientSide) {
+    if (!world.isClientSide()) {
       BlockEntity tile = world.getBlockEntity(pos);
       if (tile instanceof MenuProvider) {
         ServerPlayer player = (ServerPlayer) playerIn;
@@ -56,7 +56,7 @@ public class BlockCradle extends EntityBlockFlib {
 
   @Override
   public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-    if (!level.isClientSide && level instanceof ServerLevel) {
+    if (!level.isClientSide() && level instanceof ServerLevel) {
       BlockEntity be = level.getBlockEntity(pos);
       if (be instanceof TileCradle cradle) {
         for (int i = 0; i < TileCradle.HOLDER_SIZE; i++) {

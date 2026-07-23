@@ -8,7 +8,7 @@ import com.lothrazar.storagenetwork.block.drawer.TileDrawer;
 import com.lothrazar.storagenetwork.item.ItemBuilder;
 import com.lothrazar.storagenetwork.network.KeybindCollectorToggleMessage;
 import com.lothrazar.storagenetwork.network.KeybindCurioMessage;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.player.Player;
@@ -42,7 +42,7 @@ public class SsnEvents {
 
   private void onHitFacadeHandler(PlayerInteractEvent.LeftClickBlock event) {
     Level level = event.getLevel();
-    if (!level.isClientSide) {
+    if (!level.isClientSide()) {
       return; // dont save client data; server side only from here on
     }
     Player player = event.getEntity();
@@ -53,7 +53,7 @@ public class SsnEvents {
     TileCable cable = TileCable.getTileCable(level, event.getPos());
     if (cable != null) {
       if (held.isEmpty()) {
-        PacketDistributor.sendToServer(new BlockFacadeMessage(event.getPos(), true));
+        ClientPacketDistributor.sendToServer(new BlockFacadeMessage(event.getPos(), true));
       } else {
         Block block = Block.byItem(held.getItem());
         if (block == null || block == Blocks.AIR) {
@@ -69,7 +69,7 @@ public class SsnEvents {
         BlockPlaceContext context = new BlockPlaceContext(player, event.getHand(), held, bhr);
         BlockState facadeState = block.getStateForPlacement(context);
         CompoundTag tags = (facadeState == null) ? new CompoundTag() : NbtUtils.writeBlockState(facadeState);
-        PacketDistributor.sendToServer(new BlockFacadeMessage(event.getPos(), tags));
+        ClientPacketDistributor.sendToServer(new BlockFacadeMessage(event.getPos(), tags));
       }
     }
   }
@@ -77,11 +77,11 @@ public class SsnEvents {
   @SubscribeEvent
   public void onKeyInput(InputEvent.Key event) {
     if (ClientEventRegistry.INVENTORY_KEY.consumeClick()) {
-      PacketDistributor.sendToServer(KeybindCurioMessage.INSTANCE);
+      ClientPacketDistributor.sendToServer(KeybindCurioMessage.INSTANCE);
     }
 
     if (ClientEventRegistry.COLLECTOR_TOGGLE_KEY.consumeClick()) {
-      PacketDistributor.sendToServer(KeybindCollectorToggleMessage.INSTANCE);
+      ClientPacketDistributor.sendToServer(KeybindCollectorToggleMessage.INSTANCE);
     }
   }
 }

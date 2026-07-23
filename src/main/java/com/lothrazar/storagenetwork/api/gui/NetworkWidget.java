@@ -1,7 +1,7 @@
 package com.lothrazar.storagenetwork.api.gui;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,15 +27,15 @@ public interface NetworkWidget {
 
   void mouseScrolled(double mouseButton);
 
-  void renderSearchBar(GuiGraphics ms, int mouseX, int mouseY, float partialTicks);
+  void renderSearchBar(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks);
 
   void render();
   void syncTextToJei();
-  void renderItemSlots(GuiGraphics ms, int mouseX, int mouseY, Font font);
+  void renderItemSlots(GuiGraphicsExtractor ms, int mouseX, int mouseY, Font font);
 
-  void drawGuiContainerForegroundLayer(GuiGraphics ms, int mouseX, int mouseY, Font font);
+  void drawGuiContainerForegroundLayer(GuiGraphicsExtractor ms, int mouseX, int mouseY, Font font);
 
-  void renderBgExpanded(GuiGraphics ms, int xCenter, int yCenter);
+  void renderBgExpanded(GuiGraphicsExtractor ms, int xCenter, int yCenter);
 
   void keyPressed(int keyCode, int scanCode, int b);
 

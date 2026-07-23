@@ -4,7 +4,7 @@ import com.lothrazar.storagenetwork.api.EnumSortType;
 import com.lothrazar.storagenetwork.block.AbstractNetworkScreen;
 import com.lothrazar.storagenetwork.api.gui.NetworkScreenSize;
 import com.lothrazar.storagenetwork.gui.DefaultNetworkWidget;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -16,14 +16,20 @@ public class ScreenNetworkInventoryExpanded extends AbstractNetworkScreen<Contai
   private TileInventoryExpanded tile;
 
   public ScreenNetworkInventoryExpanded(ContainerNetworkInventoryExpanded container, Inventory inv, Component name) {
-    super(container, inv, name);
+    //TODO: refactor this calculation
+    super(container, inv, name, computeWidth(), computeHeight());
     tile = container.tile;
     network = new DefaultNetworkWidget(this, NetworkScreenSize.EXPANDED);
-    //TODO: refactor this calculation
-    imageHeight = DefaultNetworkWidget.player.height() + DefaultNetworkWidget.crafting.height()
-        + DefaultNetworkWidget.row.height() * network.getSize().lines()
+  }
+
+  private static int computeWidth() {
+    return 256 + 12 * 18; //scrollWidth
+  }
+
+  private static int computeHeight() {
+    return DefaultNetworkWidget.player.height() + DefaultNetworkWidget.crafting.height()
+        + DefaultNetworkWidget.row.height() * NetworkScreenSize.EXPANDED.lines()
         + DefaultNetworkWidget.head.height();
-    imageWidth = 256 + 12 * 18;//scrollWidth
   }
 
   @Override
@@ -45,7 +51,8 @@ public class ScreenNetworkInventoryExpanded extends AbstractNetworkScreen<Contai
   }
 
   @Override
-  public void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
+  public void extractBackground(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractBackground(ms, mouseX, mouseY, partialTicks);
     //get center points from screen size
     final int xCenter = (width - imageWidth) / 2;
     final int yCenter = (height - imageHeight) / 2;

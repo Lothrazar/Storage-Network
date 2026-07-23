@@ -1,5 +1,6 @@
 package com.lothrazar.storagenetwork.block.cable.linkfilter;
 
+import net.minecraft.client.Minecraft;
 import java.util.List;
 import java.util.Optional;
 import com.google.common.collect.Lists;
@@ -11,13 +12,15 @@ import com.lothrazar.storagenetwork.gui.components.ButtonRequest;
 import com.lothrazar.storagenetwork.gui.components.ButtonRequest.TextureEnum;
 import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.CableDataMessage;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
@@ -26,7 +29,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
     return supplier.get();
   };
-  private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable.png");
+  private final Identifier texture = Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable.png");
   ContainerCableFilter containerCableLink;
   private ButtonRequest btnRedstone;
   private ButtonRequest btnMinus;
@@ -46,7 +49,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
     super.init();
     this.isAllowlist = containerCableLink.cap.getFilter().isAllowList;
     btnRedstone = addRenderableWidget(new ButtonRequest(leftPos + 4, topPos + 4, "", (p) -> {
-      PacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.REDSTONE.ordinal()));
+      ClientPacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.REDSTONE.ordinal()));
     }, DEFAULT_NARRATION));
     btnMinus = addRenderableWidget(new ButtonRequest(leftPos + 28, topPos + 4, "", (p) -> {
       this.syncData(-1);
@@ -67,21 +70,20 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
   }
 
   private void importFilterSlots() {
-    PacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.IMPORT_FILTER.ordinal()));
+    ClientPacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.IMPORT_FILTER.ordinal()));
   }
 
   private void sendStackSlot(int value, ItemStack stack) {
-    PacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.SAVE_FITLER.ordinal(), value, stack));
+    ClientPacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.SAVE_FITLER.ordinal(), value, stack));
   }
 
   private void syncData(int priority) {
-    PacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.SYNC_DATA.ordinal(), priority, isAllowlist));
+    ClientPacketDistributor.sendToServer(new CableDataMessage(CableDataMessage.CableMessageType.SYNC_DATA.ordinal(), priority, isAllowlist));
   }
 
   @Override
-  public void render(GuiGraphics ms, int mouseX, int mouseY, float partialTicks) {
-    renderBackground(ms, mouseX, mouseY, partialTicks);
-    super.render(ms, mouseX, mouseY, partialTicks);
+  public void extractRenderState(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractRenderState(ms, mouseX, mouseY, partialTicks);
     btnAllowIgn.setTextureId(this.isAllowlist ? TextureEnum.ALLOWLIST : TextureEnum.IGNORELIST);
     if (containerCableLink == null || containerCableLink.cap == null || containerCableLink.cap.connectable == null) {
       return;
@@ -90,38 +92,38 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
   }
 
   @Override
-  public void renderLabels(GuiGraphics ms, int mouseX, int mouseY) {
+  protected void extractLabels(GuiGraphicsExtractor ms, int mouseX, int mouseY) {
     //    this.font.draw(ms, this.title, this.titleLabelX, this.titleLabelY, 4210752); // TODO: gui titles
     int priority = containerCableLink.cap.getPriority();
-    ms.drawString(font, String.valueOf(priority),
+    ms.text(font, String.valueOf(priority),
         50 - font.width(String.valueOf(priority)) / 2,
         12,
         4210752);
     this.drawTooltips(ms, mouseX, mouseY);
   }
 
-  private void drawTooltips(GuiGraphics ms, final int mouseX, final int mouseY) {
+  private void drawTooltips(GuiGraphicsExtractor ms, final int mouseX, final int mouseY) {
     if (btnImport != null && btnImport.isMouseOver(mouseX, mouseY)) {
       //NOT StringTextComponent
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.import")),
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.import")),
           Optional.empty(), mouseX - leftPos, mouseY - topPos);
     }
     if (btnAllowIgn != null && btnAllowIgn.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable(this.isAllowlist
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable(this.isAllowlist
           ? "gui.storagenetwork.allowlist"
           : "gui.storagenetwork.ignorelist")), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
     if (btnMinus != null && btnMinus.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.down")), Optional.empty(),
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.down")), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
     if (btnPlus != null && btnPlus.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.up")), Optional.empty(),
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.up")), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
     if (btnRedstone != null && btnRedstone.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.redstone."
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.redstone."
           + containerCableLink.cap.connectable.needsRedstone())), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
@@ -130,16 +132,17 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
   public static final int SLOT_SIZE = SsnConsts.SQ;
 
   @Override
-  public void renderStackTooltip(GuiGraphics ms, ItemStack stack, int mousex, int mousey) {
-    ms.renderTooltip(font, stack, mousex, mousey);
+  public void renderStackTooltip(GuiGraphicsExtractor ms, ItemStack stack, int mousex, int mousey) {
+    ms.setTooltipForNextFrame(font, stack, mousex, mousey);
   }
 
 
   @Override
-  protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
+  public void extractBackground(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
-    ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
     itemSlotsGhost = Lists.newArrayList();
     //TODO: shared with GuiCableIO
     int rows = 2;
@@ -171,7 +174,10 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+  public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    double mouseX = event.x();
+    double mouseY = event.y();
+    int mouseButton = event.button();
     ItemStack mouse = minecraft.player.containerMenu.getCarried();
     for (int i = 0; i < this.itemSlotsGhost.size(); i++) {
       ItemSlotNetwork slot = itemSlotsGhost.get(i);
@@ -179,7 +185,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
         if (slot.getStack().isEmpty() == false) {
           //i hit non-empty slot, clear it no matter what
           if (mouseButton == SsnConsts.MOUSE_BTN_RIGHT) {
-            int direction = hasShiftDown() ? -1 : 1;
+            int direction = Minecraft.getInstance().hasShiftDown() ? -1 : 1;
             int newCount = Math.min(64, slot.getStack().getCount() + direction);
             if (newCount < 1) {
               newCount = 1;
@@ -200,7 +206,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
         }
       }
     }
-    return super.mouseClicked(mouseX, mouseY, mouseButton);
+    return super.mouseClicked(event, doubleClick);
   }
 
   @Override

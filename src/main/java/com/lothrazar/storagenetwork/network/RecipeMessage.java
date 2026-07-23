@@ -11,11 +11,11 @@ import com.lothrazar.storagenetwork.gui.ContainerNetwork;
 import com.lothrazar.storagenetwork.api.util.UtilInventory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +26,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 public class RecipeMessage implements CustomPacketPayload {
 
   public static final CustomPacketPayload.Type<RecipeMessage> TYPE =
-      new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "recipe"));
+      new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "recipe"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, RecipeMessage> STREAM_CODEC = StreamCodec.of(
       RecipeMessage::write,
@@ -79,10 +79,10 @@ public class RecipeMessage implements CustomPacketPayload {
       for (int slot = 0; slot < 9; slot++) {
         Map<Integer, ItemStack> map = new HashMap<>();
         boolean isOreDict = false;
-        ListTag invList = message.nbt.getList("s" + slot, Tag.TAG_COMPOUND);
+        ListTag invList = message.nbt.getListOrEmpty("s" + slot);
         for (int i = 0; i < invList.size(); i++) {
-          CompoundTag stackTag = invList.getCompound(i);
-          ItemStack s = ItemStack.parseOptional(player.registryAccess(), stackTag);
+          CompoundTag stackTag = invList.getCompoundOrEmpty(i);
+          ItemStack s = ItemStack.CODEC.parse(player.registryAccess().createSerializationContext(NbtOps.INSTANCE), stackTag).result().orElse(ItemStack.EMPTY);
           map.put(i, s);
         }
         for (int i = 0; i < map.size(); i++) {

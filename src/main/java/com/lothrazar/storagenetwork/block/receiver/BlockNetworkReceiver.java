@@ -50,13 +50,13 @@ public class BlockNetworkReceiver extends EntityBlockFlib {
 
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-    return createTickerHelper(type, SsnRegistry.Tiles.RECEIVER.get(), world.isClientSide ? TileNetworkReceiver::clientTick : TileNetworkReceiver::serverTick);
+    return createTickerHelper(type, SsnRegistry.Tiles.RECEIVER.get(), world.isClientSide() ? TileNetworkReceiver::clientTick : TileNetworkReceiver::serverTick);
   }
 
   @Override
   public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
     super.setPlacedBy(world, pos, state, placer, stack);
-    if (world.isClientSide) {
+    if (world.isClientSide()) {
       return;
     }
     BlockEntity be = world.getBlockEntity(pos);
@@ -70,7 +70,7 @@ public class BlockNetworkReceiver extends EntityBlockFlib {
 
   @Override
   public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player playerIn, BlockHitResult result) {
-    if (!world.isClientSide) {
+    if (!world.isClientSide()) {
       BlockEntity tile = world.getBlockEntity(pos);
       if (tile instanceof MenuProvider mp && playerIn instanceof ServerPlayer sp) {
         sp.connection.send(tile.getUpdatePacket());
@@ -82,7 +82,7 @@ public class BlockNetworkReceiver extends EntityBlockFlib {
 
   @Override
   public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-    if (!level.isClientSide) {
+    if (!level.isClientSide()) {
       BlockEntity be = level.getBlockEntity(pos);
       if (be instanceof TileNetworkReceiver recv && !player.isCreative()) {
         // Drop the upgrade contents so they aren't lost on break.
@@ -125,18 +125,9 @@ public class BlockNetworkReceiver extends EntityBlockFlib {
     return EnchantmentHelper.getItemEnchantmentLevel(silk, tool) > 0;
   }
 
-  @Override
-  protected void onRemove(BlockState oldState, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-    // Run our cleanup only when the block is actually changing (break/replace),
-    // NOT on chunk unload. Chunk unload does not change the block state.
-    if (!level.isClientSide && !oldState.is(newState.getBlock())) {
-      BlockEntity be = level.getBlockEntity(pos);
-      if (be instanceof TileNetworkReceiver recv) {
-        recv.onBlockBroken();
-      }
-    }
-    super.onRemove(oldState, level, pos, newState, isMoving);
-  }
+  // Block#onRemove is gone in 26.1; this cleanup now lives in
+  // TileNetworkReceiver#preRemoveSideEffects, which the game calls at the equivalent point
+  // in the block-removal sequence (only when the block type is actually changing).
 
   @Override
   public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {

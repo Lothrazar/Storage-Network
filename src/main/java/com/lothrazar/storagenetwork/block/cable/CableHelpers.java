@@ -7,7 +7,7 @@ import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -40,7 +40,7 @@ public class CableHelpers {
         || facingState.is(SsnRegistry.Blocks.DRAWER.get());
   }
 
-  public static boolean isInventory(Direction facing, LevelAccessor world, BlockPos facingPos) {
+  public static boolean isInventory(Direction facing, LevelReader world, BlockPos facingPos) {
     if (facing == null) {
       return false;
     }
@@ -56,7 +56,7 @@ public class CableHelpers {
       return false;
     }
     if (world instanceof Level level) {
-      return level.getCapability(Capabilities.ItemHandler.BLOCK, facingPos, facing.getOpposite()) != null;
+      return level.getCapability(Capabilities.Item.BLOCK, facingPos, facing.getOpposite()) != null;
     }
     return true;
   }

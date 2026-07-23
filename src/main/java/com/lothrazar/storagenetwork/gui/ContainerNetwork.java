@@ -136,7 +136,10 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
   //it runs on server tho
   protected void findMatchingRecipeClient(Level world, CraftingContainer inventory, ResultContainer result) {
     CraftingInput craftingInput = inventory.asCraftInput();
-    Optional<RecipeHolder<CraftingRecipe>> optional = world.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftingInput, world);
+    if (world.getServer() == null) {
+      return;
+    }
+    Optional<RecipeHolder<CraftingRecipe>> optional = world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftingInput, world);
     if (optional.isPresent()) {
       this.recipeCurrent = optional.get().value();
     }
@@ -144,7 +147,7 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
 
   //from WorkbenchContainer::slotChangedCraftingGrid
   private void findMatchingRecipe(int containerId, Level world, Player player, CraftingContainer inventory, ResultContainer result) {
-    if (!world.isClientSide) {
+    if (!world.isClientSide()) {
       final int slotId = 0;
       ServerPlayer serverplayerentity = (ServerPlayer) player;
       ItemStack itemstack = ItemStack.EMPTY;
@@ -153,10 +156,9 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
       if (optional.isPresent()) {
         RecipeHolder<CraftingRecipe> holder = optional.get();
         CraftingRecipe icraftingrecipe = holder.value();
-        if (result.setRecipeUsed(world, serverplayerentity, holder)) {
-          itemstack = icraftingrecipe.assemble(craftingInput, world.registryAccess());
-          this.recipeCurrent = icraftingrecipe;
-        }
+        result.setRecipeUsed(holder);
+        itemstack = icraftingrecipe.assemble(craftingInput);
+        this.recipeCurrent = icraftingrecipe;
       }
       result.setItem(slotId, itemstack);
       serverplayerentity.connection.send(new ClientboundContainerSetSlotPacket(containerId, this.incrementStateId(), slotId, itemstack));
@@ -166,7 +168,7 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
   @Override
   public ItemStack quickMoveStack(Player playerIn, int slotIndex) {
     Level level = playerIn.level();
-    if (level.isClientSide) {
+    if (level.isClientSide()) {
       return ItemStack.EMPTY;
     }
     ItemStack itemstack = ItemStack.EMPTY;
@@ -242,7 +244,7 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
     for (int i = 0; i < matrix.getContainerSize(); i++) {
       recipeCopy.add(matrix.getItem(i).copy());
     }
-    ItemStack res = recipeCurrent.assemble(matrix.asCraftInput(), level.registryAccess());
+    ItemStack res = recipeCurrent.assemble(matrix.asCraftInput());
     if (res.isEmpty()) {
       StorageNetworkMod.LOGGER.error("err Recipe output is an empty stack " + recipeCurrent);
       return;
@@ -255,7 +257,7 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
     StorageNetworkMod.LOGGER.debug("[craftShift] START sizePerCraft={} limit={} fullStack={} for {}", sizePerCraft, limit, isFullStackCraft(), res);
     while (crafted + sizePerCraft <= limit) {
       iter++;
-      res = recipeCurrent.assemble(matrix.asCraftInput(), level.registryAccess());
+      res = recipeCurrent.assemble(matrix.asCraftInput());
       //StorageNetworkMod.LOGGER.debug("[craftShift] iter={} crafted={} res.count={}", iter, crafted, res.getCount());
       if (!ItemHandlerHelper.insertItemStacked(new PlayerMainInvWrapper(playerInv), res, true).isEmpty()) {
         //StorageNetworkMod.LOGGER.debug("[craftShift] BREAK iter={}: simulate-insert says no room", iter);
@@ -277,7 +279,8 @@ public abstract class ContainerNetwork extends AbstractContainerMenu {
         if (slot.isEmpty()) {
           continue;
         }
-        ItemStack containerItem = slot.getItem().getCraftingRemainingItem(slot);
+        var remainderTemplate = slot.getItem().getCraftingRemainder(slot);
+        ItemStack containerItem = remainderTemplate != null ? remainderTemplate.create() : ItemStack.EMPTY;
         if (!containerItem.isEmpty()) {
           //milk bucket, water bucket, etc - replace ingredient with its container
           this.matrix.setItem(i, containerItem);

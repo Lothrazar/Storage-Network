@@ -19,19 +19,22 @@ import com.lothrazar.storagenetwork.network.ClearRecipeMessage;
 import com.lothrazar.storagenetwork.network.InsertMessage;
 import com.lothrazar.storagenetwork.network.RequestMessage;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
 import com.lothrazar.storagenetwork.api.util.CacheModName;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -44,13 +47,13 @@ public class DefaultNetworkWidget implements NetworkWidget {
 
   private static final int W = 256;
   //i know they could all be in the same png file and i pull out sprites from it, but split images is easier to work with
-  public static final TileableTexture head = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head.png"), W, 10);
-  public static final TileableTexture head_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head_right.png"), W, 10);
-  public static final TileableTexture row = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row.png"), W, SsnConsts.SQ);
-  public static final TileableTexture row_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row_right.png"), W, SsnConsts.SQ);
-  public static final TileableTexture crafting = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting.png"), W, 66);
-  public static final TileableTexture crafting_right = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting_right.png"), W, 66);
-  public static final TileableTexture player = new TileableTexture(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_player.png"), 176, 84);
+  public static final TileableTexture head = new TileableTexture(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head.png"), W, 10);
+  public static final TileableTexture head_right = new TileableTexture(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_head_right.png"), W, 10);
+  public static final TileableTexture row = new TileableTexture(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row.png"), W, SsnConsts.SQ);
+  public static final TileableTexture row_right = new TileableTexture(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_row_right.png"), W, SsnConsts.SQ);
+  public static final TileableTexture crafting = new TileableTexture(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting.png"), W, 66);
+  public static final TileableTexture crafting_right = new TileableTexture(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_crafting_right.png"), W, 66);
+  public static final TileableTexture player = new TileableTexture(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/expandable_player.png"), 176, 84);
 
   public static List<SearchHandler> searchHandlers = new ArrayList<>();
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
@@ -86,7 +89,7 @@ public class DefaultNetworkWidget implements NetworkWidget {
     slots = Lists.newArrayList();
     this.size = size;
     setScreenSize();
-    PacketDistributor.sendToServer(new RequestMessage());
+    ClientPacketDistributor.sendToServer(new RequestMessage());
     lastClick = System.currentTimeMillis();
   }
 
@@ -205,8 +208,8 @@ public class DefaultNetworkWidget implements NetworkWidget {
       }
       clearGridBtn = new ButtonRequest(
           x, y, "", (p) -> {
-            PacketDistributor.sendToServer(ClearRecipeMessage.INSTANCE);
-            PacketDistributor.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
+            ClientPacketDistributor.sendToServer(ClearRecipeMessage.INSTANCE);
+            ClientPacketDistributor.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
           }, DEFAULT_NARRATION);
       clearGridBtn.setHeight(7);
       clearGridBtn.setWidth(7);
@@ -286,7 +289,7 @@ public class DefaultNetworkWidget implements NetworkWidget {
     }
     else if (searchText.startsWith(EnumSearchPrefix.TAG.getPrefix())) { // search tags
       List<String> joiner = new ArrayList<>();
-      for (ResourceLocation oreId : stack.getTags().map((tagKey) -> tagKey.location()).toList()) {
+      for (Identifier oreId : stack.typeHolder().tags().map((tagKey) -> tagKey.location()).toList()) {
         String oreName = oreId.toString();
         joiner.add(oreName);
       }
@@ -393,7 +396,7 @@ public class DefaultNetworkWidget implements NetworkWidget {
   }
 
   @Override
-  public void drawGuiContainerForegroundLayer(GuiGraphics ms, int mouseX, int mouseY, Font font) {
+  public void drawGuiContainerForegroundLayer(GuiGraphicsExtractor ms, int mouseX, int mouseY, Font font) {
     for (ItemSlotNetwork slot : slots) {
       if (slot != null && slot.isMouseOverSlot(mouseX, mouseY)) {
         slot.drawTooltip(ms, mouseX, mouseY);
@@ -422,7 +425,7 @@ public class DefaultNetworkWidget implements NetworkWidget {
     }
     else if (this.inSearchBar(mouseX, mouseY)) {
       //tooltip = new TranslationTextComponent("gui.storagenetwork.fil.tooltip_clear");
-      if (!Screen.hasShiftDown()) {
+      if (!Minecraft.getInstance().hasShiftDown()) {
         tooltip = Component.translatable("gui.storagenetwork.shift");
       }
       else {
@@ -431,18 +434,18 @@ public class DefaultNetworkWidget implements NetworkWidget {
         lis.add(Component.translatable("gui.storagenetwork.fil.tooltip_tooltip")); //#
         lis.add(Component.translatable("gui.storagenetwork.fil.tooltip_tags")); //$
         lis.add(Component.translatable("gui.storagenetwork.fil.tooltip_clear")); //clear
-        ms.renderTooltip(font, lis, Optional.empty(), mouseX - gui.getGuiLeft(), mouseY - gui.getGuiTop());
+        ms.setTooltipForNextFrame(font, lis, Optional.empty(), mouseX - gui.getGuiLeft(), mouseY - gui.getGuiTop());
         return; // all done, we have our tts rendered
       }
     }
     //do we have a tooltip
     if (tooltip != null) {
-      ms.renderTooltip(font, Lists.newArrayList(tooltip), Optional.empty(), mouseX - gui.getGuiLeft(), mouseY - gui.getGuiTop());
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(tooltip), Optional.empty(), mouseX - gui.getGuiLeft(), mouseY - gui.getGuiTop());
     }
   }
 
   @Override
-  public void renderItemSlots(GuiGraphics ms, int mouseX, int mouseY, Font font) {
+  public void renderItemSlots(GuiGraphicsExtractor ms, int mouseX, int mouseY, Font font) {
     stackUnderMouse = ItemStack.EMPTY;
     for (ItemSlotNetwork slot : slots) {
       slot.drawSlot(ms, font, mouseX, mouseY);
@@ -456,8 +459,8 @@ public class DefaultNetworkWidget implements NetworkWidget {
   }
 
   public boolean charTyped(char typedChar, int keyCode) {
-    if (searchBar.isFocused() && searchBar.charTyped(typedChar, keyCode)) {
-      PacketDistributor.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
+    if (searchBar.isFocused() && searchBar.charTyped(new CharacterEvent(typedChar))) {
+      ClientPacketDistributor.sendToServer(new RequestMessage(0, ItemStack.EMPTY, false, false));
       syncTextToJei();
       return true;
     }
@@ -482,13 +485,13 @@ public class DefaultNetworkWidget implements NetworkWidget {
         && (mouseButton == SsnConsts.MOUSE_BTN_LEFT || mouseButton == SsnConsts.MOUSE_BTN_RIGHT)
         && stackCarriedByMouse.isEmpty()) {
       // Request an item (from the network) if we are in the upper section of the GUI 
-      PacketDistributor.sendToServer(new RequestMessage(mouseButton, this.stackUnderMouse.copy(), Screen.hasShiftDown(),
-          Screen.hasAltDown() || Screen.hasControlDown()));
+      ClientPacketDistributor.sendToServer(new RequestMessage(mouseButton, this.stackUnderMouse.copy(), Minecraft.getInstance().hasShiftDown(),
+          Minecraft.getInstance().hasAltDown() || Minecraft.getInstance().hasControlDown()));
       this.lastClick = System.currentTimeMillis();
     }
     else if (!stackCarriedByMouse.isEmpty() && inField((int) mouseX, (int) mouseY)) {
       // Insert the item held by the mouse into the network
-      PacketDistributor.sendToServer(new InsertMessage(0, mouseButton));
+      ClientPacketDistributor.sendToServer(new InsertMessage(0, mouseButton));
       this.lastClick = System.currentTimeMillis();
     }
   }
@@ -531,8 +534,8 @@ public class DefaultNetworkWidget implements NetworkWidget {
     });
   }
   @Override
-  public void renderSearchBar(GuiGraphics ms, int mouseX, int mouseY, float partialTicks) {
-    searchBar.render(ms, mouseX, mouseY, partialTicks);
+  public void renderSearchBar(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    searchBar.extractRenderState(ms, mouseX, mouseY, partialTicks);
   }
 
   @Override
@@ -559,12 +562,12 @@ public class DefaultNetworkWidget implements NetworkWidget {
     }
   }
 
-  private void blitSegment(GuiGraphics ms, TileableTexture tt, int xpos, int ypos) {
-    ms.blit(tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height());
+  private void blitSegment(GuiGraphicsExtractor ms, TileableTexture tt, int xpos, int ypos) {
+    ms.blit(RenderPipelines.GUI_TEXTURED, tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height(), tt.width(), tt.height());
   }
 
   @Override
-  public void renderBgExpanded(GuiGraphics ms, int xCenter, int yCenter) {
+  public void renderBgExpanded(GuiGraphicsExtractor ms, int xCenter, int yCenter) {
     //render the top
     int xpos = xCenter;
     int ypos = yCenter;
@@ -585,6 +588,6 @@ public class DefaultNetworkWidget implements NetworkWidget {
 
   @Override
   public void keyPressed(int keyCode, int scanCode, int b) {
-     searchBar.keyPressed(keyCode, scanCode, b);
+     searchBar.keyPressed(new KeyEvent(keyCode, scanCode, b));
   }
 }

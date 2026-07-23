@@ -6,7 +6,7 @@ import java.util.List;
 import com.lothrazar.library.util.StringParseUtil;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,7 +36,7 @@ public class ConfigRegistry {
   }
 
   public static boolean isFacadeAllowed(ItemStack item) {
-    ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item.getItem());
+    Identifier itemId = BuiltInRegistries.ITEM.getKey(item.getItem());
     if (StringParseUtil.isInList(CABLEIGNORELIST.get(), itemId)) {
       return false;
     }

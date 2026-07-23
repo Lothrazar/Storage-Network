@@ -11,18 +11,18 @@ import com.lothrazar.storagenetwork.api.batch.StackProvider;
 import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import com.lothrazar.storagenetwork.api.network.BlockEntityConnectableNode;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CapabilityConnectableDefault implements CapabilityConnectable, INBTSerializable<CompoundTag> {
+public class CapabilityConnectableDefault implements CapabilityConnectable, ValueIOSerializable {
   public static final Logger LOGGER = LogManager.getLogger();
 
   public final ConnectableNode connectable;
@@ -268,60 +268,52 @@ public class CapabilityConnectableDefault implements CapabilityConnectable, INBT
   }
 
   @Override
-  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
-    CompoundTag result = new CompoundTag();
-    result.putInt("prio", priority);
+  public void serialize(ValueOutput output) {
+    output.putInt("prio", priority);
     if (inventoryFace != null) {
-      result.putString("inventoryFace", inventoryFace.toString());
+      output.putString("inventoryFace", inventoryFace.toString());
     }
-    result.putString("way", filterDirection.toString());
-    CompoundTag operation = new CompoundTag();
+    output.putString("way", filterDirection.toString());
+    ValueOutput operation = output.child("operation");
     if (!operationStack.isEmpty()) {
-      operation.put("stack", (CompoundTag) operationStack.save(registries));
+      operation.store("stack", ItemStack.CODEC, operationStack);
     }
     operation.putBoolean("mustBeSmaller", operationMustBeSmaller);
     operation.putInt("limit", operationLimit);
-    result.put("operation", operation);
-    CompoundTag filters = this.filters.serializeNBT(registries);
-    result.put("filters", filters);
-    return result;
+    this.filters.serialize(output.child("filters"));
   }
 
   @Override
-  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
-    priority = nbt.getInt("prio");
-    CompoundTag filters = nbt.getCompound("filters");
-    this.filters.deserializeNBT(registries, filters);
-    if (nbt.contains("inventoryFace")) {
-      inventoryFace = Direction.byName(nbt.getString("inventoryFace"));
+  public void deserialize(ValueInput input) {
+    priority = input.getIntOr("prio", 0);
+    this.filters.deserialize(input.childOrEmpty("filters"));
+    String faceName = input.getStringOr("inventoryFace", null);
+    if (faceName != null) {
+      inventoryFace = Direction.byName(faceName);
     }
     try {
-      filterDirection = EnumStorageDirection.valueOf(nbt.getString("way"));
+      filterDirection = EnumStorageDirection.valueOf(input.getStringOr("way", EnumStorageDirection.BOTH.toString()));
     }
     catch (Exception e) {
       filterDirection = EnumStorageDirection.BOTH;
     }
-    CompoundTag operation = nbt.getCompound("operation");
     operationStack = ItemStack.EMPTY;
-    if (operation != null) {
-      operationLimit = operation.getInt("limit");
-      operationMustBeSmaller = operation.getBoolean("mustBeSmaller");
-      if (operation.contains("stack")) {
-        operationStack = ItemStack.parseOptional(registries, operation.getCompound("stack"));
-      }
-    }
+    ValueInput operation = input.childOrEmpty("operation");
+    operationLimit = operation.getIntOr("limit", 0);
+    operationMustBeSmaller = operation.getBooleanOr("mustBeSmaller", true);
+    operation.read("stack", ItemStack.CODEC).ifPresent(stack -> operationStack = stack);
   }
 
   @Override
   public ItemStack extractFromSlot(int slot, int amount, boolean simulate) {
     DimPos inventoryPos = connectable.getPos().offset(inventoryFace);
     // Test whether the connected block has the IItemHandler capability
-    IItemHandler itemHandler = inventoryPos.getCapability(Capabilities.ItemHandler.BLOCK,
+    var resourceHandler = inventoryPos.getCapability(Capabilities.Item.BLOCK,
         inventoryFace.getOpposite());
-    if (itemHandler == null) {
+    if (resourceHandler == null) {
       return ItemStack.EMPTY;
     }
-    return itemHandler.extractItem(slot, amount, simulate);
+    return IItemHandler.of(resourceHandler).extractItem(slot, amount, simulate);
   }
 
   @Override
@@ -340,11 +332,12 @@ public class CapabilityConnectableDefault implements CapabilityConnectable, INBT
     }
     DimPos inventoryPos = connectablePos.offset(inventoryFace);
     // Test whether the connected block has the IItemHandler capability
-    IItemHandler itemHandler = inventoryPos.getCapability(Capabilities.ItemHandler.BLOCK,
+    var resourceHandler = inventoryPos.getCapability(Capabilities.Item.BLOCK,
         inventoryFace.getOpposite());
-    if (itemHandler == null) {
+    if (resourceHandler == null) {
       return;
     }
+    IItemHandler itemHandler = IItemHandler.of(resourceHandler);
     // if (itemHandler instanceof ExchangeItemStackHandler) {
     // StorageNetwork.log("cannot loop back a network extract into
     // ExchangeItemStackHandler");

@@ -7,8 +7,12 @@ import com.lothrazar.storagenetwork.gui.DefaultGuiNetwork;
 import com.lothrazar.storagenetwork.gui.components.TextboxInteger;
 import com.lothrazar.storagenetwork.compat.jei.JeiHooks;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -23,6 +27,10 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
     super(container, inv, name);
   }
 
+  public AbstractNetworkScreen(T container, Inventory inv, Component name, int imageWidth, int imageHeight) {
+    super(container, inv, name, imageWidth, imageHeight);
+  }
+
   @Override
   public void setStacks(List<ItemStack> stacks) {
     getNetwork().setStacks(stacks);
@@ -34,16 +42,19 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
 //  }
 
   @Override
-  public boolean charTyped(char typedChar, int keyCode) {
-    if (getNetwork().charTyped(typedChar, keyCode)) {
+  public boolean charTyped(CharacterEvent event) {
+    if (getNetwork().charTyped((char) event.codepoint(), event.codepoint())) {
       return true;
     }
     return false;
   }
 
   @Override
-  public boolean keyPressed(int keyCode, int scanCode, int b) {
-    InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
+  public boolean keyPressed(KeyEvent event) {
+    int keyCode = event.key();
+    int scanCode = event.scancode();
+    int b = event.modifiers();
+    InputConstants.Key mouseKey = InputConstants.getKey(event);
     if (keyCode == TextboxInteger.KEY_ESC) {
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.
@@ -68,7 +79,7 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
       minecraft.player.closeContainer();
       return true; // Forge MC-146650: Needs to return true when the key is handled.
     }
-    return super.keyPressed(keyCode, scanCode, b);
+    return super.keyPressed(event);
   }
 
   // used by ItemSlotNetwork and NetworkWidget
@@ -96,33 +107,31 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-    super.mouseClicked(mouseX, mouseY, mouseButton);
-    getNetwork().mouseClicked(mouseX, mouseY, mouseButton);
+  public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    super.mouseClicked(event, doubleClick);
+    getNetwork().mouseClicked(event.x(), event.y(), event.button());
     return true;
   }
 
   @Deprecated
-  protected void blitSegment(GuiGraphics ms, TileableTexture tt, int xpos, int ypos) {
-    ms.blit(tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height());
+  protected void blitSegment(GuiGraphicsExtractor graphics, TileableTexture tt, int xpos, int ypos) {
+    graphics.blit(RenderPipelines.GUI_TEXTURED, tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height(), tt.width(), tt.height());
   }
 
   @Override
-  public void render(GuiGraphics ms, int mouseX, int mouseY, float partialTicks) {
-    this.renderBackground(ms, mouseX, mouseY, partialTicks);
-    super.render(ms, mouseX, mouseY, partialTicks);
-    this.renderTooltip(ms, mouseX, mouseY);
-    getNetwork().renderSearchBar(ms, mouseX, mouseY, partialTicks);
+  public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+    super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
+    getNetwork().renderSearchBar(graphics, mouseX, mouseY, partialTicks);
     getNetwork().render();
   }
 
   @Override
-  public void renderStackTooltip(GuiGraphics ms, ItemStack stack, int mousex, int mousey) {
-    ms.renderTooltip(font, stack, mousex, mousey);
+  public void renderStackTooltip(GuiGraphicsExtractor graphics, ItemStack stack, int mousex, int mousey) {
+    graphics.setTooltipForNextFrame(font, stack, mousex, mousey);
   }
 
   @Override
-  public void renderLabels(GuiGraphics ms, int mouseX, int mouseY) {
-    getNetwork().drawGuiContainerForegroundLayer(ms, mouseX, mouseY, font);
+  protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    getNetwork().drawGuiContainerForegroundLayer(graphics, mouseX, mouseY, font);
   }
 }

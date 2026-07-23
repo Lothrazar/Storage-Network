@@ -1,6 +1,6 @@
 package com.lothrazar.storagenetwork.item;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import com.lothrazar.library.util.ChatUtil;
 import net.minecraft.core.component.DataComponents;
@@ -28,11 +28,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 
 public class ItemCollector extends ItemFlib {
@@ -51,7 +50,9 @@ public class ItemCollector extends ItemFlib {
   public void toggleEnabled(ItemStack stack, Player player) {
     boolean newEnabled = !isEnabled(stack);
     stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, data -> data.update(tag -> tag.putBoolean(NBT_ENABLED, newEnabled)));
-    player.displayClientMessage(makeDisabledTooltip(newEnabled), true);
+    if (player instanceof ServerPlayer sp) {
+      sp.sendSystemMessage(makeDisabledTooltip(newEnabled), true);
+    }
   }
 
   // not subscribe, called from SsnEvents.java
@@ -75,7 +76,7 @@ public class ItemCollector extends ItemFlib {
       ItemStack item = event.getItemEntity().getItem();
       Level world = player.level();
       DimPos dp = DimPos.getPosStored(collectorStack);
-      if (dp != null && !world.isClientSide) {
+      if (dp != null && !world.isClientSide()) {
         ServerLevel serverTargetWorld = DimPos.stringDimensionLookup(dp.getDimension(), world.getServer());
         if (serverTargetWorld == null) {
           StorageNetworkMod.LOGGER.error("Missing dimension key " + dp.getDimension());
@@ -103,7 +104,7 @@ public class ItemCollector extends ItemFlib {
   }
   private static boolean isEnabled(ItemStack collectorStack) {
     CustomData customData = collectorStack.get(DataComponents.CUSTOM_DATA);
-    return customData != null && customData.copyTag().getBoolean(NBT_ENABLED);
+    return customData != null && customData.copyTag().getBooleanOr(NBT_ENABLED, false);
   }
 
   @Override
@@ -122,17 +123,16 @@ public class ItemCollector extends ItemFlib {
   }
 
   @Override
-  @OnlyIn(Dist.CLIENT)
-  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
     MutableComponent t = Component.translatable(getDescriptionId() + ".tooltip");
     t.withStyle(ChatFormatting.GRAY);
-    tooltip.add(t);
+    tooltip.accept(t);
     if (stack.has(DataComponents.CUSTOM_DATA)) {
       DimPos dp = DimPos.getPosStored(stack);
       if (dp != null) {
-        tooltip.add(dp.makeTooltip());
+        tooltip.accept(dp.makeTooltip());
       }
-      tooltip.add(makeDisabledTooltip(isEnabled(stack)).withStyle(ChatFormatting.DARK_GRAY));
+      tooltip.accept(makeDisabledTooltip(isEnabled(stack)).withStyle(ChatFormatting.DARK_GRAY));
     }
   }
 

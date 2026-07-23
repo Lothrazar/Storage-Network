@@ -6,7 +6,7 @@ import com.lothrazar.storagenetwork.StorageNetworkMod;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -16,7 +16,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 
 public class SsnTab {
 
-  private static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "tab"));
+  private static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "tab"));
 
   @SubscribeEvent
   public static void onCreativeModeTabRegister(RegisterEvent event) {
@@ -30,7 +30,7 @@ public class SsnTab {
               try {
                 // FQCN kept so the class doesn't load when Patchouli isn't present.
                 ItemStack book = vazkii.patchouli.api.PatchouliAPI.get()
-                    .getBookStack(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "network_book"));
+                    .getBookStack(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "network_book"));
                 if (!book.isEmpty()) {
                   stacks.add(book);
                 }

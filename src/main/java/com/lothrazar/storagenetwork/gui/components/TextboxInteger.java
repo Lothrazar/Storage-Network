@@ -2,9 +2,11 @@ package com.lothrazar.storagenetwork.gui.components;
 //package com.lothrazar.cyclic.gui;
 
 import com.lothrazar.storagenetwork.network.CableIOMessage;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 
 /**
  * https://github.com/Lothrazar/Cyclic/blob/61887dc2b69541a553bb0259347d13d6f9d7730e/src/main/java/com/lothrazar/cyclic/gui/TextboxInteger.java
@@ -31,23 +33,23 @@ public class TextboxInteger extends EditBox {
   }
 
   @Override
-  public boolean keyPressed(int key, int mx, int my) {
-    if (key == KEY_BACKSPACE || key == KEY_DELETE) {
+  public boolean keyPressed(KeyEvent event) {
+    if (event.key() == KEY_BACKSPACE || event.key() == KEY_DELETE) {
       saveValue();
     }
-    return super.keyPressed(key, mx, my);
+    return super.keyPressed(event);
   }
 
   private void saveValue() {
-    PacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SYNC_OP_TEXT.ordinal(), this.getCurrent(), false));
+    ClientPacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SYNC_OP_TEXT.ordinal(), this.getCurrent(), false));
   }
 
   @Override
-  public boolean charTyped(char chr, int p) {
-    if (!Character.isDigit(chr)) {
+  public boolean charTyped(CharacterEvent event) {
+    if (!Character.isDigit(event.codepoint())) {
       return false;
     }
-    boolean worked = super.charTyped(chr, p);
+    boolean worked = super.charTyped(event);
     if (worked) {
       saveValue();
     }

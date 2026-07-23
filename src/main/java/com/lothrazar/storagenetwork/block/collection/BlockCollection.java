@@ -33,7 +33,7 @@ public class BlockCollection extends EntityBlockFlib {
 
   @Override
   public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player playerIn, BlockHitResult result) {
-    if (!world.isClientSide) {
+    if (!world.isClientSide()) {
       BlockEntity tile = world.getBlockEntity(pos);
       if (tile instanceof MenuProvider) {
         ServerPlayer player = (ServerPlayer) playerIn;

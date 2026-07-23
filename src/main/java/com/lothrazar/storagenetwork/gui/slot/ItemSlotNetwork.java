@@ -2,11 +2,10 @@ package com.lothrazar.storagenetwork.gui.slot;
 
 import com.lothrazar.storagenetwork.api.gui.GuiPrivate;
 import com.lothrazar.storagenetwork.api.util.UtilInventory;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import org.joml.Matrix3x2fStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -40,42 +39,40 @@ public class ItemSlotNetwork {
     return parent.isInRegion(x - guiLeft, y - guiTop, 16, 16, mouseX, mouseY);
   }
 
-  public void drawSlot(GuiGraphics poseStack, Font font, int mx, int my) {
+  public void drawSlot(GuiGraphicsExtractor poseStack, Font font, int mx, int my) {
     if (!getStack().isEmpty()) {
       //      poseStack.pushPose();
       String amount;
       //cant sneak in gui
       //default to short form, show full amount if sneak
-      if (Screen.hasShiftDown()) {
+      if (Minecraft.getInstance().hasShiftDown()) {
         amount = size + "";
       }
       else {
         amount = UtilInventory.formatLargeNumber(size);
       }
       final float scale = 0.85F;
-      PoseStack pose = poseStack.pose();
-      pose.pushPose();
-      pose.translate(x + 3, y + 3, 0);
-      pose.scale(scale, scale, scale);
-      pose.translate(-1 * x, -1 * y, 0);
+      Matrix3x2fStack pose = poseStack.pose();
+      pose.pushMatrix();
+      pose.translate(x + 3, y + 3);
+      pose.scale(scale, scale);
+      pose.translate(-1 * x, -1 * y);
       if (isShowNumbers() && size > 1) {
-        poseStack.renderItemDecorations(font, stack, x, y, amount);
+        poseStack.itemDecorations(font, stack, x, y, amount);
       }
-      pose.popPose();
+      pose.popMatrix();
       if (isMouseOverSlot(mx, my)) {
         int j1 = x;
         int k1 = y;
-        RenderSystem.colorMask(true, true, true, false);
         poseStack.fillGradient(j1, k1, j1 + 16, k1 + 16, -2130706433, -2130706433);
         //        parent.drawGradient(poseStack, j1, k1, j1 + 16, k1 + 16, -2130706433, -2130706433);
-        RenderSystem.colorMask(true, true, true, true);
       }
-      poseStack.renderItem(stack, x, y);
+      poseStack.item(stack, x, y);
       //      Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(poseStack, getStack(), x, y);
     }
   }
 
-  public void drawTooltip(GuiGraphics ms, int mx, int my) {
+  public void drawTooltip(GuiGraphicsExtractor ms, int mx, int my) {
     if (isMouseOverSlot(mx, my) && !getStack().isEmpty()) {
       parent.renderStackTooltip(ms, getStack(),
           mx - parent.getGuiLeft(),

@@ -3,9 +3,9 @@ package com.lothrazar.storagenetwork.api.capabilities;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.lothrazar.library.cap.ItemStackHandlerEx;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class FilterItemStackHandler extends ItemStackHandlerEx {
 
@@ -83,23 +83,21 @@ public class FilterItemStackHandler extends ItemStackHandlerEx {
   }
 
   @Override
-  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
-    super.deserializeNBT(registries, nbt);
-    CompoundTag rulesTag = nbt.getCompound("rules");
-    tags = rulesTag.getBoolean("tags");
-    this.nbt = rulesTag.getBoolean("nbt");
-    isAllowList = rulesTag.getBoolean("whitelist");
+  public void deserialize(ValueInput input) {
+    super.deserialize(input);
+    ValueInput rules = input.childOrEmpty("rules");
+    tags = rules.getBooleanOr("tags", false);
+    this.nbt = rules.getBooleanOr("nbt", false);
+    isAllowList = rules.getBooleanOr("whitelist", true);
   }
 
   @Override
-  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
-    CompoundTag result = super.serializeNBT(registries);
-    CompoundTag rulesTag = new CompoundTag();
-    rulesTag.putBoolean("tags", tags);
-    rulesTag.putBoolean("nbt", nbt);
-    rulesTag.putBoolean("whitelist", isAllowList);
-    result.put("rules", rulesTag);
-    return result;
+  public void serialize(ValueOutput output) {
+    super.serialize(output);
+    ValueOutput rules = output.child("rules");
+    rules.putBoolean("tags", tags);
+    rules.putBoolean("nbt", nbt);
+    rules.putBoolean("whitelist", isAllowList);
   }
 
   public int getStackCount(ItemStack stackCurrent) {

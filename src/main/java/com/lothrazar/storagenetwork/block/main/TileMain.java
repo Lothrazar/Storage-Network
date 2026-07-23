@@ -3,8 +3,6 @@ package com.lothrazar.storagenetwork.block.main;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.EnumStorageDirection;
@@ -20,13 +18,14 @@ import com.lothrazar.storagenetwork.api.batch.RequestBatch;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -77,19 +76,12 @@ public class TileMain extends BlockEntity implements BlockEntityMainNetwork {
 
   @Override
   public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-    CompoundTag nbt = new CompoundTag();
-    this.saveAdditional(nbt, registries);
-    return nbt;
+    return this.saveCustomOnly(registries);
   }
 
   @Override
   public ClientboundBlockEntityDataPacket getUpdatePacket() {
     return ClientboundBlockEntityDataPacket.create(this);
-  }
-
-  @Override
-  public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
-    loadAdditional(pkt.getTag() == null ? new CompoundTag() : pkt.getTag(), registries);
   }
 
   @Override
@@ -152,26 +144,21 @@ public class TileMain extends BlockEntity implements BlockEntityMainNetwork {
   }
 
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.loadAdditional(compound, registries);
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
     boundReceivers.clear();
-    if (compound.contains(NBT_RECEIVERS)) {
-      ListTag list = compound.getList(NBT_RECEIVERS, Tag.TAG_COMPOUND);
-      for (int i = 0; i < list.size(); i++) {
-        DimPos dp = new DimPos(list.getCompound(i));
-        boundReceivers.add(dp);
-      }
+    for (ValueInput child : input.childrenListOrEmpty(NBT_RECEIVERS)) {
+      boundReceivers.add(DimPos.of(child));
     }
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.saveAdditional(compound, registries);
-    ListTag list = new ListTag();
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
+    ValueOutput.ValueOutputList list = output.childrenList(NBT_RECEIVERS);
     for (DimPos dp : boundReceivers) {
-      list.add(dp.serializeNBT(registries));
+      dp.serialize(list.addChild());
     }
-    compound.put(NBT_RECEIVERS, list);
   }
 
   public void clearCache() {
@@ -208,7 +195,7 @@ public class TileMain extends BlockEntity implements BlockEntityMainNetwork {
    * Finally run processing at the end
    */
   private void tick() {
-    if (level == null || level.isClientSide) {
+    if (level == null || level.isClientSide()) {
       return;
     }
     refresh();

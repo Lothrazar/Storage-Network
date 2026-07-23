@@ -18,17 +18,17 @@ import com.lothrazar.storagenetwork.api.network.ConnectableNodeDefault;
 import com.lothrazar.storagenetwork.api.util.UtilInventory;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CapabilityImportExportDefault implements INBTSerializable<CompoundTag>, CapabilityImportExport {
+public class CapabilityImportExportDefault implements ValueIOSerializable, CapabilityImportExport {
   public static final Logger LOGGER = LogManager.getLogger();
 
   public static final int DEFAULT_ITEMS_PER = 4;
@@ -133,50 +133,37 @@ public class CapabilityImportExportDefault implements INBTSerializable<CompoundT
   }
 
   @Override
-  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
-    CompoundTag result = new CompoundTag();
-    result.put("upgrades", this.upgrades.serializeNBT(registries));
-    result.put("filters", this.filters.serializeNBT(registries));
-    result.putInt("prio", priority);
+  public void serialize(ValueOutput output) {
+    this.upgrades.serialize(output.child("upgrades"));
+    this.filters.serialize(output.child("filters"));
+    output.putInt("prio", priority);
     if (inventoryFace != null) {
-      result.putString("inventoryFace", inventoryFace.toString());
+      output.putString("inventoryFace", inventoryFace.toString());
     }
-    CompoundTag operation = new CompoundTag();
+    ValueOutput operation = output.child("operation");
     if (!operationStack.isEmpty()) {
-      operation.put("stack", (CompoundTag) operationStack.save(registries));
+      operation.store("stack", ItemStack.CODEC, operationStack);
     }
     operation.putInt("operationType", operationType);
     operation.putInt("limit", operationLimit);
-    result.put("operation", operation);
-    return result;
   }
 
   @Override
-  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
-    CompoundTag upgrades = nbt.getCompound("upgrades");
-    if (upgrades != null) {
-      this.upgrades.deserializeNBT(registries, upgrades);
+  public void deserialize(ValueInput input) {
+    this.upgrades.deserialize(input.childOrEmpty("upgrades"));
+    this.filters.deserialize(input.childOrEmpty("filters"));
+    priority = input.getIntOr("prio", 0);
+    String faceName = input.getStringOr("inventoryFace", null);
+    if (faceName != null) {
+      inventoryFace = Direction.byName(faceName);
     }
-    CompoundTag filters = nbt.getCompound("filters");
-    if (filters != null) {
-      this.filters.deserializeNBT(registries, filters);
-    }
-    priority = nbt.getInt("prio");
-    if (nbt.contains("inventoryFace")) {
-      inventoryFace = Direction.byName(nbt.getString("inventoryFace"));
-    }
-    if (nbt.contains("needsRedstone") && nbt.getBoolean("needsRedstone")) {
+    if (input.getBooleanOr("needsRedstone", false)) {
       this.needsRedstone(true);
     }
-    CompoundTag operation = nbt.getCompound("operation");
-    this.operationLimit = operation.getInt("limit");
-    this.operationType = operation.getInt("operationType");
-    if (operation.contains("stack")) {
-      this.operationStack = ItemStack.parseOptional(registries, operation.getCompound("stack"));
-    }
-    else {
-      this.operationStack = ItemStack.EMPTY;
-    }
+    ValueInput operation = input.childOrEmpty("operation");
+    this.operationLimit = operation.getIntOr("limit", 0);
+    this.operationType = operation.getIntOr("operationType", OpCompareType.LESS.ordinal());
+    this.operationStack = operation.read("stack", ItemStack.CODEC).orElse(ItemStack.EMPTY);
   }
 
   @Override

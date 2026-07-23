@@ -1,14 +1,11 @@
 package com.lothrazar.storagenetwork.gui.components;
 
 import com.lothrazar.storagenetwork.StorageNetworkMod;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ButtonRequest extends Button {
 
@@ -97,21 +94,21 @@ public class ButtonRequest extends Button {
 
   private static final int SIZE = 16;
 
-  public ButtonRequest setTexture(ResourceLocation texture) {
+  public ButtonRequest setTexture(Identifier texture) {
     this.texture = texture;
     return this;
   }
 
-  private ResourceLocation texture;
+  private Identifier texture;
   private TextureEnum textureId = null;
 
-  public ResourceLocation getTexture() {
+  public Identifier getTexture() {
     return texture;
   }
 
   public ButtonRequest(int xPos, int yPos, String displayString, OnPress handler, CreateNarration narration) {
     super(xPos, yPos, SIZE, SIZE, Component.translatable(displayString), handler, narration);
-    texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable.png");
+    texture = Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable.png");
   }
 
   private int getTextureY() {
@@ -126,26 +123,18 @@ public class ButtonRequest extends Button {
   }
 
   @Override
-  public void renderWidget(GuiGraphics ms, int mouseX, int mouseY, float partial) {
-    super.renderWidget(ms, mouseX, mouseY, partial);
-    //    Minecraft minecraft = Minecraft.getInstance();
-    //    minecraft.getTextureManager().bind(getTexture());
-    RenderSystem.setShader(GameRenderer::getPositionTexShader);
-    RenderSystem.setShaderTexture(0, getTexture());
+  protected void extractContents(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partial) {
     int k = getTextureY(); // getYImage ()
-    RenderSystem.enableBlend();
-    RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-    RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-    ms.blit(getTexture(), this.getX(), this.getY(),
+    ms.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, getTexture(), this.getX(), this.getY(),
         160 + SIZE * k, 52,
-        width, height);
+        width, height, 256, 256);
     if (textureId != null) {
-      ms.blit(getTexture(), this.getX(), this.getY(),
+      ms.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, getTexture(), this.getX(), this.getY(),
           textureId.getX(), textureId.getY(),
-          width, height);
+          width, height, 256, 256);
     }
     else {
-      ms.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, 2210752);
+      ms.centeredText(Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, 2210752);
     }
   }
 

@@ -3,36 +3,59 @@ package com.lothrazar.storagenetwork.block.cable;
 import com.lothrazar.library.util.FacadeUtil;
 import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
-public class CableFacadeRenderer implements BlockEntityRenderer<TileCable> {
+public class CableFacadeRenderer implements BlockEntityRenderer<TileCable, CableFacadeRenderer.State> {
 
-  private BlockRenderDispatcher brd;
-  private ModelBlockRenderer renderer;
-
-  public CableFacadeRenderer(BlockEntityRendererProvider.Context d) {
-    this.brd = d.getBlockRenderDispatcher();
-    this.renderer = brd.getModelRenderer();
-  }
+  public CableFacadeRenderer(BlockEntityRendererProvider.Context ctx) {}
 
   @Override
-  public boolean shouldRenderOffScreen(TileCable te) {
+  public boolean shouldRenderOffScreen() {
     return true;
   }
 
   @Override
-  public void render(TileCable te, float v, PoseStack matrixStack, MultiBufferSource ibuffer, int packedLight, int packedOverlay) {
-    if (ConfigRegistry.enableFacades.get()) {
-      BlockState facadeState = te.getFacadeState();
-      if (facadeState != null) {
-        FacadeUtil.renderBlockState(te.getLevel(), te.getBlockPos(), brd, renderer, ibuffer,
-            matrixStack, facadeState, packedLight, packedOverlay);
-      }
+  public State createRenderState() {
+    return new State();
+  }
+
+  @Override
+  public void extractRenderState(TileCable te, State state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+    BlockEntityRenderState.extractBase(te, state, breakProgress);
+    state.level = te.getLevel();
+    state.pos = te.getBlockPos();
+    state.facadeState = ConfigRegistry.enableFacades.get() ? te.getFacadeState() : null;
+  }
+
+  @Override
+  public void submit(State state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+    if (state.facadeState == null || state.level == null) {
+      return;
     }
+    // FacadeUtil.renderBlockState (FLib) still draws synchronously against a MultiBufferSource;
+    // the shared immediate buffer source is the standard escape hatch for ad-hoc rendering from
+    // inside the new deferred submit() phase (see 26.1 rendering-pipeline migration notes).
+    MultiBufferSource.BufferSource buffers = Minecraft.getInstance().renderBuffers().bufferSource();
+    FacadeUtil.renderBlockState(state.level, state.pos, buffers, poseStack, state.facadeState, state.lightCoords, OverlayTexture.NO_OVERLAY);
+    buffers.endBatch();
+  }
+
+  public static class State extends BlockEntityRenderState {
+    Level level;
+    BlockPos pos;
+    BlockState facadeState;
   }
 }

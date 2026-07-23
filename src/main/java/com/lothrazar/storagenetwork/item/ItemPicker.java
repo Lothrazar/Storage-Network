@@ -1,6 +1,6 @@
 package com.lothrazar.storagenetwork.item;
 
-import java.util.List;
+import java.util.function.Consumer;
 import com.lothrazar.library.item.ItemFlib;
 import com.lothrazar.library.util.ChatUtil;
 import com.lothrazar.storagenetwork.StorageNetworkMod;
@@ -19,12 +19,11 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 public class ItemPicker extends ItemFlib {
 
@@ -49,7 +48,7 @@ public class ItemPicker extends ItemFlib {
     else {
       ItemStack stack = player.getItemInHand(hand);
       DimPos dp = DimPos.getPosStored(stack);
-      if (dp != null && hand == InteractionHand.MAIN_HAND && !world.isClientSide) {
+      if (dp != null && hand == InteractionHand.MAIN_HAND && !world.isClientSide()) {
         ServerLevel serverTargetWorld = DimPos.stringDimensionLookup(dp.getDimension(), world.getServer());
         if (serverTargetWorld == null) {
           StorageNetworkMod.LOGGER.error("Missing dimension key " + dp.getDimension());
@@ -63,19 +62,21 @@ public class ItemPicker extends ItemFlib {
           int size = player.isCrouching() ? 1 : 64;
           ItemStack found = network.request(matcher, size, false);
           if (!found.isEmpty()) {
-            player.displayClientMessage(Component.translatable("item.remote.found"), true);
+            if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
+              sp.sendSystemMessage(Component.translatable("item.remote.found"), true);
+            }
             //using add will bypass the collector so try if possible
-            if (!player.addItem(found)) {
-              player.spawnAtLocation(found);
+            if (!player.addItem(found) && world instanceof ServerLevel playerLevel) {
+              player.spawnAtLocation(playerLevel, found);
             }
           }
-          else {
-            player.displayClientMessage(Component.translatable("item.remote.notfound.item"), true);
+          else if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
+            sp.sendSystemMessage(Component.translatable("item.remote.notfound.item"), true);
           }
         }
-        else {
+        else if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
           //no main
-          player.displayClientMessage(Component.translatable("item.remote.notfound"), true);
+          sp.sendSystemMessage(Component.translatable("item.remote.notfound"), true);
         }
       }
     }
@@ -83,15 +84,14 @@ public class ItemPicker extends ItemFlib {
   }
 
   @Override
-  @OnlyIn(Dist.CLIENT)
-  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
     MutableComponent t = Component.translatable(getDescriptionId() + ".tooltip");
     t.withStyle(ChatFormatting.GRAY);
-    tooltip.add(t);
+    tooltip.accept(t);
     if (stack.has(DataComponents.CUSTOM_DATA)) {
       DimPos dp = DimPos.getPosStored(stack);
       if (dp != null) {
-        tooltip.add(dp.makeTooltip());
+        tooltip.accept(dp.makeTooltip());
       }
     }
   }

@@ -17,7 +17,7 @@ public class BlockCableIO extends BlockCable {
 
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-    return createTickerHelper(type, SsnRegistry.Tiles.IMPORT_KABEL.get(), world.isClientSide ? TileCableIO::clientTick : TileCableIO::serverTick);
+    return createTickerHelper(type, SsnRegistry.Tiles.IMPORT_KABEL.get(), world.isClientSide() ? TileCableIO::clientTick : TileCableIO::serverTick);
   }
 
   @Override

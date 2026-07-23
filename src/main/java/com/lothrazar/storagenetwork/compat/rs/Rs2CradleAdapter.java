@@ -43,7 +43,7 @@ public class Rs2CradleAdapter implements CradleAdapter {
   @Override
   public CapabilityConnectable wrap(ItemStack heldStack, TileCradle cradle) {
     Level level = cradle.getLevel();
-    if (level == null || level.isClientSide) {
+    if (level == null || level.isClientSide()) {
       return null;
     }
     if (!(heldStack.getItem() instanceof StorageContainerItem sci)) {

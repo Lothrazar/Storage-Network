@@ -14,13 +14,14 @@ import com.lothrazar.storagenetwork.block.main.TileMain;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,19 +62,17 @@ public abstract class TileConnectable extends BlockEntity implements BlockEntity
   }
 
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    if (compound.contains("connectable")) {
-      connectable.deserializeNBT(registries, compound.getCompound("connectable"));
-    }
-    ownChunk.load(compound, "chunkTicketHeld", "ownTicketDim", "ownTicketChunkX", "ownTicketChunkZ");
-    super.loadAdditional(compound, registries);
+  protected void loadAdditional(ValueInput input) {
+    input.child("connectable").ifPresent(connectable::deserialize);
+    ownChunk.load(input, "chunkTicketHeld", "ownTicketDim", "ownTicketChunkX", "ownTicketChunkZ");
+    super.loadAdditional(input);
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    compound.put("connectable", connectable.serializeNBT(registries));
-    ownChunk.save(compound, "chunkTicketHeld", "ownTicketDim", "ownTicketChunkX", "ownTicketChunkZ");
-    super.saveAdditional(compound, registries);
+  protected void saveAdditional(ValueOutput output) {
+    connectable.serialize(output.child("connectable"));
+    ownChunk.save(output, "chunkTicketHeld", "ownTicketDim", "ownTicketChunkX", "ownTicketChunkZ");
+    super.saveAdditional(output);
   }
 
   @Override
@@ -83,14 +82,7 @@ public abstract class TileConnectable extends BlockEntity implements BlockEntity
 
   @Override
   public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-    CompoundTag updateTag = new CompoundTag();
-    this.saveAdditional(updateTag, registries);
-    return updateTag;
-  }
-
-  @Override
-  public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
-    loadAdditional(pkt.getTag() == null ? new CompoundTag() : pkt.getTag(), registries);
+    return this.saveCustomOnly(registries);
   }
 
   @Override
@@ -128,18 +120,18 @@ public abstract class TileConnectable extends BlockEntity implements BlockEntity
   }
 
   protected void updateChunkloadTicket(boolean want) {
-    if (level == null || level.isClientSide || !(level instanceof ServerLevel sl)) {
+    if (level == null || level.isClientSide() || !(level instanceof ServerLevel sl)) {
       return;
     }
     if (want) {
-      if (ownChunk.assertOn(sl, new ChunkPos(worldPosition))) {
+      if (ownChunk.assertOn(sl, ChunkPos.containing(worldPosition))) {
         setChanged();
-        LOGGER.debug("Asserting own-chunk forced ticket at {} in {}", ownChunk.chunkPos(), sl.dimension().location());
+        LOGGER.debug("Asserting own-chunk forced ticket at {} in {}", ownChunk.chunkPos(), sl.dimension().identifier());
       }
     }
     else if (ownChunk.release(level.getServer())) {
       setChanged();
-      LOGGER.debug("Released own-chunk forced ticket at {} in {}", new ChunkPos(worldPosition), sl.dimension().location());
+      LOGGER.debug("Released own-chunk forced ticket at {} in {}", ChunkPos.containing(worldPosition), sl.dimension().identifier());
     }
   }
 

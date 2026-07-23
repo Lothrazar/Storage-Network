@@ -1,7 +1,8 @@
 package com.lothrazar.storagenetwork.block.cable.processing;
 
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 //Not done but planned:
 //{A}Text box input for priority (all)
@@ -42,23 +43,22 @@ public class ProcessRequestModel {
     this.count = countRequested;
   }
 
-  public void readFromNBT(CompoundTag compound) {
-    this.count = compound.getInt(PREFIX + "count");
-    this.status = ProcessStatus.values()[compound.getInt(PREFIX + "status")];
-    this.alwaysActive = compound.getBoolean(PREFIX + "always");
-    this.stackIndex = compound.getInt(PREFIX + "stack");
-    this.inputFace = Direction.values()[compound.getInt(PREFIX + "in")];
-    this.outputFace = Direction.values()[compound.getInt(PREFIX + "out")];
+  public void readFromNBT(ValueInput input) {
+    this.count = input.getIntOr(PREFIX + "count", 0);
+    this.status = ProcessStatus.values()[input.getIntOr(PREFIX + "status", ProcessStatus.EXPORTING.ordinal())];
+    this.alwaysActive = input.getBooleanOr(PREFIX + "always", false);
+    this.stackIndex = input.getIntOr(PREFIX + "stack", 0);
+    this.inputFace = Direction.values()[input.getIntOr(PREFIX + "in", Direction.UP.ordinal())];
+    this.outputFace = Direction.values()[input.getIntOr(PREFIX + "out", Direction.DOWN.ordinal())];
   }
 
-  public CompoundTag writeToNBT(CompoundTag compound) {
-    compound.putInt(PREFIX + "count", count);
-    compound.putInt(PREFIX + "status", status.ordinal());
-    compound.putBoolean(PREFIX + "always", alwaysActive);
-    compound.putInt(PREFIX + "stack", stackIndex);
-    compound.putInt(PREFIX + "in", this.inputFace.ordinal());
-    compound.putInt(PREFIX + "out", this.outputFace.ordinal());
-    return compound;
+  public void writeToNBT(ValueOutput output) {
+    output.putInt(PREFIX + "count", count);
+    output.putInt(PREFIX + "status", status.ordinal());
+    output.putBoolean(PREFIX + "always", alwaysActive);
+    output.putInt(PREFIX + "stack", stackIndex);
+    output.putInt(PREFIX + "in", this.inputFace.ordinal());
+    output.putInt(PREFIX + "out", this.outputFace.ordinal());
   }
 
   public ProcessStatus getStatus() {

@@ -2,6 +2,7 @@ package com.lothrazar.storagenetwork.api.capabilities;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemStackMatcherDefault implements ItemStackMatcher {
@@ -23,15 +24,14 @@ public class ItemStackMatcherDefault implements ItemStackMatcher {
   private ItemStackMatcherDefault() {}
 
   public void readFromNBT(HolderLookup.Provider registries, CompoundTag compound) {
-    CompoundTag c = (CompoundTag) compound.get("stack");
-    stack = c != null ? ItemStack.parseOptional(registries, c) : ItemStack.EMPTY;
-    ore = compound.getBoolean("ore");
-    nbt = compound.getBoolean("nbt");
+    stack = compound.read("stack", ItemStack.CODEC, registries.createSerializationContext(NbtOps.INSTANCE)).orElse(ItemStack.EMPTY);
+    ore = compound.getBooleanOr("ore", false);
+    nbt = compound.getBooleanOr("nbt", false);
   }
 
   public CompoundTag writeToNBT(HolderLookup.Provider registries, CompoundTag compound) {
     if (!stack.isEmpty()) {
-      compound.put("stack", stack.save(registries));
+      compound.store("stack", ItemStack.CODEC, registries.createSerializationContext(NbtOps.INSTANCE), stack);
     }
     compound.putBoolean("ore", ore);
     compound.putBoolean("nbt", nbt);

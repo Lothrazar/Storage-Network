@@ -11,15 +11,16 @@ import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectableCradle
 import com.lothrazar.storagenetwork.registry.CradleAdapterRegistry;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class TileCradle extends TileConnectable implements MenuProvider, BlockEntityCradle {
@@ -40,7 +41,7 @@ public class TileCradle extends TileConnectable implements MenuProvider, BlockEn
     @Override
     protected void onContentsChanged(int slot) {
       setChanged();
-      if (level != null && !level.isClientSide) {
+      if (level != null && !level.isClientSide()) {
         level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         DimPos m = getMain();
         if (m != null) {
@@ -50,6 +51,18 @@ public class TileCradle extends TileConnectable implements MenuProvider, BlockEn
           }
         }
       }
+    }
+
+    @Override
+    public void deserialize(ValueInput input) {
+      // Force the saved Size up to HOLDER_SIZE so old worlds (which saved Size=1) still load
+      // and we don't end up with a 1-slot handler at runtime.
+      setSize(HOLDER_SIZE);
+      input.listOrEmpty("Items", ItemStackWithSlot.CODEC).forEach(slot -> {
+        if (slot.isValidInContainer(HOLDER_SIZE)) {
+          stacks.set(slot.slot(), slot.stack());
+        }
+      });
     }
   };
   private final CapabilityConnectableCradle linkCap = new CapabilityConnectableCradle(this);
@@ -88,21 +101,15 @@ public class TileCradle extends TileConnectable implements MenuProvider, BlockEn
   }
 
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.loadAdditional(compound, registries);
-    if (compound.contains("holder")) {
-      // Force the saved Size up to HOLDER_SIZE so old worlds (which saved Size=1) still load
-      // and we don't end up with a 1-slot handler at runtime.
-      CompoundTag holderTag = compound.getCompound("holder").copy();
-      holderTag.putInt("Size", HOLDER_SIZE);
-      holder.deserializeNBT(registries, holderTag);
-    }
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
+    input.child("holder").ifPresent(holder::deserialize);
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.saveAdditional(compound, registries);
-    compound.put("holder", holder.serializeNBT(registries));
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
+    holder.serialize(output.child("holder"));
   }
 
   @Override

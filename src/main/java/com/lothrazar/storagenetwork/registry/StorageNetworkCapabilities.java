@@ -6,8 +6,9 @@ import com.lothrazar.storagenetwork.api.network.ConnectableNode;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityImportExport;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityProcessing;
 import com.lothrazar.storagenetwork.api.capabilities.CapabilityConnectable;
+import com.lothrazar.storagenetwork.api.capabilities.ItemHandlerResourceAdapter;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -16,16 +17,16 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 public class StorageNetworkCapabilities {
 
   public static final BlockCapability<ConnectableNode,  Direction> CONNECTABLE =
-      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable"), ConnectableNode.class);
+      BlockCapability.createSided(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable"), ConnectableNode.class);
 
   public static final BlockCapability<CapabilityConnectable, Direction> CONNECTABLE_ITEM_STORAGE =
-      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_item_storage"), CapabilityConnectable.class);
+      BlockCapability.createSided(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_item_storage"), CapabilityConnectable.class);
 
   public static final BlockCapability<CapabilityImportExport, Direction> CONNECTABLE_AUTO_IO =
-      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_auto_io"), CapabilityImportExport.class);
+      BlockCapability.createSided(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_auto_io"), CapabilityImportExport.class);
 
   public static final BlockCapability<CapabilityProcessing, Direction> PROCESSING =
-      BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_processing"), CapabilityProcessing.class);
+      BlockCapability.createSided(Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "connectable_processing"), CapabilityProcessing.class);
 
   @SubscribeEvent
   public static void registerCapabilities(RegisterCapabilitiesEvent event) {
@@ -60,7 +61,7 @@ public class StorageNetworkCapabilities {
     event.registerBlockEntity(PROCESSING, SsnRegistry.Tiles.PROCESS_KABEL.get(), (be, side) -> be.getItemStorage());
 
     // ITEM_HANDLER - exchange and collector blocks proxy item access into the network
-    event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SsnRegistry.Tiles.EXCHANGE.get(), (be, side) -> be.getItemHandler());
-    event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SsnRegistry.Tiles.COLLECTOR.get(), (be, side) -> be.getItemHandler());
+    event.registerBlockEntity(Capabilities.Item.BLOCK, SsnRegistry.Tiles.EXCHANGE.get(), (be, side) -> new ItemHandlerResourceAdapter(be.getItemHandler()));
+    event.registerBlockEntity(Capabilities.Item.BLOCK, SsnRegistry.Tiles.COLLECTOR.get(), (be, side) -> new ItemHandlerResourceAdapter(be.getItemHandler()));
   }
 }

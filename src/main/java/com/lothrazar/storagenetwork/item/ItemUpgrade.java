@@ -1,6 +1,6 @@
 package com.lothrazar.storagenetwork.item;
 
-import java.util.List;
+import java.util.function.Consumer;
 import com.lothrazar.library.item.ItemFlib;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -8,8 +8,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 public class ItemUpgrade extends ItemFlib {
 
@@ -18,10 +17,9 @@ public class ItemUpgrade extends ItemFlib {
   }
 
   @Override
-  @OnlyIn(Dist.CLIENT)
-  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
     MutableComponent t = Component.translatable(getDescriptionId() + ".tooltip");
     t.withStyle(ChatFormatting.GRAY);
-    tooltip.add(t);
+    tooltip.accept(t);
   }
 }

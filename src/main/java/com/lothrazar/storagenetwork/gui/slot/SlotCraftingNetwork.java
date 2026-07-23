@@ -27,7 +27,7 @@ public class SlotCraftingNetwork extends ResultSlot {
 
   @Override
   public void onTake(Player playerIn, ItemStack stack) {
-    if (playerIn.level().isClientSide) {
+    if (playerIn.level().isClientSide()) {
       return;
     }
     List<ItemStack> lis = Lists.newArrayList();

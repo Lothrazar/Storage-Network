@@ -11,12 +11,12 @@ import com.lothrazar.storagenetwork.registry.ConfigRegistry;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -85,7 +85,7 @@ public class TileDrawer extends TileConnectable {
   }
 
   private TileMain adoptMasterFromNeighbor() {
-    if (level == null || level.isClientSide) {
+    if (level == null || level.isClientSide()) {
       return null;
     }
     for (Direction d : Direction.values()) {
@@ -153,29 +153,24 @@ public class TileDrawer extends TileConnectable {
   }
 
   private void syncToClient() {
-    if (level != null && !level.isClientSide) {
+    if (level != null && !level.isClientSide()) {
       level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
     }
   }
 
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.loadAdditional(compound, registries);
-    if (compound.contains(NBT_LOCKED)) {
-      lockedStack = ItemStack.parseOptional(registries, compound.getCompound(NBT_LOCKED));
-    }
-    else {
-      lockedStack = ItemStack.EMPTY;
-    }
-    cachedCount = compound.getInt(NBT_CACHED);
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
+    lockedStack = input.read(NBT_LOCKED, ItemStack.CODEC).orElse(ItemStack.EMPTY);
+    cachedCount = input.getIntOr(NBT_CACHED, 0);
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.saveAdditional(compound, registries);
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
     if (!lockedStack.isEmpty()) {
-      compound.put(NBT_LOCKED, lockedStack.save(registries, new CompoundTag()));
+      output.store(NBT_LOCKED, ItemStack.CODEC, lockedStack);
     }
-    compound.putInt(NBT_CACHED, cachedCount);
+    output.putInt(NBT_CACHED, cachedCount);
   }
 }

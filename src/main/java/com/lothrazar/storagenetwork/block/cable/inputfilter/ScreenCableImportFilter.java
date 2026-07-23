@@ -1,5 +1,6 @@
 package com.lothrazar.storagenetwork.block.cable.inputfilter;
 
+import net.minecraft.client.Minecraft;
 import java.util.List;
 import java.util.Optional;
 import com.google.common.collect.Lists;
@@ -13,13 +14,15 @@ import com.lothrazar.storagenetwork.gui.components.TextboxInteger;
 import com.lothrazar.storagenetwork.gui.slot.ItemSlotNetwork;
 import com.lothrazar.storagenetwork.network.CableIOMessage;
 import com.lothrazar.storagenetwork.registry.ClientEventRegistry;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import com.lothrazar.storagenetwork.util.SsnConsts;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
@@ -28,7 +31,7 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
   protected static final Button.CreateNarration DEFAULT_NARRATION = (supplier) -> {
     return supplier.get();
   };
-  private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable_filter.png");
+  private final Identifier texture = Identifier.fromNamespaceAndPath(StorageNetworkMod.MODID, "textures/gui/cable_filter.png");
   ContainerCableImportFilter containerCableLink;
   private ButtonRequest btnRedstone;
   private ButtonRequest btnMinus;
@@ -47,8 +50,8 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
   }
 
   @Override
-  public void renderStackTooltip(GuiGraphics ms, ItemStack stack, int mousex, int mousey) {
-    ms.renderTooltip(font, stack, mousex, mousey);
+  public void renderStackTooltip(GuiGraphicsExtractor ms, ItemStack stack, int mousex, int mousey) {
+    ms.setTooltipForNextFrame(font, stack, mousex, mousey);
   }
 
   @Override
@@ -57,7 +60,7 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
     this.isAllowlist = containerCableLink.cap.getFilter().isAllowList;
     btnRedstone = addRenderableWidget(new ButtonRequest(leftPos + 4, topPos + 4, "", (p) -> {
       this.syncData(0);
-      PacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.REDSTONE.ordinal()));
+      ClientPacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.REDSTONE.ordinal()));
     }, DEFAULT_NARRATION));
     btnMinus = addRenderableWidget(new ButtonRequest(leftPos + 22, topPos + 4, "", (p) -> {
       this.syncData(-1);
@@ -72,7 +75,7 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
       this.syncData(0);
     }, DEFAULT_NARRATION));
     btnImport = addRenderableWidget(new ButtonRequest(leftPos + 80, topPos + 4, "", (p) -> {
-      PacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.IMPORT_FILTER.ordinal()));
+      ClientPacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.IMPORT_FILTER.ordinal()));
     }, DEFAULT_NARRATION));
     btnImport.setTextureId(TextureEnum.IMPORT);
     txtHeight = new TextboxInteger(this.font, leftPos + 48, topPos + 26, 36);
@@ -83,7 +86,7 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
       //      containerCableLink.cap.operationType = containerCableLink.cap.operationType.toggle();
       OpCompareType old = OpCompareType.get(containerCableLink.cap.operationType);
       containerCableLink.cap.operationType = old.toggle().ordinal();
-      PacketDistributor.sendToServer(
+      ClientPacketDistributor.sendToServer(
           new CableIOMessage(CableIOMessage.CableMessageType.SYNC_OP.ordinal(),
               containerCableLink.cap.operationType, false));
     }, DEFAULT_NARRATION));
@@ -91,10 +94,10 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
   }
 
   @Override
-  public void renderLabels(GuiGraphics ms, int mouseX, int mouseY) {
+  protected void extractLabels(GuiGraphicsExtractor ms, int mouseX, int mouseY) {
     //    this.font.draw(ms, this.title, this.titleLabelX, this.titleLabelY, 4210752);// TODO: gui titles
     int priority = containerCableLink.cap.getPriority();
-    ms.drawString(font, String.valueOf(priority),
+    ms.text(font, String.valueOf(priority),
         50 - font.width(String.valueOf(priority)) / 2,
         12,
         4210752);
@@ -106,19 +109,17 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
   }
 
   private void sendStackSlot(int value, ItemStack stack) {
-    PacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SAVE_FITLER.ordinal(), value, stack));
+    ClientPacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SAVE_FITLER.ordinal(), value, stack));
   }
 
   private void syncData(int priority) {
     containerCableLink.cap.getFilter().isAllowList = this.isAllowlist;
-    PacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SYNC_DATA.ordinal(), priority, isAllowlist));
+    ClientPacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SYNC_DATA.ordinal(), priority, isAllowlist));
   }
 
   @Override
-  public void render(GuiGraphics ms, int mouseX, int mouseY, float partialTicks) {
-    renderBackground(ms, mouseX, mouseY, partialTicks);
-    super.render(ms, mouseX, mouseY, partialTicks);
-    this.renderTooltip(ms, mouseX, mouseY);
+  public void extractRenderState(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractRenderState(ms, mouseX, mouseY, partialTicks);
     if (containerCableLink == null || containerCableLink.cap == null) {
       return;
     }
@@ -135,31 +136,31 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
     return this.containerCableLink.cap.isOperationMode();
   }
 
-  private void drawTooltips(GuiGraphics ms, final int mouseX, final int mouseY) {
+  private void drawTooltips(GuiGraphicsExtractor ms, final int mouseX, final int mouseY) {
     if (btnImport != null && btnImport.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.import")), Optional.empty(),
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.import")), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
     if (btnAllowIgn != null && btnAllowIgn.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable(this.isAllowlist ? "gui.storagenetwork.allowlist" : "gui.storagenetwork.ignorelist")), Optional.empty(),
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable(this.isAllowlist ? "gui.storagenetwork.allowlist" : "gui.storagenetwork.ignorelist")), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
     if (btnMinus != null && btnMinus.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.down")), Optional.empty(),
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.down")), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
     if (btnPlus != null && btnPlus.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.up")), Optional.empty(),
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.up")), Optional.empty(),
           mouseX - leftPos, mouseY - topPos);
     }
     if (btnRedstone != null && btnRedstone.isMouseOver(mouseX, mouseY)) {
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.redstone."
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.redstone."
           + containerCableLink.cap.needsRedstone())), Optional.empty(), mouseX - leftPos, mouseY - topPos);
     }
     if (btnOperationToggle != null && btnOperationToggle.isMouseOver(mouseX, mouseY)) {
       OpCompareType t = OpCompareType.get(containerCableLink.cap.operationType);
       String two = "gui.storagenetwork.operate.tooltip." + t.word();
-      ms.renderTooltip(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.operate.tooltip"),
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.operate.tooltip"),
           Component.translatable(two)),
           Optional.empty(), mouseX - leftPos, mouseY - topPos);
     }
@@ -168,10 +169,11 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
   public static final int SLOT_SIZE = SsnConsts.SQ;;
 
   @Override
-  protected void renderBg(GuiGraphics ms, float partialTicks, int mouseX, int mouseY) {
+  public void extractBackground(GuiGraphicsExtractor ms, int mouseX, int mouseY, float partialTicks) {
+    super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
-    ms.blit(texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
     itemSlotsGhost = Lists.newArrayList();
     //TODO: shared with GuiCableIO
     final int rows = 2;
@@ -198,7 +200,7 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
     operationItemSlot = new ItemSlotNetwork(this, containerCableLink.cap.operationStack, x, y, size, leftPos, topPos, false);
     if (this.isOperationMode()) {
       operationItemSlot.drawSlot(ms, font, mouseX, mouseY);
-      ms.blit(ClientEventRegistry.SLOT, x - 1, y - 1, 0, 0, size, size, size, size);
+      ms.blit(RenderPipelines.GUI_TEXTURED, ClientEventRegistry.SLOT, x - 1, y - 1, 0, 0, size, size, size, size);
     }
   }
 
@@ -245,10 +247,13 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
   }
 
   @Override
-  public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+  public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    double mouseX = event.x();
+    double mouseY = event.y();
+    int mouseButton = event.button();
     ItemStack stackCarriedByMouse = minecraft.player.containerMenu.getCarried();
     if (operationItemSlot.isMouseOverSlot((int) mouseX, (int) mouseY)) {
-      PacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SYNC_OP_STACK.ordinal(), stackCarriedByMouse.copy()));
+      ClientPacketDistributor.sendToServer(new CableIOMessage(CableIOMessage.CableMessageType.SYNC_OP_STACK.ordinal(), stackCarriedByMouse.copy()));
       return true;
     }
     for (int i = 0; i < this.itemSlotsGhost.size(); i++) {
@@ -257,7 +262,7 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
         if (slot.getStack().isEmpty() == false) {
           //i hit non-empty slot, clear it no matter what
           if (mouseButton == SsnConsts.MOUSE_BTN_RIGHT) {
-            int direction = hasShiftDown() ? -1 : 1;
+            int direction = Minecraft.getInstance().hasShiftDown() ? -1 : 1;
             int newCount = Math.min(64, slot.getStack().getCount() + direction);
             if (newCount < 1) {
               newCount = 1;
@@ -278,7 +283,7 @@ public class ScreenCableImportFilter extends AbstractContainerScreen<ContainerCa
         }
       }
     }
-    return super.mouseClicked(mouseX, mouseY, mouseButton);
+    return super.mouseClicked(event, doubleClick);
   }
 
   @Override

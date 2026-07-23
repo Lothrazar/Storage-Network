@@ -13,12 +13,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -46,14 +45,14 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 public class BlockDrawer extends EntityBlockFlib {
 
   private static final Logger LOGGER = LogManager.getLogger();
-  public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+  public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
   // Imprint is stored in the BlockItem's CUSTOM_DATA under this key (Item registry name).
   public static final String NBT_LOCKED_ITEM = "drawer_locked_item";
 
@@ -85,13 +84,13 @@ public class BlockDrawer extends EntityBlockFlib {
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
     return createTickerHelper(type, SsnRegistry.Tiles.DRAWER.get(),
-        world.isClientSide ? TileDrawer::clientTick : TileDrawer::serverTick);
+        world.isClientSide() ? TileDrawer::clientTick : TileDrawer::serverTick);
   }
 
   @Override
   public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
     super.setPlacedBy(world, pos, state, placer, stack);
-    if (world.isClientSide) {
+    if (world.isClientSide()) {
       return;
     }
     BlockEntity be = world.getBlockEntity(pos);
@@ -106,11 +105,11 @@ public class BlockDrawer extends EntityBlockFlib {
     if (!tag.contains(NBT_LOCKED_ITEM)) {
       return;
     }
-    ResourceLocation rl = ResourceLocation.tryParse(tag.getString(NBT_LOCKED_ITEM));
+    Identifier rl = Identifier.tryParse(tag.getStringOr(NBT_LOCKED_ITEM, ""));
     if (rl == null) {
       return;
     }
-    Item item = BuiltInRegistries.ITEM.get(rl);
+    Item item = BuiltInRegistries.ITEM.get(rl).map(net.minecraft.core.Holder::value).orElse(null);
     if (item == null) {
       return;
     }
@@ -123,39 +122,39 @@ public class BlockDrawer extends EntityBlockFlib {
   //   non-matching, drawer empty -> auto-imprint + insert
   //   non-matching, locked      -> pass
   @Override
-  public ItemInteractionResult useItemOn(ItemStack held, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-    if (world.isClientSide) {
-      return ItemInteractionResult.SUCCESS;
+  public InteractionResult useItemOn(ItemStack held, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    if (world.isClientSide()) {
+      return InteractionResult.SUCCESS;
     }
     BlockEntity be = world.getBlockEntity(pos);
     if (!(be instanceof TileDrawer drawer)) {
-      return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+      return InteractionResult.PASS;
     }
     // Shift + item -> explicit imprint (matches Storage Drawers "lock to this item" feel).
     if (player.isSecondaryUseActive()) {
       if (!canImprint(held)) {
-        return ItemInteractionResult.CONSUME;
+        return InteractionResult.CONSUME;
       }
       drawer.setLockedStack(held.copyWithCount(1));
       playImprintSound(world, pos);
-      return ItemInteractionResult.CONSUME;
+      return InteractionResult.CONSUME;
     }
     ItemStack locked = drawer.getLockedStack();
     // Auto-imprint: first right-click with an item on an empty drawer.
     if (locked.isEmpty()) {
       if (!canImprint(held)) {
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.PASS;
       }
       drawer.setLockedStack(held.copyWithCount(1));
       playImprintSound(world, pos);
       locked = drawer.getLockedStack();
     }
     if (locked.getItem() != held.getItem()) {
-      return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+      return InteractionResult.PASS;
     }
     if (!drawer.isConnected()) {
       LOGGER.info("[drawer] insert skipped, not connected at {}", pos);
-      return ItemInteractionResult.CONSUME;
+      return InteractionResult.CONSUME;
     }
     // Double-right-click within 10t with matching item -> drain ALL matching from inventory.
     long now = world.getGameTime();
@@ -177,7 +176,7 @@ public class BlockDrawer extends EntityBlockFlib {
       }
     }
     world.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 0.25F, 1.0F);
-    return ItemInteractionResult.CONSUME;
+    return InteractionResult.CONSUME;
   }
 
   // Right-click empty hand.
@@ -185,7 +184,7 @@ public class BlockDrawer extends EntityBlockFlib {
   //   non-shift -> no-op (left-click is the extract gesture)
   @Override
   public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
-    if (world.isClientSide) {
+    if (world.isClientSide()) {
       return InteractionResult.SUCCESS;
     }
     BlockEntity be = world.getBlockEntity(pos);
@@ -228,7 +227,7 @@ public class BlockDrawer extends EntityBlockFlib {
     if (player.swingTime != 0) {
       return;
     }
-    if (world.isClientSide) {
+    if (world.isClientSide()) {
       player.swing(event.getHand());
       return;
     }
@@ -249,14 +248,15 @@ public class BlockDrawer extends EntityBlockFlib {
   private void drainMatchingFromInventory(Player player, TileDrawer drawer) {
     Inventory inv = player.getInventory();
     Item lockedItem = drawer.getLockedStack().getItem();
-    for (int i = 0; i < inv.items.size(); i++) {
-      ItemStack s = inv.items.get(i);
+    var items = inv.getNonEquipmentItems();
+    for (int i = 0; i < items.size(); i++) {
+      ItemStack s = items.get(i);
       if (s.isEmpty() || s.getItem() != lockedItem) {
         continue;
       }
       ItemStack toInsert = s.copy();
       int remainder = drawer.insertIntoNetwork(toInsert);
-      inv.items.set(i, remainder == 0 ? ItemStack.EMPTY : s.copyWithCount(remainder));
+      items.set(i, remainder == 0 ? ItemStack.EMPTY : s.copyWithCount(remainder));
     }
   }
 
@@ -278,14 +278,14 @@ public class BlockDrawer extends EntityBlockFlib {
   // Silk-touch preserves the locked imprint by dropping a stamped BlockItem with CUSTOM_DATA.
   @Override
   public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-    if (!level.isClientSide && !player.isCreative()) {
+    if (!level.isClientSide() && !player.isCreative()) {
       BlockEntity be = level.getBlockEntity(pos);
       if (be instanceof TileDrawer drawer
           && !drawer.getLockedStack().isEmpty()
           && hasSilkTouch(level, player.getMainHandItem())) {
         ItemStack stamped = new ItemStack(SsnRegistry.Items.DRAWER.get());
         CompoundTag tag = new CompoundTag();
-        ResourceLocation rl = BuiltInRegistries.ITEM.getKey(drawer.getLockedStack().getItem());
+        Identifier rl = BuiltInRegistries.ITEM.getKey(drawer.getLockedStack().getItem());
         tag.putString(NBT_LOCKED_ITEM, rl.toString());
         stamped.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
         Block.popResource(level, pos, stamped);
@@ -324,9 +324,9 @@ public class BlockDrawer extends EntityBlockFlib {
     if (cd != null) {
       CompoundTag tag = cd.copyTag();
       if (tag.contains(NBT_LOCKED_ITEM)) {
-        ResourceLocation rl = ResourceLocation.tryParse(tag.getString(NBT_LOCKED_ITEM));
+        Identifier rl = Identifier.tryParse(tag.getStringOr(NBT_LOCKED_ITEM, ""));
         if (rl != null) {
-          Item item = BuiltInRegistries.ITEM.get(rl);
+          Item item = BuiltInRegistries.ITEM.get(rl).map(net.minecraft.core.Holder::value).orElse(null);
           if (item != null) {
             tooltip.add(Component.translatable("block.storagenetwork.drawer.imprint", new ItemStack(item).getHoverName()).withStyle(ChatFormatting.AQUA));
           }

@@ -2,12 +2,12 @@ package com.lothrazar.storagenetwork.api.network;
 
 import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.api.capabilities.FilterItemStackHandler;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 
-public class ConnectableNodeDefault implements ConnectableNode, INBTSerializable<CompoundTag> {
+public class ConnectableNodeDefault implements ConnectableNode, ValueIOSerializable {
 
   FilterItemStackHandler filters = new FilterItemStackHandler();
   DimPos main;
@@ -62,31 +62,23 @@ public class ConnectableNodeDefault implements ConnectableNode, INBTSerializable
 
 
   @Override
-  public CompoundTag serializeNBT(HolderLookup.Provider registries) {
-    CompoundTag result = new CompoundTag();
+  public void serialize(ValueOutput output) {
     if (getMainPos() == null) {
-      return result;
+      return;
     }
-    result.put("master", getMainPos().serializeNBT(registries));
+    getMainPos().serialize(output.child("master"));
     if (getPos() != null) {
-      result.put("self", getPos().serializeNBT(registries));
+      getPos().serialize(output.child("self"));
     }
-    CompoundTag filters = this.getFilter().serializeNBT(registries);
-    result.put("filters", filters);
-    result.putBoolean("needsRedstone", this.needsRedstone());
-    return result;
+    this.getFilter().serialize(output.child("filters"));
+    output.putBoolean("needsRedstone", this.needsRedstone());
   }
 
   @Override
-  public void deserializeNBT(HolderLookup.Provider registries, CompoundTag nbt) {
-    setMainPos(new DimPos(nbt.getCompound("master")));
-    if (nbt.contains("self")) {
-      setPos(new DimPos(nbt.getCompound("self")));
-    }
-    if (nbt.contains("filters")) {
-      CompoundTag filters = nbt.getCompound("filters");
-      this.getFilter().deserializeNBT(registries, filters);
-    }
-    this.needsRedstone(nbt.getBoolean("needsRedstone"));
+  public void deserialize(ValueInput input) {
+    setMainPos(DimPos.of(input.childOrEmpty("master")));
+    input.child("self").ifPresent(self -> setPos(DimPos.of(self)));
+    input.child("filters").ifPresent(filters -> this.getFilter().deserialize(filters));
+    this.needsRedstone(input.getBooleanOr("needsRedstone", false));
   }
 }

@@ -8,9 +8,9 @@ import com.lothrazar.storagenetwork.api.DimPos;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +34,7 @@ public class BlockMain extends EntityBlockFlib {
   @Override
   public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
     super.setPlacedBy(worldIn, pos, state, placer, stack);
-    if (!worldIn.isClientSide) {
+    if (!worldIn.isClientSide()) {
       BlockEntity tileAtPos = worldIn.getBlockEntity(pos);
       if (tileAtPos instanceof TileMain main) {
         main.getNetwork().setShouldRefresh();
@@ -43,33 +43,33 @@ public class BlockMain extends EntityBlockFlib {
   }
 
   @Override
-  protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn,
+  protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn,
       BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
-    if (worldIn.isClientSide) {
-      return ItemInteractionResult.SUCCESS;
+    if (worldIn.isClientSide()) {
+      return InteractionResult.SUCCESS;
     }
     if (stack.getItem() == SsnRegistry.Items.RECEIVER.get()) {
       BlockEntity be = worldIn.getBlockEntity(pos);
       if (be instanceof TileMain) {
         if (DimPos.getPosStored(stack) != null) {
           playerIn.sendSystemMessage(Component.translatable("chat.storagenetwork.receiver.alreadybound").withStyle(ChatFormatting.YELLOW));
-          return ItemInteractionResult.CONSUME;
+          return InteractionResult.CONSUME;
         }
         DimPos.putPos(stack, pos, worldIn);
         playerIn.sendSystemMessage(Component.translatable("chat.storagenetwork.receiver.bound")
             .append(Component.literal(" "))
             .append(new DimPos(worldIn, pos).makeTooltip())
             .withStyle(ChatFormatting.GREEN));
-        return ItemInteractionResult.CONSUME;
+        return InteractionResult.CONSUME;
       }
     }
-    return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    return InteractionResult.PASS;
   }
 
   @Override
   public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos,
       Player playerIn, BlockHitResult result) {
-    if (worldIn.isClientSide) {
+    if (worldIn.isClientSide()) {
       return InteractionResult.SUCCESS;
     }
     BlockEntity tileHere = worldIn.getBlockEntity(pos);
@@ -108,7 +108,7 @@ public class BlockMain extends EntityBlockFlib {
 
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-    return createTickerHelper(type, SsnRegistry.Tiles.MASTER.get(), world.isClientSide ? TileMain::clientTick : TileMain::serverTick);
+    return createTickerHelper(type, SsnRegistry.Tiles.MASTER.get(), world.isClientSide() ? TileMain::clientTick : TileMain::serverTick);
   }
 
   @Override
@@ -122,7 +122,7 @@ public class BlockMain extends EntityBlockFlib {
   }
 
   @Override
-  public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+  public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
     if (level.getBlockEntity(pos) instanceof TileMain tile) {
       return tile.getComparatorSignal();
     }

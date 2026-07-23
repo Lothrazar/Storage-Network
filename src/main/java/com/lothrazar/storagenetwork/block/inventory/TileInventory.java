@@ -6,8 +6,6 @@ import com.lothrazar.storagenetwork.block.TileConnectable;
 import com.lothrazar.storagenetwork.block.request.TileRequest;
 import com.lothrazar.storagenetwork.registry.SsnRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -15,6 +13,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class TileInventory extends TileConnectable implements MenuProvider, TileNetworkSync {
 
@@ -43,23 +43,21 @@ public class TileInventory extends TileConnectable implements MenuProvider, Tile
   }
 
   @Override
-  protected void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.loadAdditional(compound, registries);
-    autoFocus = compound.getBoolean("autoFocus");
-    setDownwards(compound.getBoolean("dir"));
-    setSort(EnumSortType.values()[compound.getInt("sort")]);
-    if (compound.contains(NBT_JEI)) {
-      this.setJeiSearchSynced(compound.getBoolean(NBT_JEI));
-    }
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
+    autoFocus = input.getBooleanOr("autoFocus", true);
+    setDownwards(input.getBooleanOr("dir", false));
+    setSort(EnumSortType.values()[input.getIntOr("sort", EnumSortType.NAME.ordinal())]);
+    this.setJeiSearchSynced(input.getBooleanOr(NBT_JEI, false));
   }
 
   @Override
-  protected void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-    super.saveAdditional(compound, registries);
-    compound.putBoolean("dir", isDownwards());
-    compound.putInt("sort", getSort().ordinal());
-    compound.putBoolean("autoFocus", autoFocus);
-    compound.putBoolean(NBT_JEI, this.isJeiSearchSynced());
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
+    output.putBoolean("dir", isDownwards());
+    output.putInt("sort", getSort().ordinal());
+    output.putBoolean("autoFocus", autoFocus);
+    output.putBoolean(NBT_JEI, this.isJeiSearchSynced());
   }
 
   @Override
