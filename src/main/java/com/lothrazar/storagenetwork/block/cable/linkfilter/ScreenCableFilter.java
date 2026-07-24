@@ -106,26 +106,26 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
     if (btnImport != null && btnImport.isMouseOver(mouseX, mouseY)) {
       //NOT StringTextComponent
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.import")),
-          Optional.empty(), mouseX - leftPos, mouseY - topPos);
+          Optional.empty(), mouseX, mouseY);
     }
     if (btnAllowIgn != null && btnAllowIgn.isMouseOver(mouseX, mouseY)) {
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable(this.isAllowlist
           ? "gui.storagenetwork.allowlist"
           : "gui.storagenetwork.ignorelist")), Optional.empty(),
-          mouseX - leftPos, mouseY - topPos);
+          mouseX, mouseY);
     }
     if (btnMinus != null && btnMinus.isMouseOver(mouseX, mouseY)) {
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.down")), Optional.empty(),
-          mouseX - leftPos, mouseY - topPos);
+          mouseX, mouseY);
     }
     if (btnPlus != null && btnPlus.isMouseOver(mouseX, mouseY)) {
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.up")), Optional.empty(),
-          mouseX - leftPos, mouseY - topPos);
+          mouseX, mouseY);
     }
     if (btnRedstone != null && btnRedstone.isMouseOver(mouseX, mouseY)) {
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.redstone."
           + containerCableLink.cap.connectable.needsRedstone())), Optional.empty(),
-          mouseX - leftPos, mouseY - topPos);
+          mouseX, mouseY);
     }
   }
 
@@ -142,7 +142,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
     super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
-    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, 256, 256);
     itemSlotsGhost = Lists.newArrayList();
     //TODO: shared with GuiCableIO
     int rows = 2;

@@ -66,7 +66,7 @@ public class ScreenNetworkReceiver extends AbstractContainerScreen<ContainerNetw
     super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
-    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, 256, 256);
     ms.blit(RenderPipelines.GUI_TEXTURED, ClientEventRegistry.SLOT, leftPos + ContainerNetworkReceiver.UPGRADE_X - 1, topPos + ContainerNetworkReceiver.UPGRADE_Y - 1, 0, 0, 18, 18, 18, 18);
     drawGhostUpgrade(ms);
   }

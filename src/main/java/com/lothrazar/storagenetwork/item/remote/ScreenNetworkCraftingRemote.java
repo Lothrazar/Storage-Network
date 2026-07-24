@@ -52,7 +52,7 @@ public class ScreenNetworkCraftingRemote extends AbstractNetworkScreen<Container
     super.extractBackground(ms, mouseX, mouseY, partialTicks);
     final int xCenter = (width - imageWidth) / 2;
     final int yCenter = (height - imageHeight) / 2;
-    ms.blit(RenderPipelines.GUI_TEXTURED, textureCraft, xCenter, yCenter, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, textureCraft, xCenter, yCenter, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
     //update network
     network.applySearchTextToSlots();
     network.renderItemSlots(ms, mouseX, mouseY, font);

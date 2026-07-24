@@ -48,7 +48,7 @@ public class ScreenNetworkRemote extends AbstractNetworkScreen<ContainerNetworkR
     super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (this.width - this.imageWidth) / 2;
     int yCenter = (this.height - this.imageHeight) / 2;
-    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
     network.applySearchTextToSlots();
     network.renderItemSlots(ms, mouseX, mouseY, font);
   }

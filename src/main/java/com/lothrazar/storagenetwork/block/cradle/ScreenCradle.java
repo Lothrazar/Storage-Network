@@ -23,7 +23,7 @@ public class ScreenCradle extends AbstractContainerScreen<ContainerCradle> {
     super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
-    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, 256, 256);
     // slot frames behind the held-item 3x3 grid - draw 18x18 frame around each
     for (int i = 0; i < TileCradle.HOLDER_SIZE; i++) {
       int col = i % ContainerCradle.HELD_GRID_COLS;

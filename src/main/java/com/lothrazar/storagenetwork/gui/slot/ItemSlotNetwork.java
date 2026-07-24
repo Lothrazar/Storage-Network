@@ -42,25 +42,6 @@ public class ItemSlotNetwork {
   public void drawSlot(GuiGraphicsExtractor poseStack, Font font, int mx, int my) {
     if (!getStack().isEmpty()) {
       //      poseStack.pushPose();
-      String amount;
-      //cant sneak in gui
-      //default to short form, show full amount if sneak
-      if (Minecraft.getInstance().hasShiftDown()) {
-        amount = size + "";
-      }
-      else {
-        amount = UtilInventory.formatLargeNumber(size);
-      }
-      final float scale = 0.85F;
-      Matrix3x2fStack pose = poseStack.pose();
-      pose.pushMatrix();
-      pose.translate(x + 3, y + 3);
-      pose.scale(scale, scale);
-      pose.translate(-1 * x, -1 * y);
-      if (isShowNumbers() && size > 1) {
-        poseStack.itemDecorations(font, stack, x, y, amount);
-      }
-      pose.popMatrix();
       if (isMouseOverSlot(mx, my)) {
         int j1 = x;
         int k1 = y;
@@ -69,14 +50,33 @@ public class ItemSlotNetwork {
       }
       poseStack.item(stack, x, y);
       //      Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(poseStack, getStack(), x, y);
+      if (isShowNumbers() && size > 1) {
+        String amount;
+        //cant sneak in gui
+        //default to short form, show full amount if sneak
+        if (Minecraft.getInstance().hasShiftDown()) {
+          amount = size + "";
+        }
+        else {
+          amount = UtilInventory.formatLargeNumber(size);
+        }
+        final float scale = 0.85F;
+        Matrix3x2fStack pose = poseStack.pose();
+        pose.pushMatrix();
+        pose.translate(x + 3, y + 3);
+        pose.scale(scale, scale);
+        pose.translate(-1 * x, -1 * y);
+        poseStack.itemDecorations(font, stack, x, y, amount);
+        pose.popMatrix();
+      }
     }
   }
 
   public void drawTooltip(GuiGraphicsExtractor ms, int mx, int my) {
     if (isMouseOverSlot(mx, my) && !getStack().isEmpty()) {
-      parent.renderStackTooltip(ms, getStack(),
-          mx - parent.getGuiLeft(),
-          my - parent.getGuiTop());
+      // setTooltipForNextFrame defers rendering until after the GUI-local pose translate
+      // has been popped, so it needs absolute screen coords here, not GUI-relative ones.
+      parent.renderStackTooltip(ms, getStack(), mx, my);
     }
   }
 

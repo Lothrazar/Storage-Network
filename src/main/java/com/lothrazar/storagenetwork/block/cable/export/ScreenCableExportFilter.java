@@ -136,27 +136,27 @@ public class ScreenCableExportFilter extends AbstractContainerScreen<ContainerCa
     //    this.renderTooltip();
     if (btnImport != null && btnImport.isMouseOver(mouseX, mouseY)) {
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.import")), Optional.empty(),
-          mouseX - leftPos, mouseY - topPos);
+          mouseX, mouseY);
     }
     if (btnMinus != null && btnMinus.isMouseOver(mouseX, mouseY)) {
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.down")), Optional.empty(),
-          mouseX - leftPos, mouseY - topPos);
+          mouseX, mouseY);
     }
     if (btnPlus != null && btnPlus.isMouseOver(mouseX, mouseY)) {
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.priority.up")), Optional.empty(),
-          mouseX - leftPos, mouseY - topPos);
+          mouseX, mouseY);
     }
     if (btnRedstone != null && btnRedstone.isMouseOver(mouseX, mouseY)) {
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.redstone."
           + containerCableLink.cap.needsRedstone())), Optional.empty(),
-          mouseX - leftPos, mouseY - topPos);
+          mouseX, mouseY);
     }
     if (btnOperationToggle != null && btnOperationToggle.isMouseOver(mouseX, mouseY)) {
       OpCompareType t = OpCompareType.get(containerCableLink.cap.operationType);
       String two = "gui.storagenetwork.operate.tooltip." + t.word();
       ms.setTooltipForNextFrame(font, Lists.newArrayList(Component.translatable("gui.storagenetwork.operate.tooltip"),
           Component.translatable(two)),
-          Optional.empty(), mouseX - leftPos, mouseY - topPos);
+          Optional.empty(), mouseX, mouseY);
     }
   }
 
@@ -167,7 +167,7 @@ public class ScreenCableExportFilter extends AbstractContainerScreen<ContainerCa
     super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
-    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, 256, 256);
     itemSlotsGhost = Lists.newArrayList();
     //TODO: shared with GuiCableIO
     int rows = 2;

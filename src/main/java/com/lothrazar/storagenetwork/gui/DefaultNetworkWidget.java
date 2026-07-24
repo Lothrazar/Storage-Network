@@ -434,13 +434,13 @@ public class DefaultNetworkWidget implements NetworkWidget {
         lis.add(Component.translatable("gui.storagenetwork.fil.tooltip_tooltip")); //#
         lis.add(Component.translatable("gui.storagenetwork.fil.tooltip_tags")); //$
         lis.add(Component.translatable("gui.storagenetwork.fil.tooltip_clear")); //clear
-        ms.setTooltipForNextFrame(font, lis, Optional.empty(), mouseX - gui.getGuiLeft(), mouseY - gui.getGuiTop());
+        ms.setTooltipForNextFrame(font, lis, Optional.empty(), mouseX, mouseY);
         return; // all done, we have our tts rendered
       }
     }
     //do we have a tooltip
     if (tooltip != null) {
-      ms.setTooltipForNextFrame(font, Lists.newArrayList(tooltip), Optional.empty(), mouseX - gui.getGuiLeft(), mouseY - gui.getGuiTop());
+      ms.setTooltipForNextFrame(font, Lists.newArrayList(tooltip), Optional.empty(), mouseX, mouseY);
     }
   }
 
@@ -563,7 +563,7 @@ public class DefaultNetworkWidget implements NetworkWidget {
   }
 
   private void blitSegment(GuiGraphicsExtractor ms, TileableTexture tt, int xpos, int ypos) {
-    ms.blit(RenderPipelines.GUI_TEXTURED, tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height(), tt.width(), tt.height());
+    ms.blit(RenderPipelines.GUI_TEXTURED, tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height(), 256, 256);
   }
 
   @Override

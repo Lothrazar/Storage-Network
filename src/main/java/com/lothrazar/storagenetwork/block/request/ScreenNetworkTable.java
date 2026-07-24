@@ -51,7 +51,7 @@ public class ScreenNetworkTable extends AbstractNetworkScreen<ContainerNetworkCr
     super.extractBackground(ms, mouseX, mouseY, partialTicks);
     int xCenter = (width - imageWidth) / 2;
     int yCenter = (height - imageHeight) / 2;
-    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+    ms.blit(RenderPipelines.GUI_TEXTURED, texture, xCenter, yCenter, 0, 0, imageWidth, imageHeight, 256, 256);
     //good stuff
     network.applySearchTextToSlots();
     network.renderItemSlots(ms, mouseX, mouseY, font);

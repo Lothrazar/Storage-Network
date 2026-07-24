@@ -115,7 +115,7 @@ public abstract class AbstractNetworkScreen<T extends AbstractContainerMenu> ext
 
   @Deprecated
   protected void blitSegment(GuiGraphicsExtractor graphics, TileableTexture tt, int xpos, int ypos) {
-    graphics.blit(RenderPipelines.GUI_TEXTURED, tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height(), tt.width(), tt.height());
+    graphics.blit(RenderPipelines.GUI_TEXTURED, tt.texture(), xpos, ypos, 0, 0, tt.width(), tt.height(), 256, 256);
   }
 
   @Override
