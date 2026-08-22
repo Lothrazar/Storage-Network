@@ -6,12 +6,8 @@
     " i "
   ],
   "key": {
-    "i": {
-      "item": "storagenetwork:kabel"
-    },
-    "m": {
-      "item": "storagenetwork:inventory_remote"
-    }
+    "i": "storagenetwork:kabel",
+    "m": "storagenetwork:inventory_remote"
   },
   "result": {
     "id": "storagenetwork:picker_remote"

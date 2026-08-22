@@ -6,15 +6,9 @@
     "iki"
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:kabel"
-    },
-    "e": {
-      "item": "minecraft:ender_eye"
-    },
-    "i": {
-      "tag": "c:ingots/copper"
-    }
+    "k": "storagenetwork:kabel",
+    "e": "minecraft:ender_eye",
+    "i": "#c:ingots/copper"
   },
   "result": {
     "id": "storagenetwork:receiver"

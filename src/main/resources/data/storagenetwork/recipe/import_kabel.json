@@ -6,12 +6,8 @@
     " k "
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:kabel"
-    },
-    "p": {
-      "item": "minecraft:hopper"
-    }
+    "k": "storagenetwork:kabel",
+    "p": "minecraft:hopper"
   },
   "result": {
     "id": "storagenetwork:import_kabel",

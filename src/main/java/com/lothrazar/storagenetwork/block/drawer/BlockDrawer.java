@@ -56,6 +56,8 @@ public class BlockDrawer extends EntityBlockFlib {
   public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
   // Imprint is stored in the BlockItem's CUSTOM_DATA under this key (Item registry name).
   public static final String NBT_LOCKED_ITEM = "drawer_locked_item";
+  // Minimum ticks between left-click extractions per player, roughly one swing cycle.
+  private static final long LEFT_CLICK_COOLDOWN_TICKS = 6L;
 
   public BlockDrawer(Identifier id) {
     super(Block.Properties.of().strength(5.0F, 1200.0F).sound(SoundType.STONE).setId(ResourceKey.create(Registries.BLOCK, id)));
@@ -154,7 +156,7 @@ public class BlockDrawer extends EntityBlockFlib {
       return InteractionResult.PASS;
     }
     if (!drawer.isConnected()) {
-      LOGGER.info("[drawer] insert skipped, not connected at {}", pos);
+//      LOGGER.debug("[drawer] insert skipped, not connected at {}", pos);
       return InteractionResult.CONSUME;
     }
     // Double-right-click within 10t with matching item -> drain ALL matching from inventory.
@@ -169,8 +171,8 @@ public class BlockDrawer extends EntityBlockFlib {
       ItemStack toInsert = held.copy();
       int remainder = drawer.insertIntoNetwork(toInsert);
       int consumed = heldBefore - remainder;
-      LOGGER.info("[drawer] insert: item={} heldBefore={} remainder={} consumed={}",
-          held.getItem(), heldBefore, remainder, consumed);
+//      LOGGER.debug("[drawer] insert: item={} heldBefore={} remainder={} consumed={}",
+//          held.getItem(), heldBefore, remainder, consumed);
       if (consumed > 0) {
         ItemStack newHeld = remainder == 0 ? ItemStack.EMPTY : held.copyWithCount(remainder);
         player.setItemInHand(hand, newHeld);
@@ -200,9 +202,12 @@ public class BlockDrawer extends EntityBlockFlib {
     return InteractionResult.CONSUME;
   }
 
-  // Left-click handler is routed through PlayerInteractEvent.LeftClickBlock so we can cancel
-  // the vanilla break sequence (no destroy particles, no crack overlay) and still run our extract.
-  // The block can still be broken by emptying its imprint first (shift-right-click empty hand).
+  // Left-click handler is routed through PlayerInteractEvent.LeftClickBlock so we can extract
+  // on a tap. Only creative mode needs the vanilla break itself canceled: a single creative
+  // click would otherwise insta-delete the whole node before extraction has a chance to run.
+  // Survival mining is slow enough (hardness-based) that we leave it completely alone here -
+  // extraction happens per-tap alongside it, and holding the click through still breaks the
+  // block normally, same as 1.21.1.
   public static void handleLeftClick(PlayerInteractEvent.LeftClickBlock event) {
     Level world = event.getLevel();
     BlockPos pos = event.getPos();
@@ -218,27 +223,38 @@ public class BlockDrawer extends EntityBlockFlib {
     if (drawer.getLockedStack().isEmpty()) {
       return;
     }
-    // Imprinted drawer: cancel break entirely, do extract once per click on server.
-    event.setCanceled(true);
     Player player = event.getEntity();
+    if (player.getAbilities().instabuild) {
+      event.setCanceled(true);
+    }
     boolean shift = player.isSecondaryUseActive();
-    // !! throttle using the player's own swing animation
-    // (~6 ticks). Each successful extract triggers swing(), so swingTime -1 or [1,6]
-    // "we just extracted, wait" - rate is naturally tied to the visual feedback.
-    if (player.swingTime != 0) {
-      return;
-    }
     if (world.isClientSide()) {
-      player.swing(event.getHand());
+      // Purely cosmetic: only swing if we're not already mid-animation, so held clicks
+      // don't spam-restart it. Not used for gating - see server-side cooldown below.
+      if (player.swingTime == 0) {
+        player.swing(event.getHand());
+      }
       return;
     }
+    // Rate-limit extraction ourselves (~6 ticks, one swing cycle) using our own per-player
+    // clock. We used to gate on vanilla player.swingTime, but that field is also mutated by
+    // the separate arm-swing network packet and proved unreliable here - it could read
+    // nonzero (even -1) on essentially every attempt, blocking extraction outright.
+    long now = world.getGameTime();
+    Long lastExtract = drawer.getLastLeftClickTick(player.getUUID());
+    if (lastExtract != null && (now - lastExtract) < LEFT_CLICK_COOLDOWN_TICKS) {
+      return;
+    }
+    drawer.setLastLeftClickTick(player.getUUID(), now);
     if (!drawer.isConnected()) {
+//      LOGGER.debug("[drawer] extract skipped, not connected at {}", pos);
       return;
     }
     int extractCount = shift
         ? drawer.getLockedStack().getMaxStackSize()
         : 1;
     ItemStack got = drawer.extractFromNetwork(extractCount);
+//    LOGGER.debug("[drawer] extract: locked={} extractCount={} got={}", drawer.getLockedStack().getItem(), extractCount, got);
     if (got.isEmpty()) {
       return;
     }

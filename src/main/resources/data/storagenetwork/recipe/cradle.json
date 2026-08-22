@@ -6,15 +6,9 @@
     "iki"
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:kabel"
-    },
-    "c": {
-      "tag": "c:chests/wooden"
-    },
-    "i": {
-      "tag": "c:nuggets/iron"
-    }
+    "k": "storagenetwork:kabel",
+    "c": "#c:chests/wooden",
+    "i": "#c:nuggets/iron"
   },
   "result": {
     "id": "storagenetwork:cradle"

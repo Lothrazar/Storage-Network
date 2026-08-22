@@ -6,12 +6,8 @@
     "sss"
   ],
   "key": {
-    "s": {
-      "item": "minecraft:stone_slab"
-    },
-    "i": {
-      "tag": "c:ingots/iron"
-    }
+    "s": "minecraft:stone_slab",
+    "i": "#c:ingots/iron"
   },
   "result": {
     "id": "storagenetwork:kabel",

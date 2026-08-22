@@ -6,21 +6,11 @@
     "cpc"
   ],
   "key": {
-    "e": {
-      "item": "minecraft:ender_eye"
-    },
-    "c": {
-      "tag": "c:storage_blocks/copper"
-    },
-    "m": {
-      "item": "storagenetwork:operation_upgrade"
-    },
-    "s": {
-      "item": "storagenetwork:stack_upgrade"
-    },
-    "p": {
-      "item": "storagenetwork:speed_upgrade"
-    }
+    "e": "minecraft:ender_eye",
+    "c": "#c:storage_blocks/copper",
+    "m": "storagenetwork:operation_upgrade",
+    "s": "storagenetwork:stack_upgrade",
+    "p": "storagenetwork:speed_upgrade"
   },
   "result": {
     "id": "storagenetwork:request_expanded"

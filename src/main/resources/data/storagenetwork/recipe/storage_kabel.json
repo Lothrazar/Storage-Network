@@ -6,12 +6,8 @@
     " k "
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:kabel"
-    },
-    "p": {
-      "tag": "c:chests/wooden"
-    }
+    "k": "storagenetwork:kabel",
+    "p": "#c:chests/wooden"
   },
   "result": {
     "id": "storagenetwork:storage_kabel",

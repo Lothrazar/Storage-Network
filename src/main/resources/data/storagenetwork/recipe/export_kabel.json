@@ -6,12 +6,8 @@
     " k "
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:kabel"
-    },
-    "p": {
-      "item": "minecraft:piston"
-    }
+    "k": "storagenetwork:kabel",
+    "p": "minecraft:piston"
   },
   "result": {
     "id": "storagenetwork:export_kabel",

@@ -6,15 +6,9 @@
     "dkd"
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:kabel"
-    },
-    "d": {
-      "tag": "c:nuggets/iron"
-    },
-    "c": {
-      "item": "minecraft:dropper"
-    }
+    "k": "storagenetwork:kabel",
+    "d": "#c:nuggets/iron",
+    "c": "minecraft:dropper"
   },
   "result": {
     "id": "storagenetwork:inventory"

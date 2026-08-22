@@ -6,12 +6,8 @@
     " k "
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:import_kabel"
-    },
-    "p": {
-      "item": "minecraft:barrel"
-    }
+    "k": "storagenetwork:import_kabel",
+    "p": "minecraft:barrel"
   },
   "result": {
     "id": "storagenetwork:import_filter_kabel",

@@ -6,15 +6,9 @@
     "dkd"
   ],
   "key": {
-    "k": {
-      "item": "minecraft:crafting_table"
-    },
-    "d": {
-      "tag": "c:ingots/gold"
-    },
-    "c": {
-      "item": "storagenetwork:inventory"
-    }
+    "k": "minecraft:crafting_table",
+    "d": "#c:ingots/gold",
+    "c": "storagenetwork:inventory"
   },
   "result": {
     "id": "storagenetwork:request"

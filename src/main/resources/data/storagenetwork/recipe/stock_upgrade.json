@@ -6,15 +6,9 @@
     " c "
   ],
   "key": {
-    "c": {
-      "tag": "c:dusts/redstone"
-    },
-    "i": {
-      "item": "storagenetwork:kabel"
-    },
-    "g": {
-      "item": "minecraft:chest"
-    }
+    "c": "#c:dusts/redstone",
+    "i": "storagenetwork:kabel",
+    "g": "minecraft:chest"
   },
   "result": {
     "id": "storagenetwork:stock_upgrade"

@@ -6,18 +6,10 @@
     "p p"
   ],
   "key": {
-    "c": {
-      "tag": "c:dusts/glowstone"
-    },
-    "i": {
-      "tag": "c:ingots/gold"
-    },
-    "m": {
-      "item": "storagenetwork:master"
-    },
-    "p": {
-      "tag": "c:slimeballs"
-    }
+    "c": "#c:dusts/glowstone",
+    "i": "#c:ingots/gold",
+    "m": "storagenetwork:master",
+    "p": "#c:slimeballs"
   },
   "result": {
     "id": "storagenetwork:inventory_remote"

@@ -6,12 +6,8 @@
     " i "
   ],
   "key": {
-    "i": {
-      "item": "storagenetwork:request"
-    },
-    "m": {
-      "item": "storagenetwork:inventory_remote"
-    }
+    "i": "storagenetwork:request",
+    "m": "storagenetwork:inventory_remote"
   },
   "result": {
     "id": "storagenetwork:builder_remote"

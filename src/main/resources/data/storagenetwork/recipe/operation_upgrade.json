@@ -6,15 +6,9 @@
     " c "
   ],
   "key": {
-    "c": {
-      "tag": "c:dusts/redstone"
-    },
-    "i": {
-      "item": "storagenetwork:kabel"
-    },
-    "g": {
-      "item": "minecraft:comparator"
-    }
+    "c": "#c:dusts/redstone",
+    "i": "storagenetwork:kabel",
+    "g": "minecraft:comparator"
   },
   "result": {
     "id": "storagenetwork:operation_upgrade"

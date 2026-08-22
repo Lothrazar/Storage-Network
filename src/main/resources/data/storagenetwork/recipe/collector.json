@@ -6,15 +6,9 @@
     "dkd"
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:speed_upgrade"
-    },
-    "d": {
-      "tag": "c:nuggets/iron"
-    },
-    "c": {
-      "item": "storagenetwork:inventory"
-    }
+    "k": "storagenetwork:speed_upgrade",
+    "d": "#c:nuggets/iron",
+    "c": "storagenetwork:inventory"
   },
   "result": {
     "id": "storagenetwork:collector"

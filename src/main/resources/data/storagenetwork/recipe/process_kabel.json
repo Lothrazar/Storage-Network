@@ -6,12 +6,8 @@
     " k "
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:export_kabel"
-    },
-    "p": {
-      "item": "minecraft:observer"
-    }
+    "k": "storagenetwork:export_kabel",
+    "p": "minecraft:observer"
   },
   "result": {
     "id": "storagenetwork:process_kabel",

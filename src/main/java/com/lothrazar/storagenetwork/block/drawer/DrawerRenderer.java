@@ -77,7 +77,7 @@ public class DrawerRenderer implements BlockEntityRenderer<TileDrawer, DrawerRen
     // Item.
     ps.pushPose();
     ps.scale(ITEM_SCALE, ITEM_SCALE, ITEM_SCALE);
-    state.item.submit(ps, submitNodeCollector, state.light, OverlayTexture.NO_OVERLAY, -1);
+    state.item.submit(ps, submitNodeCollector, state.light, OverlayTexture.NO_OVERLAY, 0);
     ps.popPose();
     // Count text below item.
     ps.pushPose();
@@ -86,7 +86,7 @@ public class DrawerRenderer implements BlockEntityRenderer<TileDrawer, DrawerRen
     Font font = Minecraft.getInstance().font;
     float halfW = font.width(state.countText) / 2.0F;
     submitNodeCollector.submitText(ps, -halfW, 0, Component.literal(state.countText).getVisualOrderText(),
-        false, Font.DisplayMode.NORMAL, state.light, 0xFFFFFF, 0, 0);
+        false, Font.DisplayMode.NORMAL, state.light, 0xFFFFFFFF, 0, 0);
     ps.popPose();
     ps.popPose();
   }

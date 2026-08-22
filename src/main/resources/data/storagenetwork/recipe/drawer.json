@@ -6,10 +6,10 @@
     "ipi"
   ],
   "key": {
-    "k": { "item": "storagenetwork:kabel" },
-    "c": { "item": "minecraft:chest" },
-    "p": { "item": "minecraft:glass_pane" },
-    "i": { "tag": "c:ingots/copper" }
+    "k": "storagenetwork:kabel",
+    "c": "minecraft:chest",
+    "p": "minecraft:glass_pane",
+    "i": "#c:ingots/copper"
   },
   "result": {
     "id": "storagenetwork:drawer"

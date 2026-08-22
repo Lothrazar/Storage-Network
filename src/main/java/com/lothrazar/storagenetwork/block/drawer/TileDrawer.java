@@ -30,6 +30,10 @@ public class TileDrawer extends TileConnectable {
   private int cachedCount = 0;
   // Transient: per-player last punch tick for double-punch detection.
   private final Map<UUID, Long> lastRightClickTick = new HashMap<>();
+  // Transient: per-player last extract tick, so left-click extraction is rate-limited by our
+  // own clock instead of vanilla swingTime (which is also mutated by the separate arm-swing
+  // packet and was found unreliable: it could read nonzero on every attempt).
+  private final Map<UUID, Long> lastLeftClickTick = new HashMap<>();
 
   public TileDrawer(BlockPos pos, BlockState state) {
     super(SsnRegistry.Tiles.DRAWER.get(), pos, state);
@@ -60,6 +64,18 @@ public class TileDrawer extends TileConnectable {
       lastRightClickTick.entrySet().removeIf(e -> (tick - e.getValue()) > 200L);
     }
     lastRightClickTick.put(id, tick);
+  }
+
+  public Long getLastLeftClickTick(UUID id) {
+    return lastLeftClickTick.get(id);
+  }
+
+  public void setLastLeftClickTick(UUID id, long tick) {
+    // Opportunistic cleanup of stale entries.
+    if (lastLeftClickTick.size() > 32) {
+      lastLeftClickTick.entrySet().removeIf(e -> (tick - e.getValue()) > 200L);
+    }
+    lastLeftClickTick.put(id, tick);
   }
 
   public boolean isConnected() {
@@ -112,24 +128,29 @@ public class TileDrawer extends TileConnectable {
   public int insertIntoNetwork(ItemStack stack) {
     TileMain main = getTileMain();
     if (main == null || stack.isEmpty()) {
-      LOGGER.info("[drawer-tile] insert aborted: main={} stackEmpty={}", main, stack.isEmpty());
+//      LOGGER.debug("[drawer-tile] insert aborted: main={} stackEmpty={}", main, stack.isEmpty());
       return stack.getCount();
     }
     int connectableCount = main.getNetwork().getConnectableSize();
     int beforeAmount = main.getNetwork().getAmount(new ItemStackMatcherDefault(stack));
     int leftover = main.insertStack(stack, false);
     int afterAmount = main.getNetwork().getAmount(new ItemStackMatcherDefault(stack));
-    LOGGER.info("[drawer-tile] insert: connectables={} beforeAmt={} leftover={} afterAmt={} masterPos={}",
-        connectableCount, beforeAmount, leftover, afterAmount, main.getBlockPos());
+//    LOGGER.debug("[drawer-tile] insert: connectables={} beforeAmt={} leftover={} afterAmt={} masterPos={}",
+//        connectableCount, beforeAmount, leftover, afterAmount, main.getBlockPos());
     return leftover;
   }
 
   public ItemStack extractFromNetwork(int count) {
     TileMain main = getTileMain();
     if (main == null || lockedStack.isEmpty() || count <= 0) {
+//      LOGGER.debug("[drawer-tile] extract aborted: main={} lockedEmpty={} count={}", main, lockedStack.isEmpty(), count);
       return ItemStack.EMPTY;
     }
-    return main.request(new ItemStackMatcherDefault(lockedStack), count, false);
+//    int networkAmountBefore = main.getNetwork().getAmount(new ItemStackMatcherDefault(lockedStack));
+    ItemStack result = main.request(new ItemStackMatcherDefault(lockedStack), count, false);
+//    LOGGER.debug("[drawer-tile] extract: locked={} count={} networkAmountBefore={} result={}",
+//        lockedStack.getItem(), count, networkAmountBefore, result);
+    return result;
   }
 
   public static void clientTick(Level level, BlockPos pos, BlockState state, TileDrawer tile) {}

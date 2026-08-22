@@ -6,15 +6,9 @@
     "dkd"
   ],
   "key": {
-    "k": {
-      "item": "storagenetwork:kabel"
-    },
-    "d": {
-      "item": "minecraft:quartz"
-    },
-    "c": {
-      "tag": "c:gems/diamond"
-    }
+    "k": "storagenetwork:kabel",
+    "d": "minecraft:quartz",
+    "c": "#c:gems/diamond"
   },
   "result": {
     "id": "storagenetwork:master"

@@ -6,18 +6,10 @@
     "p p"
   ],
   "key": {
-    "c": {
-      "item": "minecraft:ender_chest"
-    },
-    "i": {
-      "tag": "c:storage_blocks/gold"
-    },
-    "m": {
-      "item": "storagenetwork:master"
-    },
-    "p": {
-      "item": "minecraft:sea_lantern"
-    }
+    "c": "minecraft:ender_chest",
+    "i": "#c:storage_blocks/gold",
+    "m": "storagenetwork:master",
+    "p": "minecraft:sea_lantern"
   },
   "result": {
     "id": "storagenetwork:crafting_remote"
