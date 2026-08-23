@@ -26,6 +26,8 @@ public class ClientEventRegistry {
     event.registerBlockEntityRenderer(Tiles.STORAGE_KABEL.get(), CableFacadeRenderer::new);
     event.registerBlockEntityRenderer(Tiles.IMPORT_FILTER_KABEL.get(), CableFacadeRenderer::new);
     event.registerBlockEntityRenderer(Tiles.IMPORT_KABEL.get(), CableFacadeRenderer::new);
+    event.registerBlockEntityRenderer(Tiles.FILTER_KABEL.get(), CableFacadeRenderer::new);
+    event.registerBlockEntityRenderer(Tiles.PROCESS_KABEL.get(), CableFacadeRenderer::new);
     event.registerBlockEntityRenderer(Tiles.CRADLE.get(), CradleRenderer::new);
     event.registerBlockEntityRenderer(Tiles.DRAWER.get(), DrawerRenderer::new);
   }
