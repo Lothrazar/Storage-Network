@@ -98,7 +98,7 @@ public class ScreenCableFilter extends AbstractContainerScreen<ContainerCableFil
     ms.text(font, String.valueOf(priority),
         50 - font.width(String.valueOf(priority)) / 2,
         12,
-        4210752);
+        0xFFFFFFFF);
     this.drawTooltips(ms, mouseX, mouseY);
   }
 

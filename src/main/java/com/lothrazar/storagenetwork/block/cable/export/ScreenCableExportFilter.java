@@ -120,7 +120,7 @@ public class ScreenCableExportFilter extends AbstractContainerScreen<ContainerCa
     ms.text(font, String.valueOf(priority),
         50 - font.width(String.valueOf(priority)) / 2,
         12,
-        4210752);
+        0xFFFFFFFF);
     if (btnOperationToggle != null && this.isOperationMode()) {
       OpCompareType t = OpCompareType.get(containerCableLink.cap.operationType);
       btnOperationToggle.setMessage(Component.literal(t.symbol()));

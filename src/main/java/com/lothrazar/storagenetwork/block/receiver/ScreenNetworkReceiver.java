@@ -48,16 +48,16 @@ public class ScreenNetworkReceiver extends AbstractContainerScreen<ContainerNetw
     int x = leftPos + 8;
     int y = topPos + 18;
     if (!tile.isBound()) {
-      ms.text(font, Component.translatable("screen.storagenetwork.receiver.unbound").withStyle(ChatFormatting.GRAY), x, y, 0xFFFFFF, false);
+      ms.text(font, Component.translatable("screen.storagenetwork.receiver.unbound").withStyle(ChatFormatting.GRAY), x, y, 0xFFFFFFFF, false);
       return;
     }
     DimPos m = tile.getBoundMaster();
     Component status = menu.isActiveSynced()
         ? Component.translatable("screen.storagenetwork.receiver.active").withStyle(ChatFormatting.GREEN)
         : Component.translatable("screen.storagenetwork.receiver.dormant").withStyle(ChatFormatting.YELLOW);
-    ms.text(font, status, x, y, 0xFFFFFF, false);
+    ms.text(font, status, x, y, 0xFFFFFFFF, false);
     if (m != null) {
-      ms.text(font, m.makeTooltip(), x, y + 40, 0xFFFFFF, false);
+      ms.text(font, m.makeTooltip(), x, y + 40, 0xFFFFFFFF, false);
     }
   }
 

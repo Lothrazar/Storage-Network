@@ -104,7 +104,8 @@ public class ItemCollector extends ItemFlib {
   }
   private static boolean isEnabled(ItemStack collectorStack) {
     CustomData customData = collectorStack.get(DataComponents.CUSTOM_DATA);
-    return customData != null && customData.copyTag().getBooleanOr(NBT_ENABLED, false);
+    // Default to enabled for a fresh stack (no CUSTOM_DATA / no NBT_ENABLED entry yet).
+    return customData == null || customData.copyTag().getBooleanOr(NBT_ENABLED, true);
   }
 
   @Override
